@@ -1,0 +1,12 @@
+create table contacts (id uuid not null, name varchar(140) not null, primary key (id));
+create table phone_numbers (contact_id uuid not null, phone_number varchar(20), type varchar(15) not null, primary key (contact_id, type));
+alter table if exists phone_numbers add constraint FKhltfbxewqsautwqsdajcgo447 foreign key (contact_id) references contacts;
+create table contacts (id uuid not null, name varchar(140) not null, primary key (id));
+create table phone_numbers (contact_id uuid not null, phone_number varchar(20), type varchar(15) not null, primary key (contact_id, type));
+alter table if exists phone_numbers add constraint FKhltfbxewqsautwqsdajcgo447 foreign key (contact_id) references contacts;
+create table contacts (id uuid not null, name varchar(140) not null, primary key (id));
+create table phone_numbers (contact_id uuid not null, phone_number varchar(20), type varchar(15) not null, primary key (contact_id, type));
+alter table if exists phone_numbers add constraint FKhltfbxewqsautwqsdajcgo447 foreign key (contact_id) references contacts;
+create table contacts (id uuid not null, name varchar(140) not null, primary key (id));
+create table phone_numbers (type varchar(15) not null, contact_id uuid not null, phone_number varchar(20), primary key (type, contact_id));
+alter table if exists phone_numbers add constraint FKhltfbxewqsautwqsdajcgo447 foreign key (contact_id) references contacts;
