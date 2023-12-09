@@ -6,7 +6,15 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database: POSTGRESQL
     show-sql: true
+    generate-ddl: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
+    open-in-view: false
+
+  sql:
+    init:
+      mode: ALWAYS
+      schema-locations:
+        - classpath:schema.sql
