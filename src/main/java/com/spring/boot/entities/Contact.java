@@ -1,6 +1,7 @@
 package com.spring.boot.entities;
 
 import com.spring.boot.entities.embeddables.Address;
+import com.spring.boot.entities.projections.ContactSummary;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -73,5 +74,9 @@ public class Contact {
 
     public void putAddress(final String type, final Address address) {
         addressMap.put(type, Objects.requireNonNull(address));
+    }
+
+    public ContactSummary toContactSummary() {
+        return new ContactSummary(this);
     }
 }
