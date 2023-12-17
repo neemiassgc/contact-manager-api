@@ -9,6 +9,7 @@ import java.util.Map;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@Builder
 public final class ContactSummary {
 
     private final String name;
