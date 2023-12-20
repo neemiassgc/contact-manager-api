@@ -79,4 +79,14 @@ public class Contact {
     public ContactSummary toContactSummary() {
         return new ContactSummary(this);
     }
+
+    public static Contact toContact(final ContactSummary contactSummary, final User user) {
+        final Contact newContact = new Contact();
+        newContact.setUser(user);
+        newContact.setName(newContact.getName());
+        contactSummary.getPhoneNumberMap().forEach(newContact::putPhoneNumber);
+        contactSummary.getEmailMap().forEach(newContact::putEmail);
+        contactSummary.getAddressMap().forEach(newContact::putAddress);
+        return newContact;
+    }
 }
