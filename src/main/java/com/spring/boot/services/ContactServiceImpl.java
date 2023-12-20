@@ -45,4 +45,9 @@ public class ContactServiceImpl implements ContactService {
     public void update(Contact contact) {
         save(contact);
     }
+
+    @Override
+    public void deleteById(UUID id) {
+        contactRepository.deleteById(id);
+    }
 }
