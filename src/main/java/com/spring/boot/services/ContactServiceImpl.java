@@ -35,4 +35,9 @@ public class ContactServiceImpl implements ContactService {
            .map(Contact::toContactSummary)
            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "contact not found"));
     }
+
+    @Override
+    public void save(Contact contact) {
+        contactRepository.save(contact);
+    }
 }
