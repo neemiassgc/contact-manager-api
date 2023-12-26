@@ -17,4 +17,7 @@ spring:
     init:
       mode: ALWAYS
       schema-locations:
-        - classpath:schema.sql
+        - classpath:sql/schema.sql
+
+  profiles:
+    active: test
