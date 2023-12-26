@@ -1,0 +1,6 @@
+spring:
+  sql:
+    init:
+      data-locations:
+        - classpath:sql/exclusion-of-rows.sql
+        - classpath:sql/data-dev.sql
