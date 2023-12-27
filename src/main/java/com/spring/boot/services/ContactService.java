@@ -7,9 +7,9 @@ import java.util.UUID;
 
 public interface ContactService {
 
-    List<Contact> getAll();
+    List<Contact> fetchAll();
 
-    Contact getById(UUID id);
+    Contact fetchById(UUID id);
 
     void save(Contact contact);
 

@@ -1,7 +1,6 @@
 package com.spring.boot.services;
 
 import com.spring.boot.entities.Contact;
-import com.spring.boot.entities.projections.ContactSummary;
 import com.spring.boot.repositories.ContactRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,7 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -26,12 +24,12 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public List<Contact> getAll() {
-        return contactRepository.getAll();
+    public List<Contact> fetchAll() {
+        return contactRepository.fetchAll();
     }
 
     @Override
-    public Contact getById(UUID id) {
+    public Contact fetchById(UUID id) {
        return contactRepository.findById(id)
            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "contact not found"));
     }
