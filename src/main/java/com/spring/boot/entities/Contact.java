@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -88,5 +89,9 @@ public class Contact {
         contactSummary.getEmailMap().forEach(newContact::putEmail);
         contactSummary.getAddressMap().forEach(newContact::putAddress);
         return newContact;
+    }
+
+    public static List<ContactSummary> toListOfContactSummary(final List<Contact> contacts) {
+        return contacts.stream().map(Contact::toContactSummary).collect(Collectors.toList());
     }
 }
