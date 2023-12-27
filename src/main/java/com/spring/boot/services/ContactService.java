@@ -17,4 +17,6 @@ public interface ContactService {
     void update(Contact contact);
 
     void deleteById(UUID id);
+
+    List<Contact> findAllByUserId(UUID id);
 }
