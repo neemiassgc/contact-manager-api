@@ -21,6 +21,11 @@ public class ContactServiceImpl implements ContactService {
     private ContactRepository contactRepository;
 
     @Override
+    public List<Contact> findAllByUserId(UUID id) {
+        return contactRepository.findAllByUserId(id);
+    }
+
+    @Override
     public List<ContactSummary> getAll() {
         return contactRepository
             .getAll()
