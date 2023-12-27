@@ -26,18 +26,13 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public List<ContactSummary> getAll() {
-        return contactRepository
-            .getAll()
-            .stream()
-            .map(Contact::toContactSummary)
-            .collect(Collectors.toList());
+    public List<Contact> getAll() {
+        return contactRepository.getAll();
     }
 
     @Override
-    public ContactSummary getById(UUID id) {
+    public Contact getById(UUID id) {
        return contactRepository.findById(id)
-           .map(Contact::toContactSummary)
            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "contact not found"));
     }
 
