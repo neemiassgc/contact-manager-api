@@ -5,14 +5,17 @@ import com.spring.boot.entities.embeddables.Address;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 @SpringBootTest
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -62,6 +65,19 @@ public class ContactServiceIT {
         final List<Contact> listOfContacts = contactService.findAllByUserId(userUUID);
 
         assertThat(listOfContacts).isEmpty();
+    }
+
+    @Test
+    void should_throw_an_error_when_a_contact_is_not_found() {
+        final UUID contactUUID = UUID.randomUUID();
+        final Throwable throwable = catchThrowable(() -> contactService.fetchById(contactUUID));
+
+        assertThat(throwable).isNotNull();
+        assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+        assertThat((ResponseStatusException)throwable).satisfies(rse -> {
+            assertThat(rse.getReason()).isEqualTo("Contact not found");
+            assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        });
     }
 
     @Test
