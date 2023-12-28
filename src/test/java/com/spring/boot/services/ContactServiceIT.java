@@ -5,6 +5,7 @@ import com.spring.boot.entities.embeddables.Address;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@Transactional
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
 public class ContactServiceIT {
 
     @Autowired
@@ -53,6 +54,14 @@ public class ContactServiceIT {
             assertThat(addressMap.keySet()).containsOnly("home", "work");
             assertThat(addressMap.values()).extracting(Address::getCity).containsOnly("Abiko-shi", "Rankoshi-cho Isoya-gun");
         });
+    }
+
+    @Test
+    void should_return_an_empty_list_of_contacts_for_a_user_that_does_not_exist() {
+        final UUID userUUID = UUID.randomUUID();
+        final List<Contact> listOfContacts = contactService.findAllByUserId(userUUID);
+
+        assertThat(listOfContacts).isEmpty();
     }
 
     @Test
