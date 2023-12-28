@@ -1,14 +1,17 @@
 package com.spring.boot.services;
 
 import com.spring.boot.entities.Contact;
-import static org.assertj.core.api.Assertions.*;
+import com.spring.boot.entities.embeddables.Address;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
@@ -27,6 +30,30 @@ public class ContactServiceIT {
             .containsExactly("Best friend Julia", "Mom", "Pizza and burgers", "Uncle Jeff");
     }
 
+    @Test
+    void should_get_a_contact_and_all_its_details_successfully() {
+        final UUID gregFromAccountingContactId = UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167");
+        final Contact contact = contactService.fetchById(gregFromAccountingContactId);
+
+        assertThat(contact).isNotNull();
+        assertThat(contact).extracting(Contact::getName).isEqualTo("Greg from accounting");
+        assertThat(contact).extracting(Contact::getPhoneNumberMap).satisfies(phoneNumberMap -> {
+            assertThat(phoneNumberMap).isNotNull();
+            assertThat(phoneNumberMap).hasSize(1);
+            assertThat(phoneNumberMap).containsOnly(Map.entry("home", "+359(26)5948-0427"));
+        });
+        assertThat(contact).extracting(Contact::getEmailMap).satisfies(emailMap -> {
+            assertThat(emailMap).isNotNull();
+            assertThat(emailMap).hasSize(1);
+            assertThat(emailMap).containsOnly(Map.entry("main", "sailor.greg99@hotmail.co.jp"));
+        });
+        assertThat(contact).extracting(Contact::getAddressMap).satisfies(addressMap -> {
+            assertThat(addressMap).isNotNull();
+            assertThat(addressMap).hasSize(2);
+            assertThat(addressMap.keySet()).containsOnly("home", "work");
+            assertThat(addressMap.values()).extracting(Address::getCity).containsOnly("Abiko-shi", "Rankoshi-cho Isoya-gun");
+        });
+    }
 
     @Test
     void should_save_a_contact_successfully() {
