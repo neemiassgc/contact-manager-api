@@ -30,7 +30,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public Contact fetchById(UUID id) {
-       return contactRepository.findById(id)
+       return contactRepository.fetchById(id)
            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "contact not found"));
     }
 
