@@ -13,7 +13,7 @@ import java.util.UUID;
 @Repository
 public interface ContactRepository extends JpaRepository<Contact, UUID> {
 
-    @Query("select c, p, e, a from Contact c join fetch c.phoneNumberMap p join fetch c.emailMap e join fetch addressMap a")
+    @Query("select c from Contact c join fetch c.phoneNumberMap p join fetch c.emailMap e join fetch addressMap a")
     List<Contact> fetchAll();
 
     @Query("select c from Contact c join fetch c.phoneNumberMap p join fetch c.emailMap e join fetch addressMap a where c.id = :id")
