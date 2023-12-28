@@ -25,6 +25,16 @@ public class ContactServiceIT {
     private ContactService contactService;
 
     @Test
+    void should_return_all_of_the_contacts_available() {
+        List<Contact> contactList = contactService.fetchAll();
+
+        assertThat(contactList).hasSize(7);
+        assertThat(contactList).extracting(Contact::getPhoneNumberMap).flatMap(Map::values).hasSize(12);
+        assertThat(contactList).extracting(Contact::getAddressMap).flatMap(Map::values).hasSize(11);
+        assertThat(contactList).extracting(Contact::getEmailMap).flatMap(Map::values).hasSize(10);
+    }
+
+    @Test
     void should_return_all_the_contacts_for_a_given_user() {
         final UUID robertUserId = UUID.fromString("773d20b6-bbf1-4c10-b743-5e7b693ef3ee");
         final List<Contact> listOfContacts = contactService.findAllByUserId(robertUserId);
