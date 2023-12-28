@@ -16,7 +16,7 @@ public interface ContactRepository extends JpaRepository<Contact, UUID> {
     @Query("select c, p, e, a from Contact c join fetch c.phoneNumberMap p join fetch c.emailMap e join fetch addressMap a")
     List<Contact> fetchAll();
 
-    @Query("select c, p, e, a from Contact c join fetch c.phoneNumberMap p join fetch c.emailMap e join fetch addressMap a where c.id = :id")
+    @Query("select c from Contact c join fetch c.phoneNumberMap p join fetch c.emailMap e join fetch addressMap a where c.id = :id")
     Optional<Contact> fetchById(@Param("id") UUID id);
 
     List<Contact> findAllByUserId(UUID id);
