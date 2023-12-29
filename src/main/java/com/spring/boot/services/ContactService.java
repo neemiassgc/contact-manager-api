@@ -11,7 +11,7 @@ public interface ContactService {
 
     Contact fetchById(UUID id);
 
-    void save(Contact contact);
+    void saveWithUser(Contact contact, String username);
 
     void update(Contact contact);
 

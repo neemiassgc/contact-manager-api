@@ -1,6 +1,7 @@
 package com.spring.boot.services;
 
 import com.spring.boot.entities.Contact;
+import com.spring.boot.entities.User;
 import com.spring.boot.repositories.ContactRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,9 @@ public class ContactServiceImpl implements ContactService {
     @Autowired
     private ContactRepository contactRepository;
 
+    @Autowired
+    private UserService userService;
+
     @Override
     public List<Contact> findAllByUserId(UUID id) {
         return contactRepository.findAllByUserId(id);
@@ -31,17 +35,19 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public Contact fetchById(UUID id) {
        return contactRepository.fetchById(id)
-           .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "contact not found"));
+           .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
     }
 
     @Override
-    public void save(Contact contact) {
+    public void saveWithUser(final Contact contact, final String username) {
+        final User user = userService.findByUsername(username);
+        contact.setUser(user);
         contactRepository.save(contact);
     }
 
     @Override
     public void update(Contact contact) {
-        save(contact);
+        contactRepository.save(contact);
     }
 
     @Override
