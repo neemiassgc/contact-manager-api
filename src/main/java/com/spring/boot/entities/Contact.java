@@ -44,13 +44,17 @@ public class Contact {
     private final Map<String, Address> addressMap = new HashMap<>();
 
     @JoinColumn(name = "user_id")
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @Setter
     private User user;
 
     public Contact(final String name, final User user) {
-        this.name = name;
+        this(name);
         this.user = user;
+    }
+
+    public Contact(final String name) {
+        this.name = name;
     }
 
     public Map<String, String> getPhoneNumberMap() {
