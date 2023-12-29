@@ -24,6 +24,9 @@ public class ContactServiceIT {
     @Autowired
     private ContactService contactService;
 
+    @Autowired
+    private UserService userService;
+
     @Test
     void should_return_all_of_the_contacts_available() {
         List<Contact> contactList = contactService.fetchAll();
@@ -91,7 +94,25 @@ public class ContactServiceIT {
     }
 
     @Test
-    void should_save_a_contact_successfully() {
+    void should_save_a_new_contact_successfully() {
+        final Contact newContact = new Contact("boss");
+        newContact.putPhoneNumber("office", "+1(57)8131-9975");
+        newContact.putEmail("business", "main.contact@company.com");
+        final Address companyAddress = Address.builder()
+            .country("US")
+            .street("1767 Heavner Avenue")
+            .state("Georgia")
+            .city("Carrollton")
+            .zipcode("30117")
+            .build();
+        newContact.putAddress("work", companyAddress);
 
+        contactService.saveWithUser(newContact, "robert");
+
+        final List<Contact> listOfContacts = contactService.fetchAll();
+        assertThat(listOfContacts).hasSize(8);
+        assertThat(listOfContacts).extracting(Contact::getPhoneNumberMap).flatMap(Map::values).hasSize(13);
+        assertThat(listOfContacts).extracting(Contact::getAddressMap).flatMap(Map::values).hasSize(12);
+        assertThat(listOfContacts).extracting(Contact::getEmailMap).flatMap(Map::values).hasSize(11);
     }
 }
