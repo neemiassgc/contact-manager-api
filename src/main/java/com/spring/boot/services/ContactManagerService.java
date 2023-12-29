@@ -5,7 +5,7 @@ import com.spring.boot.entities.Contact;
 import java.util.List;
 import java.util.UUID;
 
-public interface ContactService {
+public interface ContactManagerService {
 
     List<Contact> fetchAll();
 

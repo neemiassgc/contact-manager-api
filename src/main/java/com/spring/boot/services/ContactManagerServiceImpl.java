@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Service
 @Transactional
-public class ContactServiceImpl implements ContactService {
+public class ContactManagerServiceImpl implements ContactManagerService {
 
     @Autowired
     private ContactRepository contactRepository;

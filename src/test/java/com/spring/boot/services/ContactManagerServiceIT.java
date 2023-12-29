@@ -19,17 +19,17 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 
 @SpringBootTest
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-public class ContactServiceIT {
+public class ContactManagerServiceIT {
 
     @Autowired
-    private ContactService contactService;
+    private ContactManagerService contactManagerService;
 
     @Autowired
     private UserService userService;
 
     @Test
     void should_return_all_of_the_contacts_available() {
-        List<Contact> contactList = contactService.fetchAll();
+        List<Contact> contactList = contactManagerService.fetchAll();
 
         assertThat(contactList).hasSize(7);
         assertThat(contactList).extracting(Contact::getPhoneNumberMap).flatMap(Map::values).hasSize(12);
@@ -40,7 +40,7 @@ public class ContactServiceIT {
     @Test
     void should_return_all_the_contacts_for_a_given_user() {
         final UUID robertUserId = UUID.fromString("773d20b6-bbf1-4c10-b743-5e7b693ef3ee");
-        final List<Contact> listOfContacts = contactService.findAllByUserId(robertUserId);
+        final List<Contact> listOfContacts = contactManagerService.findAllByUserId(robertUserId);
 
         assertThat(listOfContacts).hasSize(4);
         assertThat(listOfContacts).extracting(Contact::getName)
@@ -50,7 +50,7 @@ public class ContactServiceIT {
     @Test
     void should_get_a_contact_and_all_its_details_successfully() {
         final UUID gregFromAccountingContactId = UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167");
-        final Contact contact = contactService.fetchById(gregFromAccountingContactId);
+        final Contact contact = contactManagerService.fetchById(gregFromAccountingContactId);
 
         assertThat(contact).isNotNull();
         assertThat(contact).extracting(Contact::getName).isEqualTo("Greg from accounting");
@@ -75,7 +75,7 @@ public class ContactServiceIT {
     @Test
     void should_return_an_empty_list_of_contacts_for_a_user_that_does_not_exist() {
         final UUID userUUID = UUID.randomUUID();
-        final List<Contact> listOfContacts = contactService.findAllByUserId(userUUID);
+        final List<Contact> listOfContacts = contactManagerService.findAllByUserId(userUUID);
 
         assertThat(listOfContacts).isEmpty();
     }
@@ -83,7 +83,7 @@ public class ContactServiceIT {
     @Test
     void should_throw_an_error_when_a_contact_is_not_found() {
         final UUID contactUUID = UUID.randomUUID();
-        final Throwable throwable = catchThrowable(() -> contactService.fetchById(contactUUID));
+        final Throwable throwable = catchThrowable(() -> contactManagerService.fetchById(contactUUID));
 
         assertThat(throwable).isNotNull();
         assertThat(throwable).isInstanceOf(ResponseStatusException.class);
@@ -107,9 +107,9 @@ public class ContactServiceIT {
             .build();
         newContact.putAddress("work", companyAddress);
 
-        contactService.saveWithUser(newContact, "robert");
+        contactManagerService.saveWithUser(newContact, "robert");
 
-        final List<Contact> listOfContacts = contactService.fetchAll();
+        final List<Contact> listOfContacts = contactManagerService.fetchAll();
         assertThat(listOfContacts).hasSize(8);
         assertThat(listOfContacts).extracting(Contact::getPhoneNumberMap).flatMap(Map::values).hasSize(13);
         assertThat(listOfContacts).extracting(Contact::getAddressMap).flatMap(Map::values).hasSize(12);
