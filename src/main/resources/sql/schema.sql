@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS users (
     user_id UUID PRIMARY KEY,
-    username VARCHAR(20) NOT NULL UNIQUE
+    username VARCHAR(20) NOT NULL UNIQUE,
+    avatar_uri VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS contacts (

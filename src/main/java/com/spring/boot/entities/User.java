@@ -24,6 +24,8 @@ public class User {
     @Setter
     private String username;
 
+    private String avatarUri;
+
     public User(final String username) {
         this.username = username;
     }
