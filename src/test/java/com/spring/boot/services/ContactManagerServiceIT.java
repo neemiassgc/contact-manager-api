@@ -14,8 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -112,5 +111,22 @@ public class ContactManagerServiceIT {
         assertThat(listOfContacts).extracting(Contact::getPhoneNumberMap).flatMap(Map::values).hasSize(13);
         assertThat(listOfContacts).extracting(Contact::getAddressMap).flatMap(Map::values).hasSize(12);
         assertThat(listOfContacts).extracting(Contact::getEmailMap).flatMap(Map::values).hasSize(11);
+    }
+
+    @Test
+    void should_throw_an_error_when_creating_a_new_contact_if_any_field_is_missing_to_set() {
+        final Contact newContact = new Contact("Aunt Julia");
+        newContact.putPhoneNumber("home", "+1(61)7982-7401");
+        newContact.putPhoneNumber("new", "juliaandherself.1@gmail.com");
+        final Address homeAddress = Address.builder()
+            .country("US")
+            .street("456 Roosevelt Street")
+            .city("San Francisco")
+            .zipcode("94124")
+            .build();
+        newContact.putAddress("home", homeAddress);
+
+        assertThatThrownBy(() -> contactManagerService.saveWithUser(newContact, "joe"))
+            .isNotNull();
     }
 }
