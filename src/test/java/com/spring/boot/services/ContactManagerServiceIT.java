@@ -39,8 +39,7 @@ public class ContactManagerServiceIT {
 
     @Test
     void should_return_all_the_contacts_for_a_given_user() {
-        final UUID robertUserId = UUID.fromString("773d20b6-bbf1-4c10-b743-5e7b693ef3ee");
-        final List<Contact> listOfContacts = contactManagerService.findAllByUserId(robertUserId);
+        final List<Contact> listOfContacts = contactManagerService.fetchAllByUsername("robert");
 
         assertThat(listOfContacts).hasSize(4);
         assertThat(listOfContacts).extracting(Contact::getName)
@@ -74,8 +73,7 @@ public class ContactManagerServiceIT {
 
     @Test
     void should_return_an_empty_list_of_contacts_for_a_user_that_does_not_exist() {
-        final UUID userUUID = UUID.randomUUID();
-        final List<Contact> listOfContacts = contactManagerService.findAllByUserId(userUUID);
+        final List<Contact> listOfContacts = contactManagerService.fetchAllByUsername("Lorena");
 
         assertThat(listOfContacts).isEmpty();
     }

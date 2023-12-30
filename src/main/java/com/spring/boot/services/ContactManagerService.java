@@ -17,5 +17,5 @@ public interface ContactManagerService {
 
     void deleteById(UUID id);
 
-    List<Contact> findAllByUserId(UUID id);
+    List<Contact> fetchAllByUsername(String username);
 }

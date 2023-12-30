@@ -23,8 +23,8 @@ public class ContactManagerServiceImpl implements ContactManagerService {
     private UserService userService;
 
     @Override
-    public List<Contact> findAllByUserId(UUID id) {
-        return contactRepository.findAllByUserId(id);
+    public List<Contact> fetchAllByUsername(String username) {
+        return contactRepository.findAllByUsername(username);
     }
 
     @Override
