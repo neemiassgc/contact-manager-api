@@ -98,4 +98,11 @@ public class Contact {
     public static List<ContactSummary> toListOfContactSummary(final List<Contact> contacts) {
         return contacts.stream().map(Contact::toContactSummary).collect(Collectors.toList());
     }
+
+    public void merge(final Contact contactToMerge) {
+        if (Objects.nonNull(contactToMerge.getName())) setName(contactToMerge.getName());
+        if (Objects.nonNull(contactToMerge.getPhoneNumberMap())) setPhoneNumberMap(contactToMerge.getPhoneNumberMap());
+        if (Objects.nonNull(contactToMerge.getEmailMap())) setEmailMap(contactToMerge.getEmailMap());
+        if (Objects.nonNull(contactToMerge.getAddressMap())) setAddressMap(contactToMerge.getAddressMap());
+    }
 }
