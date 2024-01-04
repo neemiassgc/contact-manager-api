@@ -3,6 +3,7 @@ package com.spring.boot.entities;
 import com.spring.boot.entities.embeddables.Address;
 import com.spring.boot.entities.projections.ContactSummary;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 @Entity
 @Getter
+@Setter(AccessLevel.PRIVATE)
 @Table(name = "contacts")
 @NoArgsConstructor
 public class Contact {
@@ -20,32 +22,32 @@ public class Contact {
     @Id
     @UuidGenerator
     @Column(name = "contact_id")
+    @Setter(AccessLevel.NONE)
     private UUID id;
 
     @Column(nullable = false, length = 140)
-    @Setter
     private String name;
 
     @ElementCollection
     @CollectionTable(name = "phone_numbers", joinColumns = @JoinColumn(name = "contact_id"))
     @MapKeyColumn(name = "type", length = 15)
     @Column(name = "phone_number", length = 20)
-    private final Map<String, String> phoneNumberMap = new HashMap<>();
+    private Map<String, String> phoneNumberMap = new HashMap<>();
 
     @ElementCollection
     @CollectionTable(name = "emails", joinColumns = @JoinColumn(name = "contact_id"))
     @MapKeyColumn(name = "type", length = 15)
     @Column(name = "email", length = 20)
-    private final Map<String, String> emailMap = new HashMap<>();
+    private Map<String, String> emailMap = new HashMap<>();
 
     @ElementCollection
     @CollectionTable(name = "addresses",  joinColumns = @JoinColumn(name = "contact_id"))
     @MapKeyColumn(name = "type", length = 15)
-    private final Map<String, Address> addressMap = new HashMap<>();
+    private Map<String, Address> addressMap = new HashMap<>();
 
     @JoinColumn(name = "user_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    @Setter
+    @Setter(AccessLevel.PUBLIC)
     private User user;
 
     public Contact(final String name, final User user) {
@@ -55,6 +57,11 @@ public class Contact {
 
     public Contact(final String name) {
         this.name = name;
+    }
+
+    public Contact(final String name, final UUID id) {
+        this.name = name;
+        this.id = id;
     }
 
     public Map<String, String> getPhoneNumberMap() {
