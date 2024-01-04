@@ -129,4 +129,21 @@ public class ContactManagerServiceIT {
         assertThatThrownBy(() -> contactManagerService.saveWithUser(newContact, "joe"))
             .isNotNull();
     }
+
+    @Test
+    void should_update_a_contact_successfully() {
+        final Contact contactToBeMerged = new Contact("Greg from accouting", UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"));
+        contactToBeMerged.putPhoneNumber("office", "+359(26)5948-0427");
+        contactToBeMerged.putEmail("main", "gregfromaccouting@hotmail.co.jp");
+        final Address homeAddress = Address.builder()
+            .street("343-1199, Tennodai")
+            .country("Japan")
+            .city("Abiko-shi")
+            .state("Chiba")
+            .zipcode("02169")
+            .build();
+        contactToBeMerged.putAddress("home", homeAddress);
+        
+        contactManagerService.update(contactToBeMerged);
+    }
 }
