@@ -1,5 +1,6 @@
 package com.spring.boot.services;
 
+import com.spring.boot.TestResources;
 import com.spring.boot.entities.Contact;
 import com.spring.boot.entities.embeddables.Address;
 import org.junit.jupiter.api.Test;
@@ -149,5 +150,18 @@ public class ContactManagerServiceIT {
         final Contact contactFromStorage = contactManagerService.fetchById(latestContact.getId());
 
         assertThat(latestContact.equals(contactFromStorage)).isTrue();
+    }
+
+    @Test
+    void should_throw_an_exception_when_it_is_tried_to_update_a_contact_that_does_not_exist() {
+        final Contact nonExistingContact = TestResources.getFirstContact();
+        final Throwable throwable = catchThrowable(() -> contactManagerService.update(nonExistingContact));
+
+        assertThat(throwable).isNotNull();
+        assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+        assertThat((ResponseStatusException)throwable).satisfies(rse -> {
+            assertThat(rse.getReason()).isEqualTo("Contact not found");
+            assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        });
     }
 }
