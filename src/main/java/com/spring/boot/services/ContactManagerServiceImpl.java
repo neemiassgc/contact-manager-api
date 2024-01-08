@@ -62,17 +62,7 @@ public class ContactManagerServiceImpl implements ContactManagerService {
     }
 
     @Override
-    public boolean existsByid(UUID uuid) {
-        return contactRepository.existsByid(uuid);
-    }
-
-    @Override
     public void deleteAll() {
         contactRepository.deleteAll();
-    }
-
-    @Override
-    public long count() {
-        return contactRepository.count();
     }
 }

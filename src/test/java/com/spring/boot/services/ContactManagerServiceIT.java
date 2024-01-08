@@ -171,11 +171,9 @@ public class ContactManagerServiceIT {
         contactManagerService.deleteById(targetUuid);
 
         final Throwable throwable = catchThrowable(() -> contactManagerService.findById(targetUuid));
-        final long count = contactManagerService.count();
-        final boolean isStored = contactManagerService.existsByid(targetUuid);
+        final long count = contactManagerService.findAll().size();
 
         assertThat(throwable).isNotNull();
         assertThat(count).isEqualTo(6);
-        assertThat(isStored).isFalse();
     }
 }

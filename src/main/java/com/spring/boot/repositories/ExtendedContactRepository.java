@@ -12,8 +12,6 @@ public interface ExtendedContactRepository {
 
     void save(Contact contact);
 
-    boolean existsByid(UUID uuid);
-
     @Query("select c from Contact c join fetch c.phoneNumberMap p join fetch c.emailMap e join fetch addressMap a")
     List<Contact> findAll();
 
@@ -25,6 +23,4 @@ public interface ExtendedContactRepository {
     void deleteById(@Param("id") UUID uuid);
 
     void deleteAll();
-
-    long count();
 }
