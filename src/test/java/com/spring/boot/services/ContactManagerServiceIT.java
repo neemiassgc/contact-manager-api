@@ -29,7 +29,7 @@ public class ContactManagerServiceIT {
 
     @Test
     void should_return_all_of_the_contacts_available() {
-        List<Contact> contactList = contactManagerService.fetchAll();
+        List<Contact> contactList = contactManagerService.findAll();
 
         assertThat(contactList).hasSize(7);
         assertThat(contactList).extracting(Contact::getPhoneNumberMap).flatMap(Map::values).hasSize(12);
@@ -39,7 +39,7 @@ public class ContactManagerServiceIT {
 
     @Test
     void should_return_all_the_contacts_for_a_given_user() {
-        final List<Contact> listOfContacts = contactManagerService.fetchAllByUsername("robert");
+        final List<Contact> listOfContacts = contactManagerService.findAllByUsername("robert");
 
         assertThat(listOfContacts).hasSize(4);
         assertThat(listOfContacts).extracting(Contact::getName)
@@ -49,7 +49,7 @@ public class ContactManagerServiceIT {
     @Test
     void should_get_a_contact_and_all_its_details_successfully() {
         final UUID gregFromAccountingContactId = UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167");
-        final Contact contact = contactManagerService.fetchById(gregFromAccountingContactId);
+        final Contact contact = contactManagerService.findById(gregFromAccountingContactId);
 
         assertThat(contact).isNotNull();
         assertThat(contact).extracting(Contact::getName).isEqualTo("Greg from accounting");
@@ -73,7 +73,7 @@ public class ContactManagerServiceIT {
 
     @Test
     void should_return_an_empty_list_of_contacts_for_a_user_that_does_not_exist() {
-        final List<Contact> listOfContacts = contactManagerService.fetchAllByUsername("Lorena");
+        final List<Contact> listOfContacts = contactManagerService.findAllByUsername("Lorena");
 
         assertThat(listOfContacts).isEmpty();
     }
@@ -81,7 +81,7 @@ public class ContactManagerServiceIT {
     @Test
     void should_throw_an_error_when_a_contact_is_not_found() {
         final UUID contactUUID = UUID.randomUUID();
-        final Throwable throwable = catchThrowable(() -> contactManagerService.fetchById(contactUUID));
+        final Throwable throwable = catchThrowable(() -> contactManagerService.findById(contactUUID));
 
         assertThat(throwable).isNotNull();
         assertThat(throwable).isInstanceOf(ResponseStatusException.class);
@@ -107,7 +107,7 @@ public class ContactManagerServiceIT {
 
         contactManagerService.saveWithUser(newContact, "robert");
 
-        final List<Contact> listOfContacts = contactManagerService.fetchAll();
+        final List<Contact> listOfContacts = contactManagerService.findAll();
         assertThat(listOfContacts).hasSize(8);
         assertThat(listOfContacts).extracting(Contact::getPhoneNumberMap).flatMap(Map::values).hasSize(13);
         assertThat(listOfContacts).extracting(Contact::getAddressMap).flatMap(Map::values).hasSize(12);
@@ -147,7 +147,7 @@ public class ContactManagerServiceIT {
         
         contactManagerService.update(latestContact);
 
-        final Contact contactFromStorage = contactManagerService.fetchById(latestContact.getId());
+        final Contact contactFromStorage = contactManagerService.findById(latestContact.getId());
 
         assertThat(latestContact.equals(contactFromStorage)).isTrue();
     }
@@ -163,5 +163,19 @@ public class ContactManagerServiceIT {
             assertThat(rse.getReason()).isEqualTo("Contact not found");
             assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         });
+    }
+
+    @Test
+    void should_delete_a_contact_successfully() {
+        final UUID targetUuid = UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7");
+        contactManagerService.deleteById(targetUuid);
+
+        final Throwable throwable = catchThrowable(() -> contactManagerService.findById(targetUuid));
+        final long count = contactManagerService.count();
+        final boolean isStored = contactManagerService.existsByid(targetUuid);
+
+        assertThat(throwable).isNotNull();
+        assertThat(count).isEqualTo(6);
+        assertThat(isStored).isFalse();
     }
 }
