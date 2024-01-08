@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.*;
 
+import java.util.Objects;
+
 @Embeddable
 @Setter
 @Getter
@@ -26,4 +28,21 @@ public class Address {
 
     @Column(nullable = false, length = 20)
     private String zipcode;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(country, state, street, city, zipcode);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof final Address thatAddress)) return false;
+        return
+            Objects.equals(country, thatAddress.getCountry()) &&
+            Objects.equals(street, thatAddress.getStreet()) &&
+            Objects.equals(city, thatAddress.getCity()) &&
+            Objects.equals(state, thatAddress.getState()) &&
+            Objects.equals(zipcode, thatAddress.getZipcode());
+    }
 }

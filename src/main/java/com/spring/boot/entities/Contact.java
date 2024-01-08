@@ -112,4 +112,21 @@ public class Contact {
         if (Objects.nonNull(contactToMerge.getEmailMap())) setEmailMap(contactToMerge.getEmailMap());
         if (Objects.nonNull(contactToMerge.getAddressMap())) setAddressMap(contactToMerge.getAddressMap());
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, phoneNumberMap, emailMap, addressMap, user);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof final Contact thatContact)) return false;
+        return
+            Objects.equals(name, thatContact.getName()) &&
+            Objects.equals(id, thatContact.getId()) &&
+            Objects.equals(phoneNumberMap, thatContact.getPhoneNumberMap()) &&
+            Objects.equals(emailMap, thatContact.getEmailMap()) &&
+            Objects.equals(addressMap, thatContact.getAddressMap());
+    }
 }
