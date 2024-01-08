@@ -42,7 +42,7 @@ public class ContactManagerServiceImpl implements ContactManagerService {
     public void saveWithUser(final Contact contact, final String username) {
         final User user = userService.findByUsername(username);
         contact.setUser(user);
-        contactRepository.save(contact);
+        save(contact);
     }
 
     @Override

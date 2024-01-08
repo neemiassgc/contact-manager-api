@@ -15,10 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 @SpringBootTest
-@Transactional(propagation = Propagation.NOT_SUPPORTED)
+@Transactional
 public class ContactManagerServiceIT {
 
     @Autowired
@@ -115,6 +116,7 @@ public class ContactManagerServiceIT {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
     void should_throw_an_error_when_creating_a_new_contact_if_any_field_is_missing_to_set() {
         final Contact newContact = new Contact("Aunt Julia");
         newContact.putPhoneNumber("home", "+1(61)7982-7401");
@@ -127,8 +129,9 @@ public class ContactManagerServiceIT {
             .build();
         newContact.putAddress("home", homeAddress);
 
-        assertThatThrownBy(() -> contactManagerService.saveWithUser(newContact, "joe"))
-            .isNotNull();
+        final Throwable throwable = catchThrowable(() -> contactManagerService.saveWithUser(newContact, "joe"));
+
+        assertThat(throwable).isNotNull();
     }
 
     @Test

@@ -12,7 +12,7 @@ public interface ExtendedContactRepository {
 
     void save(Contact contact);
 
-    @Query("select c from Contact c join fetch c.phoneNumberMap p join fetch c.emailMap e join fetch addressMap a")
+    @Query("select c from Contact c join fetch c.phoneNumberMap join fetch c.emailMap join fetch addressMap join fetch c.user")
     List<Contact> findAll();
 
     @Query("select c from Contact c where c.user.username = :username")
