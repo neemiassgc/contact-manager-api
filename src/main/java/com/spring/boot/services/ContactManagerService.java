@@ -1,21 +1,15 @@
 package com.spring.boot.services;
 
 import com.spring.boot.entities.Contact;
+import com.spring.boot.repositories.ExtendedContactRepository;
 
-import java.util.List;
 import java.util.UUID;
 
-public interface ContactManagerService {
+public interface ContactManagerService extends ExtendedContactRepository {
 
-    List<Contact> fetchAll();
-
-    Contact fetchById(UUID id);
+    Contact findById(UUID uuid);
 
     void saveWithUser(Contact contact, String username);
 
     void update(Contact contact);
-
-    void deleteById(UUID id);
-
-    List<Contact> fetchAllByUsername(String username);
 }

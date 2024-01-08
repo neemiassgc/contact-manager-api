@@ -23,18 +23,18 @@ public class ContactManagerServiceImpl implements ContactManagerService {
     private UserService userService;
 
     @Override
-    public List<Contact> fetchAllByUsername(String username) {
+    public List<Contact> findAllByUsername(String username) {
         return contactRepository.findAllByUsername(username);
     }
 
     @Override
-    public List<Contact> fetchAll() {
-        return contactRepository.fetchAll();
+    public List<Contact> findAll() {
+        return contactRepository.findAll();
     }
 
     @Override
-    public Contact fetchById(UUID id) {
-       return contactRepository.fetchById(id)
+    public Contact findById(UUID id) {
+       return contactRepository.findById(id)
            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
     }
 
@@ -47,12 +47,32 @@ public class ContactManagerServiceImpl implements ContactManagerService {
 
     @Override
     public void update(final Contact contact) {
-        final Contact contactFromStorage = fetchById(contact.getId());
+        final Contact contactFromStorage = findById(contact.getId());
         contactFromStorage.merge(contact);
     }
 
     @Override
     public void deleteById(UUID id) {
         contactRepository.deleteById(id);
+    }
+
+    @Override
+    public void save(Contact contact) {
+        contactRepository.save(contact);
+    }
+
+    @Override
+    public boolean existsByid(UUID uuid) {
+        return contactRepository.existsByid(uuid);
+    }
+
+    @Override
+    public void deleteAll() {
+        contactRepository.deleteAll();
+    }
+
+    @Override
+    public long count() {
+        return contactRepository.count();
     }
 }
