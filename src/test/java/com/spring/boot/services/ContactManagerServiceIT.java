@@ -179,4 +179,13 @@ public class ContactManagerServiceIT {
         assertThat(throwable).isNotNull();
         assertThat(count).isEqualTo(6);
     }
+
+    @Test
+    void shold_delete_all_the_contacts() {
+        contactManagerService.deleteAll();
+
+        final List<Contact> listOfContacts = contactManagerService.findAll();
+
+        assertThat(listOfContacts).hasSize(0);
+    }
 }
