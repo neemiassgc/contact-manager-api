@@ -48,9 +48,9 @@ public class ContactManagerServiceIT {
     }
 
     @Test
-    void should_get_a_contact_and_all_its_details_successfully() {
+    void should_get_a_contact_of_a_user_and_all_its_details_successfully() {
         final UUID gregFromAccountingContactId = UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167");
-        final Contact contact = contactManagerService.findById(gregFromAccountingContactId);
+        final Contact contact = contactManagerService.findByIdWithUser(gregFromAccountingContactId, "joe");
 
         assertThat(contact).isNotNull();
         assertThat(contact).extracting(Contact::getName).isEqualTo("Greg from accounting");
