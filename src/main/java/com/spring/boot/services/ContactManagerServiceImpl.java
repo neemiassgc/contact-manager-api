@@ -33,9 +33,11 @@ public class ContactManagerServiceImpl implements ContactManagerService {
     }
 
     @Override
-    public Contact findById(UUID id) {
-       return contactRepository.findById(id)
-           .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
+    public Contact findByIdWithUser(UUID id, String username) {
+        if (!contactRepository.existsByIdAndUser(id, username))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contact does not belong to the user: "+username);
+
+        return findById(id);
     }
 
     @Override
@@ -49,6 +51,12 @@ public class ContactManagerServiceImpl implements ContactManagerService {
     public void update(final Contact contact) {
         final Contact contactFromStorage = findById(contact.getId());
         contactFromStorage.merge(contact);
+    }
+
+    @Override
+    public Contact findById(final UUID id) {
+        return contactRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
     }
 
     @Override
