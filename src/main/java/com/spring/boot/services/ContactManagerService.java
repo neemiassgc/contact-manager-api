@@ -9,6 +9,8 @@ public interface ContactManagerService extends ExtendedContactRepository {
 
     Contact findById(UUID uuid);
 
+    Contact findByIdWithUser(UUID uuid, String username);
+
     void saveWithUser(Contact contact, String username);
 
     void update(Contact contact);
