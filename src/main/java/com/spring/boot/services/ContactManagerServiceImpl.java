@@ -34,10 +34,10 @@ public class ContactManagerServiceImpl implements ContactManagerService {
 
     @Override
     public Contact findByIdWithUser(UUID id, String username) {
-        if (!contactRepository.existsByIdAndUser(id, username))
+        final Contact contact = findById(id);
+        if (!contact.getUser().getUsername().equals(username))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contact does not belong to the user: "+username);
-
-        return findById(id);
+        return contact;
     }
 
     @Override
