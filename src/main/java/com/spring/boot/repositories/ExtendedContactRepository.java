@@ -15,7 +15,7 @@ public interface ExtendedContactRepository {
     @Query("select c from Contact c join fetch c.phoneNumberMap join fetch c.emailMap join fetch addressMap join fetch c.user")
     List<Contact> findAll();
 
-    @Query("select c from Contact c where c.user.username = :username")
+    @Query("select c from Contact c join fetch c.phoneNumberMap join fetch c.emailMap join fetch addressMap where c.user.username = :username")
     List<Contact> findAllByUsername(@Param("username") String username);
 
     @Modifying
