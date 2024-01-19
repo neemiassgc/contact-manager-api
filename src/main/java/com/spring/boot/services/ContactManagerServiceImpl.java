@@ -48,9 +48,9 @@ public class ContactManagerServiceImpl implements ContactManagerService {
     }
 
     @Override
-    public void update(final Contact contact) {
-        final Contact contactFromStorage = findById(contact.getId());
-        contactFromStorage.merge(contact);
+    public void updateWithUser(Contact freshContact, String username) {
+        final Contact contactFromStorage = findByIdWithUser(freshContact.getId(), username);
+        contactFromStorage.merge(freshContact);
     }
 
     @Override

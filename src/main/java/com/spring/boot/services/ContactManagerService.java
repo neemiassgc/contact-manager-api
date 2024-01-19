@@ -13,5 +13,5 @@ public interface ContactManagerService extends ExtendedContactRepository {
 
     void saveWithUser(Contact contact, String username);
 
-    void update(Contact contact);
+    void updateWithUser(Contact contact, String username);
 }

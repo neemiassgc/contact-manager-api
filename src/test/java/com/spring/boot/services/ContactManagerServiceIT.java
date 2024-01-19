@@ -161,8 +161,8 @@ public class ContactManagerServiceIT {
             .zipcode("02169")
             .build();
         latestContact.putAddress("home", homeAddress);
-        
-        contactManagerService.update(latestContact);
+
+        contactManagerService.updateWithUser(latestContact, "joe");
 
         final Contact contactFromStorage = contactManagerService.findById(latestContact.getId());
 
@@ -172,7 +172,7 @@ public class ContactManagerServiceIT {
     @Test
     void should_throw_an_exception_when_it_is_tried_to_update_a_contact_that_does_not_exist() {
         final Contact nonExistingContact = TestResources.getFirstContact();
-        final Throwable throwable = catchThrowable(() -> contactManagerService.update(nonExistingContact));
+        final Throwable throwable = catchThrowable(() -> contactManagerService.updateWithUser(nonExistingContact, "joe"));
 
         assertThat(throwable).isNotNull();
         assertThat(throwable).isInstanceOf(ResponseStatusException.class);
