@@ -93,6 +93,20 @@ public class ContactManagerServiceIT {
     }
 
     @Test
+    void should_throw_an_error_when_finding_a_contact_that_does_not_belong_to_the_user() {
+        final UUID contactId = UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167");
+
+        final Throwable throwable = catchThrowable(() -> contactManagerService.findByIdWithUser(contactId, "robert"));
+
+        assertThat(throwable).isNotNull();
+        assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+        assertThat((ResponseStatusException)throwable).satisfies(rse -> {
+            assertThat(rse.getReason()).isEqualTo("Contact does not belong to the user: robert");
+            assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        });
+    }
+
+    @Test
     void should_save_a_new_contact_successfully() {
         final Contact newContact = new Contact("boss");
         newContact.putPhoneNumber("office", "+1(57)8131-9975");
