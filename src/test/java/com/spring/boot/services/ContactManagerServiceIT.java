@@ -82,14 +82,10 @@ public class ContactManagerServiceIT {
     @Test
     void should_throw_an_error_when_a_contact_is_not_found() {
         final UUID contactUUID = UUID.randomUUID();
+
         final Throwable throwable = catchThrowable(() -> contactManagerService.findByIdWithUser(contactUUID, "joe"));
 
-        assertThat(throwable).isNotNull();
-        assertThat(throwable).isInstanceOf(ResponseStatusException.class);
-        assertThat((ResponseStatusException)throwable).satisfies(rse -> {
-            assertThat(rse.getReason()).isEqualTo("Contact not found");
-            assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        });
+        assertResponseStatusException(throwable, "Contact not found", HttpStatus.NOT_FOUND);
     }
 
     @Test
@@ -98,12 +94,7 @@ public class ContactManagerServiceIT {
 
         final Throwable throwable = catchThrowable(() -> contactManagerService.findByIdWithUser(contactId, "robert"));
 
-        assertThat(throwable).isNotNull();
-        assertThat(throwable).isInstanceOf(ResponseStatusException.class);
-        assertThat((ResponseStatusException)throwable).satisfies(rse -> {
-            assertThat(rse.getReason()).isEqualTo("Contact does not belong to the user: robert");
-            assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        });
+        assertResponseStatusException(throwable, "Contact does not belong to the user: robert", HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -164,12 +155,7 @@ public class ContactManagerServiceIT {
         final Contact nonExistingContact = TestResources.getFirstContact();
         final Throwable throwable = catchThrowable(() -> contactManagerService.updateWithUser(nonExistingContact, "joe"));
 
-        assertThat(throwable).isNotNull();
-        assertThat(throwable).isInstanceOf(ResponseStatusException.class);
-        assertThat((ResponseStatusException)throwable).satisfies(rse -> {
-            assertThat(rse.getReason()).isEqualTo("Contact not found");
-            assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        });
+        assertResponseStatusException(throwable, "Contact not found", HttpStatus.NOT_FOUND);
     }
 
     @Test
@@ -178,12 +164,7 @@ public class ContactManagerServiceIT {
 
         final Throwable throwable = catchThrowable(() -> contactManagerService.updateWithUser(latestContact, "robert"));
 
-        assertThat(throwable).isNotNull();
-        assertThat(throwable).isInstanceOf(ResponseStatusException.class);
-        assertThat((ResponseStatusException)throwable).satisfies(rse -> {
-            assertThat(rse.getReason()).isEqualTo("Contact does not belong to the user: robert");
-            assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        });
+        assertResponseStatusException(throwable, "Contact does not belong to the user: robert", HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -204,12 +185,7 @@ public class ContactManagerServiceIT {
 
         final Throwable throwable = catchThrowable(() -> contactManagerService.deleteByIdWithUser(targetUUID, "joe"));
 
-        assertThat(throwable).isNotNull();
-        assertThat(throwable).isInstanceOf(ResponseStatusException.class);
-        assertThat((ResponseStatusException)throwable).satisfies(rse -> {
-            assertThat(rse.getReason()).isEqualTo("Contact not found");
-            assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        });
+        assertResponseStatusException(throwable, "Contact not found", HttpStatus.NOT_FOUND);
     }
 
     @Test
@@ -218,12 +194,7 @@ public class ContactManagerServiceIT {
 
         final Throwable throwable = catchThrowable(() -> contactManagerService.deleteByIdWithUser(targetUUID, "robert"));
 
-        assertThat(throwable).isNotNull();
-        assertThat(throwable).isInstanceOf(ResponseStatusException.class);
-        assertThat((ResponseStatusException)throwable).satisfies(rse -> {
-            assertThat(rse.getReason()).isEqualTo("Contact does not belong to the user: robert");
-            assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        });
+        assertResponseStatusException(throwable, "Contact does not belong to the user: robert", HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -233,5 +204,14 @@ public class ContactManagerServiceIT {
         final List<Contact> listOfContacts = contactManagerService.findAll();
 
         assertThat(listOfContacts).hasSize(0);
+    }
+
+    private void assertResponseStatusException(final Throwable throwable, final String message, final HttpStatus httpStatus) {
+        assertThat(throwable).isNotNull();
+        assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+        assertThat((ResponseStatusException)throwable).satisfies(rse -> {
+            assertThat(rse.getReason()).isEqualTo(message);
+            assertThat(rse.getStatusCode()).isEqualTo(httpStatus);
+        });
     }
 }
