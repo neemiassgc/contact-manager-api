@@ -150,17 +150,7 @@ public class ContactManagerServiceIT {
 
     @Test
     void should_update_a_contact_successfully() {
-        final Contact latestContact = new Contact("Greg from accouting", UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"));
-        latestContact.putPhoneNumber("office", "+359(26)5948-0427");
-        latestContact.putEmail("main", "gregfromaccouting@hotmail.co.jp");
-        final Address homeAddress = Address.builder()
-            .street("343-1199, Tennodai")
-            .country("Japan")
-            .city("Abiko-shi")
-            .state("Chiba")
-            .zipcode("02169")
-            .build();
-        latestContact.putAddress("home", homeAddress);
+        final Contact latestContact = TestResources.getRealContact();
 
         contactManagerService.updateWithUser(latestContact, "joe");
 
@@ -179,6 +169,20 @@ public class ContactManagerServiceIT {
         assertThat((ResponseStatusException)throwable).satisfies(rse -> {
             assertThat(rse.getReason()).isEqualTo("Contact not found");
             assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        });
+    }
+
+    @Test
+    void should_throw_an_exception_when_trying_to_update_a_contact_that_does_not_belong_to_a_user() {
+        final Contact latestContact = TestResources.getRealContact();
+
+        final Throwable throwable = catchThrowable(() -> contactManagerService.updateWithUser(latestContact, "robert"));
+
+        assertThat(throwable).isNotNull();
+        assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+        assertThat((ResponseStatusException)throwable).satisfies(rse -> {
+            assertThat(rse.getReason()).isEqualTo("Contact does not belong to the user: robert");
+            assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         });
     }
 
