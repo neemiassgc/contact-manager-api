@@ -49,13 +49,30 @@ public final class TestResources {
             .zipcode("LL40 2WX").build()
         );
 
+        final Contact realContact = new Contact("Greg from accouting", UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"));
+        realContact.putPhoneNumber("office", "+359(26)5948-0427");
+        realContact.putEmail("main", "gregfromaccouting@hotmail.co.jp");
+        final Address homeAddress = Address.builder()
+            .street("343-1199, Tennodai")
+            .country("Japan")
+            .city("Abiko-shi")
+            .state("Chiba")
+            .zipcode("02169")
+            .build();
+        realContact.putAddress("home", homeAddress);
+
         contacts.add(contact1);
         contacts.add(contact2);
         contacts.add(contact3);
+        contacts.add(realContact);
     }
 
     public static Contact getFirstContact() {
         return contacts.get(0);
+    }
+
+    public static Contact getRealContact() {
+        return contacts.get(contacts.size() - 1);
     }
 
     public static List<Contact> getAFewContacts(final int count) {
