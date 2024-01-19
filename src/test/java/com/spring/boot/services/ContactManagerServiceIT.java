@@ -189,7 +189,7 @@ public class ContactManagerServiceIT {
     @Test
     void should_delete_a_contact_successfully() {
         final UUID targetUuid = UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7");
-        contactManagerService.deleteById(targetUuid);
+        contactManagerService.deleteByIdWithUser(targetUuid, "joe");
 
         final Throwable throwable = catchThrowable(() -> contactManagerService.findById(targetUuid));
         final long count = contactManagerService.findAll().size();
