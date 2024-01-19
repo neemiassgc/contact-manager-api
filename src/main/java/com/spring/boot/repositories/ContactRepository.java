@@ -13,4 +13,6 @@ public interface ContactRepository extends org.springframework.data.repository.R
 
     @Query("select c from Contact c join fetch c.phoneNumberMap p join fetch c.emailMap e join fetch addressMap a join fetch c.user u where c.id = :id")
     Optional<Contact> findById(@Param("id") UUID id);
+
+    void deleteById(UUID uuid);
 }
