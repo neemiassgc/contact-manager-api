@@ -199,7 +199,7 @@ public class ContactManagerServiceIT {
     }
 
     @Test
-    void shold_delete_all_the_contacts() {
+    void should_delete_all_the_contacts() {
         contactManagerService.deleteAll();
 
         final List<Contact> listOfContacts = contactManagerService.findAll();
