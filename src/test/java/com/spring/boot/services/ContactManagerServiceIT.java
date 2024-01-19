@@ -82,7 +82,7 @@ public class ContactManagerServiceIT {
     @Test
     void should_throw_an_error_when_a_contact_is_not_found() {
         final UUID contactUUID = UUID.randomUUID();
-        final Throwable throwable = catchThrowable(() -> contactManagerService.findById(contactUUID));
+        final Throwable throwable = catchThrowable(() -> contactManagerService.findByIdWithUser(contactUUID, "joe"));
 
         assertThat(throwable).isNotNull();
         assertThat(throwable).isInstanceOf(ResponseStatusException.class);
