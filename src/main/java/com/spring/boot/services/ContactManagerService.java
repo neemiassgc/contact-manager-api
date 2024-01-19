@@ -14,4 +14,6 @@ public interface ContactManagerService extends ExtendedContactRepository {
     void saveWithUser(Contact contact, String username);
 
     void updateWithUser(Contact contact, String username);
+
+    void deleteByIdWithUser(UUID id, String usename);
 }

@@ -60,7 +60,8 @@ public class ContactManagerServiceImpl implements ContactManagerService {
     }
 
     @Override
-    public void deleteById(UUID id) {
+    public void deleteByIdWithUser(UUID id, String username) {
+        findByIdWithUser(id, username);
         contactRepository.deleteById(id);
     }
 
