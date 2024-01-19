@@ -211,6 +211,21 @@ public class ContactManagerServiceIT {
             assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         });
     }
+
+    @Test
+    void should_throw_an_error_when_trying_to_delete_a_contact_that_does_not_belong_to_a_user() {
+        final UUID targetUUID = TestResources.getRealContact().getId();
+
+        final Throwable throwable = catchThrowable(() -> contactManagerService.deleteByIdWithUser(targetUUID, "robert"));
+
+        assertThat(throwable).isNotNull();
+        assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+        assertThat((ResponseStatusException)throwable).satisfies(rse -> {
+            assertThat(rse.getReason()).isEqualTo("Contact does not belong to the user: robert");
+            assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        });
+    }
+
     @Test
     void should_delete_all_the_contacts() {
         contactManagerService.deleteAll();
