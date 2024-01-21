@@ -26,12 +26,13 @@ public class ContactController {
 
     @GetMapping("/contacts")
     public List<ContactSummary> getAllContacts(@AuthenticationPrincipal Jwt jwt) {
-        final String currentUsername = jwt.getClaimAsString("username");
-        return Contact.toListOfContactSummary(contactManagerService.findAllByUsername(currentUsername));
+        final String currentUser = jwt.getClaimAsString("username");
+        return Contact.toListOfContactSummary(contactManagerService.findAllByUsername(currentUser));
     }
 
     @GetMapping("/contacts/{id}")
-    public ContactSummary getById(@PathVariable("id") UUID id) {
-        return contactManagerService.findById(id).toContactSummary();
+    public ContactSummary getById(@PathVariable("id") UUID id, @AuthenticationPrincipal Jwt jwt) {
+        final String currentUser = jwt.getClaimAsString("username");
+        return contactManagerService.findByIdWithUser(id, currentUser).toContactSummary();
     }
 }
