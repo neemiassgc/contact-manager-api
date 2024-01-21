@@ -93,8 +93,13 @@ public class Contact {
     }
 
     public static Contact toContact(final ContactSummary contactSummary, final User user) {
-        final Contact newContact = new Contact();
+        final Contact newContact = toContact(contactSummary);
         newContact.setUser(user);
+        return newContact;
+    }
+
+    public static Contact toContact(final ContactSummary contactSummary) {
+        final Contact newContact = new Contact();
         newContact.setName(newContact.getName());
         contactSummary.getPhoneNumberMap().forEach(newContact::putPhoneNumber);
         contactSummary.getEmailMap().forEach(newContact::putEmail);
