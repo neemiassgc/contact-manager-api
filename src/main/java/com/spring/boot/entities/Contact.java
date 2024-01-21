@@ -101,9 +101,9 @@ public class Contact {
     public static Contact toContact(final ContactSummary contactSummary) {
         final Contact newContact = new Contact();
         newContact.setName(newContact.getName());
-        contactSummary.getPhoneNumberMap().forEach(newContact::putPhoneNumber);
-        contactSummary.getEmailMap().forEach(newContact::putEmail);
-        contactSummary.getAddressMap().forEach(newContact::putAddress);
+        contactSummary.getPhoneNumbers().forEach(newContact::putPhoneNumber);
+        contactSummary.getEmails().forEach(newContact::putEmail);
+        contactSummary.getAddresses().forEach(newContact::putAddress);
         return newContact;
     }
 

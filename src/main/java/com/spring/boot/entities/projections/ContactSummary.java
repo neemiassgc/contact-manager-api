@@ -15,15 +15,15 @@ public final class ContactSummary {
 
     private final UUID id;
     private final String name;
-    private final Map<String, String> phoneNumberMap;
-    private final Map<String, String> emailMap;
-    private final Map<String, Address> addressMap;
+    private final Map<String, String> phoneNumbers;
+    private final Map<String, String> emails;
+    private final Map<String, Address> addresses;
 
     public ContactSummary(final Contact contact) {
         this.id = contact.getId();
         this.name = contact.getName();
-        this.phoneNumberMap = contact.getPhoneNumberMap();
-        this.emailMap = contact.getEmailMap();
-        this.addressMap = contact.getAddressMap();
+        this.phoneNumbers = contact.getPhoneNumberMap();
+        this.emails = contact.getEmailMap();
+        this.addresses = contact.getAddressMap();
     }
 }
