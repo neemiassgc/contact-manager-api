@@ -49,22 +49,141 @@ public final class TestResources {
             .zipcode("LL40 2WX").build()
         );
 
-        final Contact realContact = new Contact("Greg from accouting", UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"));
-        realContact.putPhoneNumber("office", "+359(26)5948-0427");
-        realContact.putEmail("main", "gregfromaccouting@hotmail.co.jp");
-        final Address homeAddress = Address.builder()
+        final Contact contact4 = new Contact("Greg from accouting", UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"));
+        contact4.putPhoneNumber("office", "+359(26)5948-0427");
+        contact4.putEmail("main", "gregfromaccouting@hotmail.co.jp");
+        contact4.putAddress("home", Address.builder()
             .street("343-1199, Tennodai")
             .country("Japan")
             .city("Abiko-shi")
             .state("Chiba")
             .zipcode("02169")
-            .build();
-        realContact.putAddress("home", homeAddress);
+            .build()
+        );
+        contact4.putAddress("work", Address.builder()
+            .street("127-1121, Hiyamizu")
+            .country("Japan")
+            .city("Rankoshi-cho Isoya-gun")
+            .state("Hokkaido")
+            .zipcode("02169")
+            .build()
+        );
+
+        final Contact contact5 = new Contact("Coworker Fred", UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408"));
+        contact5.putPhoneNumber("home", "+52(54)6536-5876");
+        contact5.putPhoneNumber("mobile", "+81(56)4205-8516");
+        contact5.putPhoneNumber("office", "+359(10)4094-9549");
+        contact5.putEmail("main", "yuki.fred@gmail.com");
+        contact5.putAddress("home", Address.builder()
+            .street("4454 Steve Hunt Road")
+            .country("EUA")
+            .city("Miami")
+            .state("Florida")
+            .zipcode("33131")
+            .build()
+        );
+
+        final Contact contact6 = new Contact("Sister Monica", UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7"));
+        contact6.putPhoneNumber("office", "+65(77)4248-0921");
+        contact6.putEmail("main", "usermonica01@outlook.com");
+        contact6.putAddress("home",  Address.builder()
+            .street("4529 Jehovah Drive")
+            .country("EUA")
+            .city("Waynesboro")
+            .state("Virginia")
+            .zipcode("22980")
+            .build()
+        );
+
+        final Contact contact7 = new Contact("Best friend Julia", UUID.fromString("7f23057f-77bd-4568-ac64-e933abae9a09"));
+        contact7.putPhoneNumber("home", "+31(47)1688-3562");
+        contact7.putPhoneNumber("office", "+39(05)8263-6323");
+        contact7.putPhoneNumber("office2", "+1(22)2514-4183");
+        contact7.putEmail("main", "rick.julia@zipmail.com");
+        contact7.putEmail("second", "juliarcs@outlook.com");
+        contact7.putEmail("third", "contactforjulia@wolf.com");
+        contact7.putAddress("home",  Address.builder()
+            .street("1116 Mahlon Street")
+            .country("EUA")
+            .city("Farmington Hills")
+            .state("Michigan")
+            .zipcode("48335")
+            .build()
+        );
+
+        final Contact contact8 = new Contact("Mom", UUID.fromString("84edd1b9-89a5-4107-a84d-435676c2b8f5"));
+        contact8.putPhoneNumber("home", "+65(91)6788-9156");
+        contact8.putEmail("main", "Sheyla.orton@hoppe.org");
+        contact8.putAddress("home",  Address.builder()
+            .street("2259 Sycamore Fork Road")
+            .country("EUA")
+            .city("Hopkins")
+            .state("Minnesota")
+            .zipcode("55343")
+            .build()
+        );
+
+        final Contact contact9 = new Contact("Pizza and burgers", UUID.fromString("8fb2bd75-9aec-4cc5-b77b-a95f06081388"));
+        contact9.putPhoneNumber("home", "+81(78)8606-4615");
+        contact9.putEmail("main", "pizzaandburgers.main@amazon.com");
+        contact9.putEmail("second", "pizzaandburgers.store2@amazon.com");
+        contact9.putAddress("store 1",  Address.builder()
+            .street("3267 Mercer Street")
+            .country("EUA")
+            .city("San Diego")
+            .state("California")
+            .zipcode("92119")
+            .build()
+        );
+        contact9.putAddress("store 2",  Address.builder()
+            .street("2644 Arron Smith Drive")
+            .country("EUA")
+            .city("Thelma")
+            .state("Kentucky")
+            .zipcode("41260")
+            .build()
+        );
+        contact9.putAddress("store 3",  Address.builder()
+            .street("2221 Spruce Drive")
+            .country("EUA")
+            .city("Core")
+            .state("Pennsylvania")
+            .zipcode("26529")
+            .build()
+        );
+
+        final Contact contact10 = new Contact("Uncle Jeff", UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"));
+        contact10.putPhoneNumber("home", "+39(80)9464-0706");
+        contact10.putPhoneNumber("mobile", "+31(14)1750-4453");
+        contact10.putEmail("main", "pizzaandburgers.main@amazon.com");
+        contact10.putEmail("second", "pizzaandburgers.store2@amazon.com");
+        contact10.putAddress("home",  Address.builder()
+            .street("237-1233, Ichihasama Shimmai")
+            .country("Japan")
+            .city("Kurihara-shi")
+            .state("Miyagi")
+            .zipcode("46231")
+            .build()
+        );
+        contact10.putAddress("work",  Address.builder()
+            .street("210-1040, Okada")
+            .country("Japan")
+            .city("Chikushino-shi")
+            .state("Fukuoka")
+            .zipcode("48335")
+            .build()
+        );
 
         contacts.add(contact1);
         contacts.add(contact2);
         contacts.add(contact3);
-        contacts.add(realContact);
+        contacts.add(contact4);
+        contacts.add(contact5);
+        contacts.add(contact6);
+        contacts.add(contact7);
+        contacts.add(contact8);
+        contacts.add(contact9);
+        contacts.add(contact10);
     }
 
     public static Contact getFirstContact() {
