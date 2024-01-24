@@ -100,7 +100,7 @@ public class Contact {
 
     public static Contact toContact(final ContactSummary contactSummary) {
         final Contact newContact = new Contact();
-        newContact.setName(newContact.getName());
+        newContact.setName(contactSummary.getName());
         contactSummary.getPhoneNumbers().forEach(newContact::putPhoneNumber);
         contactSummary.getEmails().forEach(newContact::putEmail);
         contactSummary.getAddresses().forEach(newContact::putAddress);
