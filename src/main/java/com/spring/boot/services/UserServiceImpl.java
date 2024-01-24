@@ -21,4 +21,9 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByUsername(username)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
+
+    @Override
+    public void create(User user) {
+        userRepository.save(user);
+    }
 }
