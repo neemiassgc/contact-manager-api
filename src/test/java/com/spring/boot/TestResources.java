@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public final class TestResources {
 
@@ -15,6 +16,9 @@ public final class TestResources {
 
     static {
         final User thomas = new User("thomas");
+        final User joe = new User("joe");
+        final User robert = new User("robert");
+
         final Contact contact1 = new Contact("Craig Bennett", UUID.randomUUID());
         contact1.setUser(thomas);
         contact1.putPhoneNumber("home", "+44  078 5357 6955");
@@ -27,7 +31,8 @@ public final class TestResources {
             .zipcode("FK14 9HE").build()
         );
 
-        final Contact contact2 = new Contact("Maisie Harris", thomas);
+        final Contact contact2 = new Contact("Maisie Harris", UUID.randomUUID());
+        contact2.setUser(thomas);
         contact2.putPhoneNumber("office", "+44  077 8877 6574");
         contact2.putEmail("main", "saunders.danielle@allen.info");
         contact2.putAddress("home", Address.builder()
@@ -38,7 +43,8 @@ public final class TestResources {
             .zipcode("KY7 7EY").build()
         );
 
-        final Contact contact3 = new Contact("Lauren Bailey", thomas);
+        final Contact contact3 = new Contact("Lauren Bailey", UUID.randomUUID());
+        contact3.setUser(thomas);
         contact3.putPhoneNumber("home", "+44 078 8085 6986");
         contact3.putEmail("main", "yrichards@hotmail.co.uk");
         contact3.putAddress("home", Address.builder()
@@ -49,7 +55,8 @@ public final class TestResources {
             .zipcode("LL40 2WX").build()
         );
 
-        final Contact contact4 = new Contact("Greg from accouting", UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"));
+        final Contact contact4 = new Contact("Greg from accounting", UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"));
+        contact4.setUser(joe);
         contact4.putPhoneNumber("office", "+359(26)5948-0427");
         contact4.putEmail("main", "gregfromaccouting@hotmail.co.jp");
         contact4.putAddress("home", Address.builder()
@@ -70,6 +77,7 @@ public final class TestResources {
         );
 
         final Contact contact5 = new Contact("Coworker Fred", UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408"));
+        contact5.setUser(joe);
         contact5.putPhoneNumber("home", "+52(54)6536-5876");
         contact5.putPhoneNumber("mobile", "+81(56)4205-8516");
         contact5.putPhoneNumber("office", "+359(10)4094-9549");
@@ -84,6 +92,7 @@ public final class TestResources {
         );
 
         final Contact contact6 = new Contact("Sister Monica", UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7"));
+        contact6.setUser(joe);
         contact6.putPhoneNumber("office", "+65(77)4248-0921");
         contact6.putEmail("main", "usermonica01@outlook.com");
         contact6.putAddress("home",  Address.builder()
@@ -96,6 +105,7 @@ public final class TestResources {
         );
 
         final Contact contact7 = new Contact("Best friend Julia", UUID.fromString("7f23057f-77bd-4568-ac64-e933abae9a09"));
+        contact7.setUser(robert);
         contact7.putPhoneNumber("home", "+31(47)1688-3562");
         contact7.putPhoneNumber("office", "+39(05)8263-6323");
         contact7.putPhoneNumber("office2", "+1(22)2514-4183");
@@ -112,6 +122,7 @@ public final class TestResources {
         );
 
         final Contact contact8 = new Contact("Mom", UUID.fromString("84edd1b9-89a5-4107-a84d-435676c2b8f5"));
+        contact8.setUser(robert);
         contact8.putPhoneNumber("home", "+65(91)6788-9156");
         contact8.putEmail("main", "Sheyla.orton@hoppe.org");
         contact8.putAddress("home",  Address.builder()
@@ -124,6 +135,7 @@ public final class TestResources {
         );
 
         final Contact contact9 = new Contact("Pizza and burgers", UUID.fromString("8fb2bd75-9aec-4cc5-b77b-a95f06081388"));
+        contact9.setUser(robert);
         contact9.putPhoneNumber("home", "+81(78)8606-4615");
         contact9.putEmail("main", "pizzaandburgers.main@amazon.com");
         contact9.putEmail("second", "pizzaandburgers.store2@amazon.com");
@@ -153,6 +165,7 @@ public final class TestResources {
         );
 
         final Contact contact10 = new Contact("Uncle Jeff", UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"));
+        contact10.setUser(robert);
         contact10.putPhoneNumber("home", "+39(80)9464-0706");
         contact10.putPhoneNumber("mobile", "+31(14)1750-4453");
         contact10.putEmail("main", "pizzaandburgers.main@amazon.com");
@@ -196,6 +209,21 @@ public final class TestResources {
 
     public static List<Contact> getAFewContacts(final int count) {
         return contacts.subList(0, count > contacts.size() ? contacts.size() - 1 : count);
+    }
+
+    public static List<Contact> getContactsForJoe() {
+        return filterContactsByUser("joe");
+    }
+
+    public static List<Contact> getContactsForRobert() {
+        return filterContactsByUser("robert");
+    }
+
+    private static List<Contact> filterContactsByUser(final String username) {
+        return contacts
+            .stream()
+            .filter(it -> it.getUser().getUsername().equals(username))
+            .collect(Collectors.toList());
     }
 
     public static Contact makeCopy(final Contact contacToBeCopied) {
