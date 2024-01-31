@@ -168,8 +168,7 @@ public final class TestResources {
         contact10.setUser(robert);
         contact10.putPhoneNumber("home", "+39(80)9464-0706");
         contact10.putPhoneNumber("mobile", "+31(14)1750-4453");
-        contact10.putEmail("main", "pizzaandburgers.main@amazon.com");
-        contact10.putEmail("second", "pizzaandburgers.store2@amazon.com");
+        contact10.putEmail("main", "contactforjeff.now@yahoo.com");
         contact10.putAddress("home",  Address.builder()
             .street("237-1233, Ichihasama Shimmai")
             .country("Japan")
