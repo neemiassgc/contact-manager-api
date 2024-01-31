@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -30,7 +31,7 @@ public class ContactControlellerUnitTest {
     private MockMvc mockMvc;
 
     @Test
-    @DisplayName("GET /api/contacts OK 200")
+    @DisplayName("GET /api/contacts -> OK 200")
     void should_response_all_the_contacts_for_Joe_with_OK_200() throws Exception {
         when(contactManagerService.findAllByUsername(eq("joe")))
             .thenReturn(TestResources.getContactsForJoe());
@@ -42,11 +43,10 @@ public class ContactControlellerUnitTest {
         )
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$[*].phoneNumbers[*]").value(containsInAnyOrder("+359(26)5948-0427",
-            "+81(56)4205-8516",
-            "+359(10)4094-9549",
-            "+52(54)6536-5876",
-            "+65(77)4248-0921")));
+        .andExpect(jsonPath("$[*].name").value(containsInAnyOrder("Greg from accounting", "Coworker Fred", "Sister Monica")))
+        .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(5)))
+        .andExpect(jsonPath("$[*].addresses.*").value(hasSize(4)))
+        .andExpect(jsonPath("$[*].emails.*").value(hasSize(3)));
 
         verify(contactManagerService, times(1)).findAllByUsername(eq("joe"));
         verifyNoMoreInteractions(contactManagerService);
