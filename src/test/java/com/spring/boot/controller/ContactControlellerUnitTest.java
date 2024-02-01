@@ -52,6 +52,30 @@ public class ContactControlellerUnitTest {
         verifyNoMoreInteractions(contactManagerService);
     }
 
+    @Test
+    @DisplayName("GET /api/contacts -> OK 200")
+    void should_return_all_the_contacts_for_Robert_with_OK_200() throws Exception {
+        when(contactManagerService.findAllByUsername(eq("robert")))
+            .thenReturn(TestResources.getContactsForRobert());
+
+        mockMvc.perform(
+            get("/api/contacts")
+            .header("Authorization", "Bearer "+jwtTokenForRobert())
+            .accept(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$[*].name").value(
+            containsInAnyOrder("Best friend Julia", "Mom", "Pizza and burgers", "Uncle Jeff"))
+        )
+        .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(7)))
+        .andExpect(jsonPath("$[*].addresses.*").value(hasSize(7)))
+        .andExpect(jsonPath("$[*].emails.*").value(hasSize(7)));
+
+        verify(contactManagerService, times(1)).findAllByUsername(eq("robert"));
+        verifyNoMoreInteractions(contactManagerService);
+    }
+
     private String jwtTokenForJoe() {
         return """
             eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJuNmpaamhHcmtpd2xnT0hmVDB1dEJ5cV
