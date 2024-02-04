@@ -13,6 +13,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.eq;
@@ -73,6 +75,28 @@ public class ContactControlellerUnitTest {
         .andExpect(jsonPath("$[*].emails.*").value(hasSize(7)));
 
         verify(contactManagerService, times(1)).findAllByUsername(eq("robert"));
+        verifyNoMoreInteractions(contactManagerService);
+    }
+
+    @Test
+    @DisplayName("GET /api/contacts/4fe25947-ecab-489c-a881-e0057124e408 -> OK 200")
+    void should_return_a_contact_for_the_user_Joe_with_OK_200() throws Exception {
+        final UUID contactId = UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408");
+        when(contactManagerService.findByIdWithUser(eq(contactId), eq("joe")))
+            .thenReturn(TestResources.getContactById(contactId));
+
+        mockMvc.perform(get("/api/contacts/"+contactId)
+            .header("Authorization", "Bearer "+jwtTokenForJoe())
+            .accept(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.name").value("Coworker Fred"))
+        .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(3)))
+        .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
+        .andExpect(jsonPath("$.addresses.*").value(hasSize(1)));
+
+        verify(contactManagerService, times(1)).findByIdWithUser(eq(contactId), eq("joe"));
         verifyNoMoreInteractions(contactManagerService);
     }
 
