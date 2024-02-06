@@ -100,6 +100,27 @@ public class ContactControlellerUnitTest {
         verifyNoMoreInteractions(contactManagerService);
     }
 
+    @Test
+    @DisplayName("GET /api/contacts/84edd1b9-89a5-4107-a84d-435676c2b8f5 -> 200 OK")
+    void should_return_a_contact_for_the_user_Robert_with_OK_200() throws Exception {
+        final UUID contactId = UUID.fromString("84edd1b9-89a5-4107-a84d-435676c2b8f5");
+        when(contactManagerService.findByIdWithUser(eq(contactId), eq("robert")))
+            .thenReturn(TestResources.getContactById(contactId));
+
+        mockMvc.perform(get("/api/contacts/"+contactId)
+            .header("Authorization", "Bearer "+jwtTokenForRobert())
+            .accept(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.name").value("Mom"))
+        .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(1)))
+        .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
+        .andExpect(jsonPath("$.addresses.*").value(hasSize(1)));
+
+        verify(contactManagerService, times(1)).findByIdWithUser(eq(contactId), eq("robert"));
+        verifyNoMoreInteractions(contactManagerService);
+    }
     private String jwtTokenForJoe() {
         return """
             eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJuNmpaamhHcmtpd2xnT0hmVDB1dEJ5cV
