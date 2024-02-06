@@ -198,6 +198,10 @@ public final class TestResources {
         contacts.add(contact10);
     }
 
+    public static Contact getContactById(UUID uuid) {
+        return contacts.stream().filter(contact -> contact.getId().equals(uuid)).toList().get(0);
+    }
+
     public static Contact getFirstContact() {
         return contacts.get(0);
     }
