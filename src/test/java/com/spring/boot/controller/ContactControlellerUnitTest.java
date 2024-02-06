@@ -10,8 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -121,6 +123,26 @@ public class ContactControlellerUnitTest {
         verify(contactManagerService, times(1)).findByIdWithUser(eq(contactId), eq("robert"));
         verifyNoMoreInteractions(contactManagerService);
     }
+
+    @Test
+    @DisplayName("GET /api/contacts/c97775aa-b7f3-49c0-a586-d0466ba592bf -> 404 NOT FOUND")
+    void should_respond_404_NOT_FOUND_when_requesting_for_a_contact_that_does_not_exist() throws Exception {
+        final UUID contactId = UUID.fromString("c97775aa-b7f3-49c0-a586-d0466ba592bf");
+        when(contactManagerService.findByIdWithUser(eq(contactId), eq("robert")))
+            .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
+
+        mockMvc.perform(get("/api/contacts/"+contactId)
+            .header("Authorization", "Bearer "+jwtTokenForRobert())
+            .accept(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().isNotFound())
+        .andExpect(content().contentType(MediaType.TEXT_PLAIN))
+        .andExpect(content().string("Contact not found"));
+
+        verify(contactManagerService, times(1)).findByIdWithUser(eq(contactId), eq("robert"));
+        verifyNoMoreInteractions(contactManagerService);
+    }
+
     private String jwtTokenForJoe() {
         return """
             eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJuNmpaamhHcmtpd2xnT0hmVDB1dEJ5cV
