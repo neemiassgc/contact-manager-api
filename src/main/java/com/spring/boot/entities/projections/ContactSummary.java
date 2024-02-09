@@ -2,6 +2,9 @@ package com.spring.boot.entities.projections;
 
 import com.spring.boot.entities.Contact;
 import com.spring.boot.entities.embeddables.Address;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.Map;
@@ -14,9 +17,20 @@ import java.util.UUID;
 public final class ContactSummary {
 
     private final UUID id;
+
+    @NotNull(message = "'name' property must not be null")
+    @Size(min = 2, max = 140, message = "'name' property must have between 2 and 140 characters")
     private final String name;
+
+    @NotNull(message = "'phoneNumbers' property must not be null")
+    @NotEmpty(message = "'phoneNumbers' property must have at least 1 item")
+    @Size(min = 1, max = 50, message = "'phoneNumbers' property must have between 1 and 50 items")
     private final Map<String, String> phoneNumbers;
+
+    @Size(max = 50, message = "'email' property must have a maximum of 50 items")
     private final Map<String, String> emails;
+
+    @Size(max = 50, message = "'email' property must have a maximum of 50 items")
     private final Map<String, Address> addresses;
 
     public ContactSummary(final Contact contact) {
