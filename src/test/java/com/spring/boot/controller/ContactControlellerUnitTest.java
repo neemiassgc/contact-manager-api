@@ -202,6 +202,35 @@ public class ContactControlellerUnitTest {
         verifyNoMoreInteractions(contactManagerService);
     }
 
+    @Test
+    @DisplayName("POST /api/contacts -> 400 BAD_REQUEST")
+    void should_respond_with_field_violation_errors_when_posting_a_bad_formatted_json() throws Exception {
+        final String jsonContent = """
+        {
+            "phoneNumbers": {
+            },
+            "emails": {
+            }
+        }
+        """;
+
+        mockMvc.perform(post("/api/contacts")
+            .header("Authorization", "Bearer "+jwtTokenForRobert())
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonContent)
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.fieldViolations").value(hasSize(3)))
+        .andExpect(jsonPath("$.fieldViolations[*]").value(containsInAnyOrder(
+            "'phoneNumbers' must have at least 1 item",
+            "'name' must not be null",
+            "'phoneNumbers' must have between 1 and 50 items"
+        )));
+
+        verifyNoInteractions(contactManagerService);
+    }
+
     private String jwtTokenForJoe() {
         return """
             eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJuNmpaamhHcmtpd2xnT0hmVDB1dEJ5cV
