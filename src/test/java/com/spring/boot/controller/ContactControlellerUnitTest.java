@@ -3,6 +3,7 @@ package com.spring.boot.controller;
 import com.spring.boot.TestResources;
 import com.spring.boot.controllers.ContactController;
 import com.spring.boot.controllers.GlobalErrorController;
+import com.spring.boot.entities.Contact;
 import com.spring.boot.services.ContactManagerService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(value = {ContactController.class, GlobalErrorController.class})
@@ -159,6 +161,44 @@ public class ContactControlellerUnitTest {
         .andExpect(content().string("Contact does not belong to the user: robert"));
 
         verify(contactManagerService, times(1)).findByIdWithUser(eq(contactId), eq("robert"));
+        verifyNoMoreInteractions(contactManagerService);
+    }
+
+    @Test
+    @DisplayName("POST /api/contacts -> CREATED 201")
+    void should_create_a_contact_for_the_user_Robert_successfully() throws Exception {
+        doNothing().when(contactManagerService).saveWithUser(any(Contact.class), eq("robert"));
+
+        final String jsonContent = """
+        {
+            "name": "Steve",
+            "phoneNumbers": {
+                "personal": "+817283640198"
+            },
+            "emails": {
+                "main": "stevan@mymail.com"
+            },
+            "addresses": {
+                "home": {
+                    "country": "United States",
+                    "street": "467 Jennifer Lane",
+                    "state": "North Carolina",
+                    "city": "Cary",
+                    "zipcode": "27513"
+                }
+            }
+        }
+        """;
+
+        mockMvc.perform(post("/api/contacts")
+            .header("Authorization", "Bearer "+jwtTokenForRobert())
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonContent)
+        )
+        .andExpect(status().isCreated());
+
+        verify(contactManagerService).saveWithUser(any(Contact.class), eq("robert"));
         verifyNoMoreInteractions(contactManagerService);
     }
 
