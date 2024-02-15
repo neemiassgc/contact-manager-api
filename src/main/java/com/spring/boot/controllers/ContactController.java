@@ -5,10 +5,10 @@ import com.spring.boot.entities.projections.ContactSummary;
 import com.spring.boot.services.ContactManagerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,7 +34,8 @@ public class ContactController {
     }
 
     @PostMapping("/contacts")
-    public void create(@RequestBody ContactSummary contactSummary, @AuthenticationPrincipal Jwt jwt) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public void create(@RequestBody @Validated ContactSummary contactSummary, @AuthenticationPrincipal Jwt jwt) {
         final String currentUser = jwt.getClaimAsString("username");
         contactManagerService.saveWithUser(Contact.toContact(contactSummary), currentUser);
     }
