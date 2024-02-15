@@ -18,19 +18,19 @@ public final class ContactSummary {
 
     private final UUID id;
 
-    @NotNull(message = "'name' property must not be null")
-    @Size(min = 2, max = 140, message = "'name' property must have between 2 and 140 characters")
+    @NotNull(message = "'name' must not be null")
+    @Size(min = 2, max = 140, message = "'name' must have between 2 and 140 characters")
     private final String name;
 
-    @NotNull(message = "'phoneNumbers' property must not be null")
-    @NotEmpty(message = "'phoneNumbers' property must have at least 1 item")
-    @Size(min = 1, max = 50, message = "'phoneNumbers' property must have between 1 and 50 items")
+    @NotNull(message = "'phoneNumbers' must not be null")
+    @NotEmpty(message = "'phoneNumbers' must have at least 1 item")
+    @Size(min = 1, max = 50, message = "'phoneNumbers' must have between 1 and 50 items")
     private final Map<String, String> phoneNumbers;
 
-    @Size(max = 50, message = "'email' property must have a maximum of 50 items")
+    @Size(max = 50, message = "'email' must have a maximum of 50 items")
     private final Map<String, String> emails;
 
-    @Size(max = 50, message = "'email' property must have a maximum of 50 items")
+    @Size(max = 50, message = "'email' must have a maximum of 50 items")
     private final Map<String, Address> addresses;
 
     public ContactSummary(final Contact contact) {
