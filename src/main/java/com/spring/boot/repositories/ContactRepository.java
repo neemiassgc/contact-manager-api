@@ -11,7 +11,10 @@ import java.util.UUID;
 @Repository
 public interface ContactRepository extends org.springframework.data.repository.Repository<Contact, UUID>, ExtendedContactRepository {
 
-    @Query("select c from Contact c join fetch c.phoneNumberMap p join fetch c.emailMap e join fetch addressMap a join fetch c.user u where c.id = :id")
+    @Query(
+        "select c from Contact c left join fetch c.phoneNumberMap p left join fetch " +
+        "c.emailMap e left join fetch addressMap a left join fetch c.user u where c.id = :id"
+    )
     Optional<Contact> findById(@Param("id") UUID id);
 
     void deleteById(UUID uuid);
