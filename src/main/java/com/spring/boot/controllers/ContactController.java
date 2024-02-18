@@ -39,4 +39,10 @@ public class ContactController {
         final String currentUser = jwt.getClaimAsString("username");
         contactManagerService.saveWithUser(Contact.toContact(contactSummary), currentUser);
     }
+
+    @PutMapping("/contacts/{id}")
+    public void update(@PathVariable("id") UUID id, @RequestBody ContactSummary contactSummary, @AuthenticationPrincipal Jwt jwt) {
+        final String currentUser = jwt.getClaimAsString("username");
+        contactManagerService.updateWithUser(Contact.toContact(contactSummary, id), currentUser);
+    }
 }
