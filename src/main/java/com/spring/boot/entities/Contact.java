@@ -98,6 +98,12 @@ public class Contact {
         return newContact;
     }
 
+    public static Contact toContact(final ContactSummary contactSummary, final UUID id) {
+        final Contact newContact = toContact(contactSummary);
+        newContact.setId(id);
+        return newContact;
+    }
+
     public static Contact toContact(final ContactSummary contactSummary) {
         final Contact newContact = new Contact();
         newContact.setName(contactSummary.getName());
