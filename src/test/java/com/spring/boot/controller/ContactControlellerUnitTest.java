@@ -22,8 +22,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(value = {ContactController.class, GlobalErrorController.class})
@@ -229,6 +228,34 @@ public class ContactControlellerUnitTest {
         )));
 
         verifyNoInteractions(contactManagerService);
+    }
+
+    @Test
+    @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> OK 200")
+    void should_update_custom_fields_of_a_contact_successfully() throws Exception {
+        doNothing().when(contactManagerService).updateWithUser(any(Contact.class), eq("robert"));
+
+        final String requestBody = """
+        {
+            "name": "Bill",
+            "phoneNumbers": {
+                "cellphone": "+811234567890"
+            },
+            "addresses": {
+            }
+        }
+        """;
+
+        mockMvc.perform(put("/api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef")
+            .header("Authorization", "Bearer "+jwtTokenForRobert())
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody)
+        )
+        .andExpect(status().isOk());
+
+        verify(contactManagerService, times(1)).updateWithUser(any(Contact.class), eq("robert"));
+        verifyNoMoreInteractions(contactManagerService);
     }
 
     private String jwtTokenForJoe() {
