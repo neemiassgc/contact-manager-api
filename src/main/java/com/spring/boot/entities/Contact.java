@@ -1,5 +1,6 @@
 package com.spring.boot.entities;
 
+import com.spring.boot.Tools;
 import com.spring.boot.entities.embeddables.Address;
 import com.spring.boot.entities.projections.ContactSummary;
 import jakarta.persistence.*;
@@ -65,15 +66,15 @@ public class Contact {
     }
 
     public Map<String, String> getPhoneNumberMap() {
-        return Collections.unmodifiableMap(phoneNumberMap);
+        return Tools.immutableMap(phoneNumberMap);
     }
 
     public Map<String, Address> getAddressMap() {
-        return Collections.unmodifiableMap(addressMap);
+        return Tools.immutableMap(addressMap);
     }
 
     public Map<String, String> getEmailMap() {
-        return Collections.unmodifiableMap(emailMap);
+        return Tools.immutableMap(emailMap);
     }
 
     public void putPhoneNumber(final String type, final String phoneNumber) {
