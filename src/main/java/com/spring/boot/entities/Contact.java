@@ -23,7 +23,6 @@ public class Contact {
     @Id
     @UuidGenerator
     @Column(name = "contact_id")
-    @Setter(AccessLevel.NONE)
     private UUID id;
 
     @Column(nullable = false, length = 140)
@@ -106,14 +105,10 @@ public class Contact {
     }
 
     public static Contact toContact(final ContactSummary contactSummary) {
-        final Contact newContact = new Contact();
-        newContact.setName(contactSummary.getName());
-        if (Objects.nonNull(contactSummary.getPhoneNumbers()))
-            contactSummary.getPhoneNumbers().forEach(newContact::putPhoneNumber);
-        if (Objects.nonNull(contactSummary.getEmails()))
-            contactSummary.getEmails().forEach(newContact::putEmail);
-        if (Objects.nonNull(contactSummary.getAddresses()))
-            contactSummary.getAddresses().forEach(newContact::putAddress);
+        final Contact newContact = new Contact(contactSummary.getName());
+        newContact.setPhoneNumberMap(contactSummary.getPhoneNumbers());
+        newContact.setEmailMap(contactSummary.getEmails());
+        newContact.setAddressMap(contactSummary.getAddresses());
         return newContact;
     }
 
@@ -122,8 +117,9 @@ public class Contact {
     }
 
     public void merge(final Contact contactToMerge) {
-        if (Objects.nonNull(contactToMerge.getName())) setName(contactToMerge.getName());
-        if (Objects.nonNull(contactToMerge.getPhoneNumberMap())) setPhoneNumberMap(contactToMerge.getPhoneNumberMap());
+        if (Objects.nonNull(contactToMerge.getName()) && !contactToMerge.getName().isBlank()) setName(contactToMerge.getName());
+        if (Objects.nonNull(contactToMerge.getPhoneNumberMap()) && !contactToMerge.getPhoneNumberMap().isEmpty())
+            setPhoneNumberMap(contactToMerge.getPhoneNumberMap());
         if (Objects.nonNull(contactToMerge.getEmailMap())) setEmailMap(contactToMerge.getEmailMap());
         if (Objects.nonNull(contactToMerge.getAddressMap())) setAddressMap(contactToMerge.getAddressMap());
     }
