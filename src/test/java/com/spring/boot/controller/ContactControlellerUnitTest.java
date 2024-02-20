@@ -270,7 +270,7 @@ public class ContactControlellerUnitTest {
 
     @Test
     @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> OK 200")
-    void should_update_custom_fields_of_a_contact_successfully() throws Exception {
+    void should_update_custom_fields_of_a_contact_for_the_Robert_successfully() throws Exception {
         doNothing().when(contactManagerService).updateWithUser(any(Contact.class), eq("robert"));
 
         final String requestBody = """
@@ -293,6 +293,35 @@ public class ContactControlellerUnitTest {
         .andExpect(status().isOk());
 
         verify(contactManagerService, times(1)).updateWithUser(any(Contact.class), eq("robert"));
+        verifyNoMoreInteractions(contactManagerService);
+    }
+
+
+    @Test
+    @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> OK 200")
+    void should_update_custom_fields_of_a_contact_for_the_Joe_successfully() throws Exception {
+        doNothing().when(contactManagerService).updateWithUser(any(Contact.class), eq("joe"));
+
+        final String requestBody = """
+        {
+            "name": "Bill",
+            "phoneNumbers": {
+                "cellphone": "+811234567890"
+            },
+            "addresses": {
+            }
+        }
+        """;
+
+        mockMvc.perform(put("/api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef")
+            .header("Authorization", "Bearer "+jwtTokenForJoe())
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody)
+        )
+        .andExpect(status().isOk());
+
+        verify(contactManagerService, times(1)).updateWithUser(any(Contact.class), eq("joe"));
         verifyNoMoreInteractions(contactManagerService);
     }
 
