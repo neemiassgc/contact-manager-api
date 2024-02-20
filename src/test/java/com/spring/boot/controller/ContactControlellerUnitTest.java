@@ -202,6 +202,44 @@ public class ContactControlellerUnitTest {
     }
 
     @Test
+    @DisplayName("POST /api/contacts -> CREATED 201")
+    void should_create_a_contact_for_the_user_Joe_successfully() throws Exception {
+        doNothing().when(contactManagerService).saveWithUser(any(Contact.class), eq("joe"));
+
+        final String jsonContent = """
+        {
+            "name": "Steve",
+            "phoneNumbers": {
+                "personal": "+817283640198"
+            },
+            "emails": {
+                "main": "stevan@mymail.com"
+            },
+            "addresses": {
+                "home": {
+                    "country": "United States",
+                    "street": "467 Jennifer Lane",
+                    "state": "North Carolina",
+                    "city": "Cary",
+                    "zipcode": "27513"
+                }
+            }
+        }
+        """;
+
+        mockMvc.perform(post("/api/contacts")
+            .header("Authorization", "Bearer "+jwtTokenForJoe())
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonContent)
+        )
+        .andExpect(status().isCreated());
+
+        verify(contactManagerService).saveWithUser(any(Contact.class), eq("joe"));
+        verifyNoMoreInteractions(contactManagerService);
+    }
+
+    @Test
     @DisplayName("POST /api/contacts -> 400 BAD_REQUEST")
     void should_respond_with_field_violation_errors_when_posting_a_bad_formatted_json() throws Exception {
         final String jsonContent = """
