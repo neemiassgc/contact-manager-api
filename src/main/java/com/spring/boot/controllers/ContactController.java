@@ -45,4 +45,10 @@ public class ContactController {
         final String currentUser = jwt.getClaimAsString("username");
         contactManagerService.updateWithUser(Contact.toContact(contactSummary, id), currentUser);
     }
+
+    @DeleteMapping("/contacts/{id}")
+    public void delete(@PathVariable("id") UUID id, @AuthenticationPrincipal Jwt jwt) {
+        final String currentUser = jwt.getClaimAsString("username");
+        contactManagerService.deleteByIdWithUser(id, currentUser);
+    }
 }
