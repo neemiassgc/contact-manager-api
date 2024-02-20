@@ -296,7 +296,6 @@ public class ContactControlellerUnitTest {
         verifyNoMoreInteractions(contactManagerService);
     }
 
-
     @Test
     @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> OK 200")
     void should_update_custom_fields_of_a_contact_for_the_Joe_successfully() throws Exception {
@@ -338,6 +337,22 @@ public class ContactControlellerUnitTest {
         .andExpect(status().isOk());
 
         verify(contactManagerService, times(1)).deleteByIdWithUser(eq(contactId), eq("joe"));
+        verifyNoMoreInteractions(contactManagerService);
+    }
+
+    @Test
+    @DisplayName("DELETE /api/contacts/4fe25947-ecab-489c-a881-e0057124e408 -> OK 200")
+    void should_delete_a_contact_for_the_user_Robert_without_any_problems() throws Exception {
+        final UUID contactId = UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408");
+        doNothing().when(contactManagerService).deleteByIdWithUser(eq(contactId), eq("robert"));
+
+        mockMvc.perform(delete("/api/contacts/"+contactId)
+            .header("Authorization", "Bearer "+jwtTokenForRobert())
+            .accept(MediaType.ALL)
+        )
+        .andExpect(status().isOk());
+
+        verify(contactManagerService, times(1)).deleteByIdWithUser(eq(contactId), eq("robert"));
         verifyNoMoreInteractions(contactManagerService);
     }
 
