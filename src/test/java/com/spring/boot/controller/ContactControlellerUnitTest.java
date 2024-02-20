@@ -274,6 +274,25 @@ public class ContactControlellerUnitTest {
         verifyNoMoreInteractions(contactManagerService);
     }
 
+    @Test
+    @DisplayName("DELETE /api/contacts/35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7 -> 404 NOT_FOUND")
+    void should_respond_404_when_trying_to_delete_a_contact_that_does_not_exist() throws Exception {
+        final UUID contactId = UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7");
+        doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"))
+            .when(contactManagerService).deleteByIdWithUser(eq(contactId), eq("joe"));
+
+        mockMvc.perform(delete("/api/contacts/"+contactId)
+            .header("Authorization", "Bearer "+jwtTokenForJoe())
+            .accept(MediaType.ALL)
+        )
+        .andExpect(status().isNotFound())
+        .andExpect(content().contentType(MediaType.TEXT_PLAIN))
+        .andExpect(content().string("Contact not found"));
+
+        verify(contactManagerService, times(1)).deleteByIdWithUser(eq(contactId), eq("joe"));
+        verifyNoMoreInteractions(contactManagerService);
+    }
+
     private String jwtTokenForJoe() {
         return """
             eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJuNmpaamhHcmtpd2xnT0hmVDB1dEJ5cV
