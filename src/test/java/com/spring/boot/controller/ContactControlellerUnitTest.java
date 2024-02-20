@@ -241,7 +241,7 @@ public class ContactControlellerUnitTest {
 
     @Test
     @DisplayName("POST /api/contacts -> 400 BAD_REQUEST")
-    void should_respond_with_field_violation_errors_when_posting_a_bad_formatted_json() throws Exception {
+    void should_respond_400_with_field_violation_errors_when_posting_a_bad_formatted_json() throws Exception {
         final String jsonContent = """
         {
             "phoneNumbers": {
