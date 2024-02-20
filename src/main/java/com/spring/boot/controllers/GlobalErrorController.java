@@ -3,6 +3,7 @@ package com.spring.boot.controllers;
 import com.spring.boot.error.ViolationResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,5 +30,10 @@ public class GlobalErrorController {
             .collect(ViolationResponse::new, ViolationResponse::putFieldViolation, (a, b) -> {});
 
         return ResponseEntity.badRequest().body(violationResponse);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<String> resolveHttpMessageNotReadableException() {
+        return ResponseEntity.badRequest().body("Json format is invalid!");
     }
 }
