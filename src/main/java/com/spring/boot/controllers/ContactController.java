@@ -15,40 +15,39 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/contacts")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ContactController {
 
     private final ContactManagerService contactManagerService;
 
-    @GetMapping("/contacts")
+    @GetMapping("/")
     public List<ContactSummary> getAllContacts(@AuthenticationPrincipal Jwt jwt) {
-        final String currentUser = jwt.getClaimAsString("username");
-        return Contact.toListOfContactSummary(contactManagerService.findAllByUsername(currentUser));
+        return Contact.toListOfContactSummary(contactManagerService.findAllByUsername(getCurrentUser(jwt)));
     }
 
-    @GetMapping("/contacts/{id}")
+    @GetMapping("/{id}")
     public ContactSummary getById(@PathVariable("id") UUID id, @AuthenticationPrincipal Jwt jwt) {
-        final String currentUser = jwt.getClaimAsString("username");
-        return contactManagerService.findByIdWithUser(id, currentUser).toContactSummary();
+        return contactManagerService.findByIdWithUser(id, getCurrentUser(jwt)).toContactSummary();
     }
 
-    @PostMapping("/contacts")
+    @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@RequestBody @Validated ContactSummary contactSummary, @AuthenticationPrincipal Jwt jwt) {
-        final String currentUser = jwt.getClaimAsString("username");
-        contactManagerService.saveWithUser(Contact.toContact(contactSummary), currentUser);
+        contactManagerService.saveWithUser(Contact.toContact(contactSummary), getCurrentUser(jwt));
     }
 
-    @PutMapping("/contacts/{id}")
+    @PutMapping("/{id}")
     public void update(@PathVariable("id") UUID id, @RequestBody ContactSummary contactSummary, @AuthenticationPrincipal Jwt jwt) {
-        final String currentUser = jwt.getClaimAsString("username");
-        contactManagerService.updateWithUser(Contact.toContact(contactSummary, id), currentUser);
+        contactManagerService.updateWithUser(Contact.toContact(contactSummary, id), getCurrentUser(jwt));
     }
 
-    @DeleteMapping("/contacts/{id}")
+    @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") UUID id, @AuthenticationPrincipal Jwt jwt) {
-        final String currentUser = jwt.getClaimAsString("username");
-        contactManagerService.deleteByIdWithUser(id, currentUser);
+        contactManagerService.deleteByIdWithUser(id, getCurrentUser(jwt));
+    }
+
+    private String getCurrentUser(final Jwt jwt) {
+        return jwt.getClaimAsString("username");
     }
 }
