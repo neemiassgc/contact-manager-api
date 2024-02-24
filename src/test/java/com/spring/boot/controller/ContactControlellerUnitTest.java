@@ -57,7 +57,7 @@ public class ContactControlellerUnitTest {
             .thenReturn(user.equals("joe") ? TestResources.getContactsForJoe() : TestResources.getContactsForRobert());
 
         mockMvc.perform(get("/api/contacts")
-            .header("Authorization", "Bearer "+(user.equals("joe") ? jwtTokenForJoe() : jwtTokenForRobert()))
+            .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
             .accept(MediaType.APPLICATION_JSON)
         )
         .andExpect(status().isOk())
@@ -90,7 +90,7 @@ public class ContactControlellerUnitTest {
                 .thenReturn(TestResources.getContactById(contactId));
 
         mockMvc.perform(get("/api/contacts/"+contactId)
-            .header("Authorization", "Bearer "+(user.equals("joe") ? jwtTokenForJoe() : jwtTokenForRobert()))
+            .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
             .accept(MediaType.APPLICATION_JSON)
         )
         .andExpect(status().isOk())
@@ -162,7 +162,7 @@ public class ContactControlellerUnitTest {
         """;
 
         mockMvc.perform(post("/api/contacts")
-            .header("Authorization", "Bearer "+(user.equals("joe") ? jwtTokenForJoe() : jwtTokenForRobert()))
+            .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonContent)
@@ -186,7 +186,7 @@ public class ContactControlellerUnitTest {
         """;
 
         mockMvc.perform(post("/api/contacts")
-            .header("Authorization", "Bearer "+jwtTokenForRobert())
+            .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonContent)
@@ -229,7 +229,7 @@ public class ContactControlellerUnitTest {
         """;
 
         mockMvc.perform(put("/api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef")
-            .header("Authorization", "Bearer "+(user.equals("joe") ? jwtTokenForJoe() : jwtTokenForRobert()))
+            .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody)
@@ -258,7 +258,7 @@ public class ContactControlellerUnitTest {
         doNothing().when(contactManagerService).deleteByIdWithUser(eq(contactId), eq(user));
 
         mockMvc.perform(delete("/api/contacts/"+contactId)
-            .header("Authorization", "Bearer "+(user.equals("joe") ? jwtTokenForJoe() : jwtTokenForRobert()))
+            .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
             .accept(MediaType.ALL)
         )
         .andExpect(status().isOk());
@@ -287,7 +287,7 @@ public class ContactControlellerUnitTest {
         httpMethodPicker.put("DELETE", MockMvcRequestBuilders::delete);
 
         mockMvc.perform(httpMethodPicker.get(httpMethod).apply("/api/contacts/"+contactId)
-            .header("Authorization", "Bearer "+(user.equals("joe") ? jwtTokenForJoe() : jwtTokenForRobert()))
+            .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
             .accept(MediaType.ALL)
         )
         .andExpect(status().isNotFound())
@@ -300,38 +300,5 @@ public class ContactControlellerUnitTest {
             verify(contactManagerService, times(1)).findByIdWithUser(eq(contactId), eq("robert"));
 
         verifyNoMoreInteractions(contactManagerService);
-    }
-
-    private String jwtTokenForJoe() {
-        return """
-            eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJuNmpaamhHcmtpd2xnT0hmVDB1dEJ5cV
-            Q4aXBSSG5Edzh3cVpDV1RDa2VZIn0.eyJleHAiOjIwMjE3NzQ1MTYsImlhdCI6MTcwNjQxNDUxNiwianRp
-            IjoiMDY0Yzg0NjMtMTk5Mi00M2YzLTgzZTAtZDZlOWU2NDU1YjgzIiwiaXNzIjoiaHR0cDovL2xvY2FsaG
-            9zdDo4MDAwL3JlYWxtcy9tYWluIiwic3ViIjoiOWRjNjc4YmYtY2UwZi00NGI3LWEyNGQtNjUyMThhMGZl
-            ZGM4IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiY29udGFjdC1tYW5hZ2VyIiwic2Vzc2lvbl9zdGF0ZSI6Ij
-            VhNTA4NjQzLTZiMWYtNDBkOS1hNGNiLTUzY2VjNmJkZWVmZCIsInNjb3BlIjoiY29udGFjdC1tYW5hZ2Vy
-            Iiwic2lkIjoiNWE1MDg2NDMtNmIxZi00MGQ5LWE0Y2ItNTNjZWM2YmRlZWZkIiwidXNlcm5hbWUiOiJqb2
-            UifQ.yMED1qj_q8IzvHBGo4xWkOJ443kISwQp4w2cr-VHjCx2DqzisyyHxavvq5GhZMx5PHOINi_PIZgP0
-            weFV84g9xpm1jjkiuhyrVfwRfaq3z6svwEZcGDWU-d-wy_58zC_ZrpRrm4CRAeNg-SzKLNUwJ1imK24HCG
-            R2yOCdb-rn79az_xkhp8J0-D8KmKiRqeOLNFDyGmMTmcYAP2HOowYQsvIXbGaaNMgG4gEZLBXkspzkLqvm
-            ZrH3nWzioBiqDqJnZQ-5DDIcJ-UbcY1FtRIZv1VYbX9Kqm1z0S7k5Q8dj3IzMRaYJ4l0_hIMgiye-vlNFg
-            izWTT-9WVM2GTjZ_-gw
-        """.trim().replaceAll("\\s", "");
-    }
-
-    private String jwtTokenForRobert() {
-        return """
-            eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJuNmpaamhHcmtpd2xnT0hmVDB1dEJ5cVQ4aXBS
-            SG5Edzh3cVpDV1RDa2VZIn0.eyJleHAiOjIwMjE5NDMyOTAsImlhdCI6MTcwNjU4MzI5MCwianRpIjoiMjU3ZDVi
-            M2YtNTRiNS00YjIyLWI2ODYtOWExN2VlNDg4ZDA3IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDAwL3JlYWxt
-            cy9tYWluIiwic3ViIjoiNmE0YmI1M2QtZGRkZi00MGQzLWFiYzQtNDljZDg0NjE4NjY3IiwidHlwIjoiQmVhcmVy
-            IiwiYXpwIjoiY29udGFjdC1tYW5hZ2VyIiwic2Vzc2lvbl9zdGF0ZSI6IjU4NGE3NDQzLTUxMjctNGYzZC04ZDgy
-            LTFkNDljNmVjMDA3MyIsInNjb3BlIjoiY29udGFjdC1tYW5hZ2VyIiwic2lkIjoiNTg0YTc0NDMtNTEyNy00ZjNk
-            LThkODItMWQ0OWM2ZWMwMDczIiwidXNlcm5hbWUiOiJyb2JlcnQifQ.unY-8y94sSTUl5bTSVqu1_sjRThI6wR7t
-            lZypH3WTFhlZ5gSjgC9DfyMEt8ZdT19ue_RPpZJQLSa3zt5u6KmV-g7yQJpeUhn_6blaHp8JLj7sLjDA4N5PtZwR
-            rFtJnV7oliRb4cVW7j6DaH19SEPrQ6Xmyq_6e8OevzoNkCijiFPTR0nrSw9rWm81UiN7YeqdRGUOnmWgkSFQhIUP
-            9NfEUgAvetZOJvMX4nrNZNKFgEvjZoleRLIORIf2-nBmXy2XJ8f68-a_Anb4k__SQFsroLQdrU7LnUR_qxTArPEf
-            DOoykEHQK2w003DePt_JT3uhVRMZIFLAMuyZfTrQ1_JvQ
-        """.trim().replaceAll("\\s", "");
     }
 }
