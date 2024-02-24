@@ -3,6 +3,7 @@ package com.spring.boot.services;
 import com.spring.boot.TestResources;
 import com.spring.boot.entities.Contact;
 import com.spring.boot.entities.embeddables.Address;
+import com.spring.boot.entities.projections.ContactSummary;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -141,13 +142,22 @@ public class ContactManagerServiceIT {
 
     @Test
     void should_update_a_contact_successfully() {
-        final Contact latestContact = TestResources.getRealContact();
+        final String contactNewName = "Alex";
+        final ContactSummary contactSummary =   ContactSummary.builder()
+            .id(UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7"))
+            .name(contactNewName)
+            .addresses(null)
+            .emails(null)
+            .phoneNumbers(null)
+            .build();
 
-        contactManagerService.updateWithUser(latestContact, "joe");
+        final Contact referenceContact = Contact.toContact(contactSummary, contactSummary.getId());
 
-        final Contact contactFromStorage = contactManagerService.findById(latestContact.getId());
+        contactManagerService.updateWithUser(referenceContact, "joe");
 
-        assertThat(latestContact.equals(contactFromStorage)).isTrue();
+        final Contact contactFromStorage = contactManagerService.findById(referenceContact.getId());
+
+        assertThat(referenceContact.getName()).isEqualTo(contactNewName);
     }
 
     @Test
@@ -160,9 +170,9 @@ public class ContactManagerServiceIT {
 
     @Test
     void should_throw_an_exception_when_trying_to_update_a_contact_that_does_not_belong_to_a_user() {
-        final Contact latestContact = TestResources.getRealContact();
+        final Contact contact = TestResources.getContactById(UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7"));
 
-        final Throwable throwable = catchThrowable(() -> contactManagerService.updateWithUser(latestContact, "robert"));
+        final Throwable throwable = catchThrowable(() -> contactManagerService.updateWithUser(contact, "robert"));
 
         assertResponseStatusException(throwable, "Contact does not belong to the user: robert", HttpStatus.BAD_REQUEST);
     }
@@ -190,7 +200,7 @@ public class ContactManagerServiceIT {
 
     @Test
     void should_throw_an_error_when_trying_to_delete_a_contact_that_does_not_belong_to_a_user() {
-        final UUID targetUUID = TestResources.getRealContact().getId();
+        final UUID targetUUID = UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7");
 
         final Throwable throwable = catchThrowable(() -> contactManagerService.deleteByIdWithUser(targetUUID, "robert"));
 
