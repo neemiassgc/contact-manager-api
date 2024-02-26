@@ -31,6 +31,12 @@ public class ContactControllerIT {
         shouldRespondWithAllTheContacts("joe", 5, 4, 3, "Greg from accounting", "Coworker Fred", "Sister Monica");
     }
 
+    @Test
+    @DisplayName("GET /api/contacts -> 200 OK")
+    public void should_respond_with_all_the_contacts_from_the_user_Robert_with_OK() throws Exception {
+        shouldRespondWithAllTheContacts("robert", 7, 7, 7, "Best friend Julia", "Mom", "Pizza and burgers", "Uncle Jeff");
+    }
+
     private void shouldRespondWithAllTheContacts(
         final String username, int phoneNumberSize,
         int addressesSize, int emailsSize, String... names
