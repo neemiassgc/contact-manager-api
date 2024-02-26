@@ -2,6 +2,8 @@ package com.spring.boot.controller;
 
 import com.spring.boot.TestResources;
 import com.spring.boot.services.ContactManagerService;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +24,12 @@ public class ContactControllerIT {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Test
+    @DisplayName("GET /api/contacts -> 200 OK")
+    public void should_respond_with_all_the_contacts_from_the_user_Joe_with_OK() throws Exception {
+        shouldRespondWithAllTheContacts("joe", 5, 4, 3, "Greg from accounting", "Coworker Fred", "Sister Monica");
+    }
 
     private void shouldRespondWithAllTheContacts(
         final String username, int phoneNumberSize,
