@@ -9,8 +9,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
@@ -80,5 +85,19 @@ public class ContactControllerIT {
         .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(phoneNumberSize)))
         .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
         .andExpect(jsonPath("$.addresses.*").value(hasSize(addressesSize)));
+    }
+
+    private void assertNotFound(String user, String httpMethod, UUID contactId, String errorMessage) throws Exception {
+        final Map<String, Function<String, MockHttpServletRequestBuilder>> httpMethodPicker = new HashMap<>();
+        httpMethodPicker.put("GET", MockMvcRequestBuilders::get);
+        httpMethodPicker.put("DELETE", MockMvcRequestBuilders::delete);
+
+        mockMvc.perform(httpMethodPicker.get(httpMethod).apply("/api/contacts/"+contactId)
+                .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
+                .accept(MediaType.ALL)
+        )
+        .andExpect(status().isNotFound())
+        .andExpect(content().contentType(MediaType.TEXT_PLAIN))
+        .andExpect(content().string(errorMessage));
     }
 }
