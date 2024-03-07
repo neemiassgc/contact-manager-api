@@ -87,6 +87,14 @@ public class ContactControllerIT {
         .andExpect(jsonPath("$.addresses.*").value(hasSize(addressesSize)));
     }
 
+    @Test
+    @DisplayName("GET /api/contacts/c97775aa-b7f3-49c0-a586-d0466ba592bf -> 404 NOT FOUND")
+    void should_respond_404_NOT_FOUND_when_requesting_for_a_contact_that_does_not_exist() throws Exception {
+        final UUID contactId = UUID.fromString("c97775aa-b7f3-49c0-a586-d0466ba592bf");
+
+        assertNotFound("robert", "GET", contactId, "Contact not found");
+    }
+
     private void assertNotFound(String user, String httpMethod, UUID contactId, String errorMessage) throws Exception {
         final Map<String, Function<String, MockHttpServletRequestBuilder>> httpMethodPicker = new HashMap<>();
         httpMethodPicker.put("GET", MockMvcRequestBuilders::get);
