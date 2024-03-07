@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -53,5 +55,17 @@ public class ContactControllerIT {
         .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(phoneNumberSize)))
         .andExpect(jsonPath("$[*].addresses.*").value(hasSize(addressesSize)))
         .andExpect(jsonPath("$[*].emails.*").value(hasSize(emailsSize)));
+    }
+    private void shouldReturnAContact(String user, UUID contactId, int phoneNumberSize, int addressesSize, String contactName) throws Exception {
+        mockMvc.perform(get("/api/contacts/"+contactId)
+            .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
+            .accept(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.name").value(contactName))
+        .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(phoneNumberSize)))
+        .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
+        .andExpect(jsonPath("$.addresses.*").value(hasSize(addressesSize)));
     }
 }
