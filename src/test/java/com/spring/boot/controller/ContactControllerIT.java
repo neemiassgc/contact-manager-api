@@ -62,6 +62,13 @@ public class ContactControllerIT {
     public void should_respond_with_a_contact_for_the_user_John_successfully() throws Exception {
         shouldReturnAContact("joe", UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"), 1, 2, "Greg from accounting");
     }
+
+    @Test
+    @DisplayName("GET /api/contacts/5c21433c-3c70-4253-a4b2-52b157be4167")
+    public void should_respond_with_a_contact_for_the_user_Robert_successfully() throws Exception {
+        shouldReturnAContact("robert", UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"), 2, 2, "Uncle Jeff");
+    }
+
     private void shouldReturnAContact(String user, UUID contactId, int phoneNumberSize, int addressesSize, String contactName) throws Exception {
         mockMvc.perform(get("/api/contacts/"+contactId)
             .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
