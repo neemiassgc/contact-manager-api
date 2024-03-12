@@ -21,6 +21,7 @@ import java.util.function.Function;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -104,6 +105,36 @@ public class ContactControllerIT {
         assertNotFound("robert", "GET", contactId, "Contact does not belong to the user: robert", HttpStatus.BAD_REQUEST);
     }
 
+    private void shouldCreateAContact(String user) throws Exception {
+        final String jsonContent = """
+        {
+            "name": "Steve",
+            "phoneNumbers": {
+                "personal": "+817283640198"
+            },
+            "emails": {
+                "main": "stevan@mymail.com"
+            },
+            "addresses": {
+                "home": {
+                    "country": "United States",
+                    "street": "467 Jennifer Lane",
+                    "state": "North Carolina",
+                    "city": "Cary",
+                    "zipcode": "27513"
+                }
+            }
+        }
+        """;
+
+        mockMvc.perform(post("/api/contacts")
+            .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonContent)
+        )
+        .andExpect(status().isCreated());
+    }
 
     private void assertNotFound(String user, String httpMethod, UUID contactId, String errorMessage, final HttpStatus httpStatus) throws Exception {
         final Map<String, Function<String, MockHttpServletRequestBuilder>> httpMethodPicker = new HashMap<>();
