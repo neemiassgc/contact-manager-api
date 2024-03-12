@@ -1,6 +1,7 @@
 package com.spring.boot.controller;
 
 import com.spring.boot.TestResources;
+import com.spring.boot.entities.Contact;
 import com.spring.boot.services.ContactManagerService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,8 +21,11 @@ import java.util.function.Function;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -173,6 +177,27 @@ public class ContactControllerIT {
             "'name' must not be null",
             "'phoneNumbers' must have between 1 and 50 items"
         )));
+    }
+
+    private void shouldUpdateSomeFieldsOfAContact(String user) throws Exception {
+        final String requestBody = """
+        {
+            "name": "Bill",
+            "phoneNumbers": {
+                "cellphone": "+811234567890"
+            },
+            "addresses": {
+            }
+        }
+        """;
+
+        mockMvc.perform(put("/api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef")
+            .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody)
+        )
+        .andExpect(status().isOk());
     }
 
     private void assertNotFound(String user, String httpMethod, UUID contactId, String errorMessage, final HttpStatus httpStatus) throws Exception {
