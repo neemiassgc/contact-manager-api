@@ -96,6 +96,14 @@ public class ContactControllerIT {
         assertNotFound("robert", "GET", contactId, "Contact not found");
     }
 
+    @Test
+    @DisplayName("GET /api/contacts/4fe25947-ecab-489c-a881-e0057124e408 -> 404 NOT FOUND")
+    void should_respond_404_NOT_FOUND_when_requesting_for_a_contact_that_does_not_belong_to_the_current_user() throws Exception {
+        final UUID contactId = UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408");
+
+        assertNotFound("robert", "GET", contactId, "Contact does not belong to the user: robert", HttpStatus.BAD_REQUEST);
+    }
+
 
     private void assertNotFound(String user, String httpMethod, UUID contactId, String errorMessage, final HttpStatus httpStatus) throws Exception {
         final Map<String, Function<String, MockHttpServletRequestBuilder>> httpMethodPicker = new HashMap<>();
