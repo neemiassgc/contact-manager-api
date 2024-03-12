@@ -148,6 +148,33 @@ public class ContactControllerIT {
         .andExpect(status().isCreated());
     }
 
+    @Test
+    @DisplayName("POST /api/contacts -> 400 BAD_REQUEST")
+    void should_respond_400_with_field_violation_errors_when_posting_a_bad_formatted_json() throws Exception {
+        final String jsonContent = """
+        {
+            "phoneNumbers": {
+            },
+            "emails": {
+            }
+        }
+        """;
+
+        mockMvc.perform(post("/api/contacts")
+            .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonContent)
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.fieldViolations").value(hasSize(3)))
+        .andExpect(jsonPath("$.fieldViolations[*]").value(containsInAnyOrder(
+            "'phoneNumbers' must have at least 1 item",
+            "'name' must not be null",
+            "'phoneNumbers' must have between 1 and 50 items"
+        )));
+    }
+
     private void assertNotFound(String user, String httpMethod, UUID contactId, String errorMessage, final HttpStatus httpStatus) throws Exception {
         final Map<String, Function<String, MockHttpServletRequestBuilder>> httpMethodPicker = new HashMap<>();
         httpMethodPicker.put("GET", MockMvcRequestBuilders::get);
