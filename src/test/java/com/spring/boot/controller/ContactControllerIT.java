@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -95,7 +96,8 @@ public class ContactControllerIT {
         assertNotFound("robert", "GET", contactId, "Contact not found");
     }
 
-    private void assertNotFound(String user, String httpMethod, UUID contactId, String errorMessage) throws Exception {
+
+    private void assertNotFound(String user, String httpMethod, UUID contactId, String errorMessage, final HttpStatus httpStatus) throws Exception {
         final Map<String, Function<String, MockHttpServletRequestBuilder>> httpMethodPicker = new HashMap<>();
         httpMethodPicker.put("GET", MockMvcRequestBuilders::get);
         httpMethodPicker.put("DELETE", MockMvcRequestBuilders::delete);
@@ -104,8 +106,12 @@ public class ContactControllerIT {
                 .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
                 .accept(MediaType.ALL)
         )
-        .andExpect(status().isNotFound())
+        .andExpect(status().is(httpStatus.value()))
         .andExpect(content().contentType(MediaType.TEXT_PLAIN))
         .andExpect(content().string(errorMessage));
+    }
+
+    private void assertNotFound(String user, String httpMethod, UUID contactId, String errorMessage) throws Exception {
+        assertNotFound(user, httpMethod, contactId, errorMessage, HttpStatus.NOT_FOUND);
     }
 }
