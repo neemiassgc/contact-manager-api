@@ -21,7 +21,7 @@ public class ContactController {
 
     private final ContactManagerService contactManagerService;
 
-    @GetMapping("/")
+    @GetMapping()
     public List<ContactSummary> getAllContacts(@AuthenticationPrincipal Jwt jwt) {
         return Contact.toListOfContactSummary(contactManagerService.findAllByUsername(getCurrentUser(jwt)));
     }
@@ -31,7 +31,7 @@ public class ContactController {
         return contactManagerService.findByIdWithUser(id, getCurrentUser(jwt)).toContactSummary();
     }
 
-    @PostMapping("/")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@RequestBody @Validated ContactSummary contactSummary, @AuthenticationPrincipal Jwt jwt) {
         contactManagerService.saveWithUser(Contact.toContact(contactSummary), getCurrentUser(jwt));

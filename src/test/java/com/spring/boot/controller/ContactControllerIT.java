@@ -52,7 +52,7 @@ public class ContactControllerIT {
     ) throws Exception {
         final String userToken = username.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert();
 
-        mockMvc.perform(get("/api/contacts/")
+        mockMvc.perform(get("/api/contacts")
             .accept(MediaType.ALL)
             .header("Authorization", "Bearer "+userToken)
         )
@@ -106,13 +106,13 @@ public class ContactControllerIT {
     }
 
     @Test
-    @DisplayName("POST /api/contacts/ -> 201 CREATED")
+    @DisplayName("POST /api/contacts -> 201 CREATED")
     void should_create_a_contact_for_the_user_Joe_successfully() throws Exception {
         shouldCreateAContact("joe");
     }
 
     @Test
-    @DisplayName("POST /api/contacts/ -> 201 CREATED")
+    @DisplayName("POST /api/contacts -> 201 CREATED")
     void should_create_a_contact_for_the_user_Robert_successfully() throws Exception {
         shouldCreateAContact("robert");
     }
@@ -139,7 +139,7 @@ public class ContactControllerIT {
         }
         """;
 
-        mockMvc.perform(post("/api/contacts/")
+        mockMvc.perform(post("/api/contacts")
             .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON)
