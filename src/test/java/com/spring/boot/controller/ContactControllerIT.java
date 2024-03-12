@@ -105,6 +105,11 @@ public class ContactControllerIT {
         assertNotFound("robert", "GET", contactId, "Contact does not belong to the user: robert", HttpStatus.BAD_REQUEST);
     }
 
+    @Test
+    @DisplayName("POST /api/contacts/ -> 201 CREATED")
+    void should_create_a_contact_for_the_user_Joe_successfully() throws Exception {
+        shouldCreateAContact("joe");
+    }
     private void shouldCreateAContact(String user) throws Exception {
         final String jsonContent = """
         {
