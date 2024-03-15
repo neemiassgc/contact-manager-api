@@ -50,6 +50,8 @@ public class ContactControllerIT {
         shouldRespondWithAllTheContacts("robert", 7, 7, 7, "Best friend Julia", "Mom", "Pizza and burgers", "Uncle Jeff");
     }
 
+    private
+
     private void shouldRespondWithAllTheContacts(
         final String username, int phoneNumberSize,
         int addressesSize, int emailsSize, String... names
