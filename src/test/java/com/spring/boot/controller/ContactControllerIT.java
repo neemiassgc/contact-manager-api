@@ -1,13 +1,16 @@
 package com.spring.boot.controller;
 
 import com.spring.boot.TestResources;
-import com.spring.boot.entities.Contact;
+import com.spring.boot.controller.types.AssertNotFoundType;
+import com.spring.boot.controller.types.ShouldRespondWithAllTheContactsType;
+import com.spring.boot.controller.types.ShouldReturnAContactType;
 import com.spring.boot.services.ContactManagerService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,10 +24,6 @@ import java.util.function.Function;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -41,22 +40,33 @@ public class ContactControllerIT {
     @Test
     @DisplayName("GET /api/contacts -> 200 OK")
     public void should_respond_with_all_the_contacts_from_the_user_Joe_with_OK() throws Exception {
-        shouldRespondWithAllTheContacts("joe", 5, 4, 3, "Greg from accounting", "Coworker Fred", "Sister Monica");
+        shouldRespondWithAllTheContacts(
+            ShouldRespondWithAllTheContactsType.builder()
+                .username("joe")
+                .phoneNumberSize(5)
+                .emailsSize(4)
+                .addressesSize(3)
+                .names(new String[]{"Greg from accounting", "Coworker Fred", "Sister Monica"})
+                .build()
+        );
     }
 
     @Test
     @DisplayName("GET /api/contacts -> 200 OK")
     public void should_respond_with_all_the_contacts_from_the_user_Robert_with_OK() throws Exception {
-        shouldRespondWithAllTheContacts("robert", 7, 7, 7, "Best friend Julia", "Mom", "Pizza and burgers", "Uncle Jeff");
+        shouldRespondWithAllTheContacts(
+            ShouldRespondWithAllTheContactsType.builder()
+                .username("robert")
+                .phoneNumberSize(7)
+                .addressesSize(7)
+                .emailsSize(7)
+                .names(new String[]{"Best friend Julia", "Mom", "Pizza and burgers", "Uncle Jeff"})
+                .build()
+        );
     }
 
-    private
-
-    private void shouldRespondWithAllTheContacts(
-        final String username, int phoneNumberSize,
-        int addressesSize, int emailsSize, String... names
-    ) throws Exception {
-        final String userToken = username.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert();
+    private void shouldRespondWithAllTheContacts(ShouldRespondWithAllTheContactsType input) throws Exception {
+        final String userToken = input.getUsername().equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert();
 
         mockMvc.perform(get("/api/contacts")
             .accept(MediaType.ALL)
@@ -64,35 +74,51 @@ public class ContactControllerIT {
         )
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$[*].name").value(containsInAnyOrder(names)))
-        .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(phoneNumberSize)))
-        .andExpect(jsonPath("$[*].addresses.*").value(hasSize(addressesSize)))
-        .andExpect(jsonPath("$[*].emails.*").value(hasSize(emailsSize)));
+        .andExpect(jsonPath("$[*].name").value(containsInAnyOrder(input.getNames())))
+        .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(input.getPhoneNumberSize())))
+        .andExpect(jsonPath("$[*].addresses.*").value(hasSize(input.getAddressesSize())))
+        .andExpect(jsonPath("$[*].emails.*").value(hasSize(input.getEmailsSize())));
     }
 
     @Test
     @DisplayName("GET /api/contacts/5c21433c-3c70-4253-a4b2-52b157be4167")
     public void should_respond_with_a_contact_for_the_user_John_successfully() throws Exception {
-        shouldReturnAContact("joe", UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"), 1, 2, "Greg from accounting");
+        shouldReturnAContact(
+            ShouldReturnAContactType.builder()
+                .user("joe")
+                .contactId(UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"))
+                .phoneNumberSize(1)
+                .addressesSize(2)
+                .contactName("Greg from accounting")
+                .build()
+        );
     }
 
     @Test
     @DisplayName("GET /api/contacts/5c21433c-3c70-4253-a4b2-52b157be4167")
     public void should_respond_with_a_contact_for_the_user_Robert_successfully() throws Exception {
-        shouldReturnAContact("robert", UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"), 2, 2, "Uncle Jeff");
+        shouldReturnAContact(
+            ShouldReturnAContactType.builder()
+                .user("robert")
+                .contactId(UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"))
+                .phoneNumberSize(2)
+                .addressesSize(2)
+                .contactName("Uncle Jeff")
+                .build()
+        );
     }
 
-    private void shouldReturnAContact(String user, UUID contactId, int phoneNumberSize, int addressesSize, String contactName) throws Exception {
-        mockMvc.perform(get("/api/contacts/"+contactId)
-            .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
+    private void shouldReturnAContact(ShouldReturnAContactType input) throws Exception {
+        mockMvc.perform(get("/api/contacts/"+input.getContactId())
+            .header("Authorization", "Bearer "+(input.getUser().equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
             .accept(MediaType.APPLICATION_JSON)
         )
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.name").value(contactName))
-        .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(phoneNumberSize)))
+        .andExpect(jsonPath("$.name").value(input.getContactName()))
+        .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(input.getPhoneNumberSize())))
         .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
-        .andExpect(jsonPath("$.addresses.*").value(hasSize(addressesSize)));
+        .andExpect(jsonPath("$.addresses.*").value(hasSize(input.getAddressesSize())));
     }
 
     @Test
@@ -100,7 +126,15 @@ public class ContactControllerIT {
     void should_respond_404_NOT_FOUND_when_requesting_for_a_contact_that_does_not_exist() throws Exception {
         final UUID contactId = UUID.fromString("c97775aa-b7f3-49c0-a586-d0466ba592bf");
 
-        assertNotFound("robert", "GET", contactId, "Contact not found");
+        assertNotFound(
+            AssertNotFoundType.builder()
+                .contactId(contactId)
+                .user("robert")
+                .errorMessage("Contact not found")
+                .httpMethod(HttpMethod.GET)
+                .httpStatus(HttpStatus.NOT_FOUND)
+                .build()
+        );
     }
 
     @Test
@@ -108,7 +142,15 @@ public class ContactControllerIT {
     void should_respond_404_NOT_FOUND_when_requesting_for_a_contact_that_does_not_belong_to_the_current_user() throws Exception {
         final UUID contactId = UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408");
 
-        assertNotFound("robert", "GET", contactId, "Contact does not belong to the user: robert", HttpStatus.BAD_REQUEST);
+        assertNotFound(
+            AssertNotFoundType.builder()
+                .contactId(contactId)
+                .user("robert")
+                .errorMessage("Contact does not belong to the user: robert")
+                .httpMethod(HttpMethod.GET)
+                .httpStatus(HttpStatus.BAD_REQUEST)
+                .build()
+        );
     }
 
     @Test
@@ -202,21 +244,17 @@ public class ContactControllerIT {
         .andExpect(status().isOk());
     }
 
-    private void assertNotFound(String user, String httpMethod, UUID contactId, String errorMessage, final HttpStatus httpStatus) throws Exception {
-        final Map<String, Function<String, MockHttpServletRequestBuilder>> httpMethodPicker = new HashMap<>();
-        httpMethodPicker.put("GET", MockMvcRequestBuilders::get);
-        httpMethodPicker.put("DELETE", MockMvcRequestBuilders::delete);
+    private void assertNotFound(AssertNotFoundType input) throws Exception {
+        final Map<HttpMethod, Function<String, MockHttpServletRequestBuilder>> httpMethodPicker = new HashMap<>();
+        httpMethodPicker.put(HttpMethod.GET, MockMvcRequestBuilders::get);
+        httpMethodPicker.put(HttpMethod.DELETE, MockMvcRequestBuilders::delete);
 
-        mockMvc.perform(httpMethodPicker.get(httpMethod).apply("/api/contacts/"+contactId)
-                .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
+        mockMvc.perform(httpMethodPicker.get(input.getHttpMethod()).apply("/api/contacts/"+input.getContactId())
+                .header("Authorization", "Bearer "+(input.getUser().equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
                 .accept(MediaType.ALL)
         )
-        .andExpect(status().is(httpStatus.value()))
+        .andExpect(status().is(input.getHttpStatus().value()))
         .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-        .andExpect(content().string(errorMessage));
-    }
-
-    private void assertNotFound(String user, String httpMethod, UUID contactId, String errorMessage) throws Exception {
-        assertNotFound(user, httpMethod, contactId, errorMessage, HttpStatus.NOT_FOUND);
+        .andExpect(content().string(input.getErrorMessage()));
     }
 }
