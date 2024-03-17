@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Builder
 @Getter
-public final class AssertNotFoundType {
+public final class AssertHttpErrorType {
 
     private final String user;
     private final HttpMethod httpMethod;

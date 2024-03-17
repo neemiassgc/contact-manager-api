@@ -1,7 +1,7 @@
 package com.spring.boot.controller;
 
 import com.spring.boot.TestResources;
-import com.spring.boot.controller.types.AssertNotFoundType;
+import com.spring.boot.controller.types.AssertHttpErrorType;
 import com.spring.boot.controller.types.ShouldRespondWithAllTheContactsType;
 import com.spring.boot.controller.types.ShouldReturnAContactType;
 import com.spring.boot.services.ContactManagerService;
@@ -126,8 +126,8 @@ public class ContactControllerIT {
     void should_respond_404_NOT_FOUND_when_requesting_for_a_contact_that_does_not_exist() throws Exception {
         final UUID contactId = UUID.fromString("c97775aa-b7f3-49c0-a586-d0466ba592bf");
 
-        assertNotFound(
-            AssertNotFoundType.builder()
+        assertHttpError(
+            AssertHttpErrorType.builder()
                 .contactId(contactId)
                 .user("robert")
                 .errorMessage("Contact not found")
@@ -142,8 +142,8 @@ public class ContactControllerIT {
     void should_respond_404_NOT_FOUND_when_requesting_for_a_contact_that_does_not_belong_to_the_current_user() throws Exception {
         final UUID contactId = UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408");
 
-        assertNotFound(
-            AssertNotFoundType.builder()
+        assertHttpError(
+            AssertHttpErrorType.builder()
                 .contactId(contactId)
                 .user("robert")
                 .errorMessage("Contact does not belong to the user: robert")
@@ -244,14 +244,15 @@ public class ContactControllerIT {
         .andExpect(status().isOk());
     }
 
-    private void assertNotFound(AssertNotFoundType input) throws Exception {
+    private void assertHttpError(AssertHttpErrorType input) throws Exception {
         final Map<HttpMethod, Function<String, MockHttpServletRequestBuilder>> httpMethodPicker = new HashMap<>();
         httpMethodPicker.put(HttpMethod.GET, MockMvcRequestBuilders::get);
         httpMethodPicker.put(HttpMethod.DELETE, MockMvcRequestBuilders::delete);
+        httpMethodPicker.put(HttpMethod.PUT, MockMvcRequestBuilders::delete);
 
         mockMvc.perform(httpMethodPicker.get(input.getHttpMethod()).apply("/api/contacts/"+input.getContactId())
-                .header("Authorization", "Bearer "+(input.getUser().equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
-                .accept(MediaType.ALL)
+            .header("Authorization", "Bearer "+(input.getUser().equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
+            .accept(MediaType.ALL)
         )
         .andExpect(status().is(input.getHttpStatus().value()))
         .andExpect(content().contentType(MediaType.TEXT_PLAIN))
