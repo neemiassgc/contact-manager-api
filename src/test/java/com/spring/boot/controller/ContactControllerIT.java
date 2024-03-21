@@ -274,6 +274,12 @@ public class ContactControllerIT {
         .andExpect(status().isOk());
     }
 
+    @Test
+    @DisplayName("DELETE /api/contacts/5c21433c-3c70-4253-a4b2-52b157be4167 -> 200 OK")
+    public void should_delete_a_contact_successfully_for_the_user_Joe() throws Exception {
+        shouldDeleteSuccessfully("joe", UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"));
+    }
+
     private void shouldDeleteSuccessfully(String user, UUID contactId) throws Exception {
         mockMvc.perform(delete("/api/contacts/" + contactId)
             .header("Authorization", "Bearer " + (user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
