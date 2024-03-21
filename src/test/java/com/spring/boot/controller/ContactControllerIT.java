@@ -25,6 +25,8 @@ import java.util.function.Function;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -268,6 +270,14 @@ public class ContactControllerIT {
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody)
+        )
+        .andExpect(status().isOk());
+    }
+
+    private void shouldDeleteSuccessfully(String user, UUID contactId) throws Exception {
+        mockMvc.perform(delete("/api/contacts/" + contactId)
+            .header("Authorization", "Bearer " + (user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
+            .accept(MediaType.ALL)
         )
         .andExpect(status().isOk());
     }
