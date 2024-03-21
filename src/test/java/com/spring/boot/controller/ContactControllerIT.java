@@ -231,6 +231,11 @@ public class ContactControllerIT {
         shouldUpdateSomeFieldsOfAContact(UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408"), "joe");
     }
 
+    @Test
+    @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> 200 OK")
+    void should_update_some_fields_of_a_contacts_for_the_user_Robert() throws Exception {
+        shouldUpdateSomeFieldsOfAContact(UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"), "robert");
+    }
     private void shouldUpdateSomeFieldsOfAContact(UUID contactId, String user) throws Exception {
         final String requestBody = """
         {
