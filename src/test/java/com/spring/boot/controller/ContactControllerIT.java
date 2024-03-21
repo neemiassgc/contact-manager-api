@@ -46,8 +46,8 @@ public class ContactControllerIT {
             ShouldRespondWithAllTheContactsType.builder()
                 .username("joe")
                 .phoneNumberSize(5)
-                .emailsSize(4)
-                .addressesSize(3)
+                .emailsSize(3)
+                .addressesSize(4)
                 .names(new String[]{"Greg from accounting", "Coworker Fred", "Sister Monica"})
                 .build()
         );
@@ -225,7 +225,8 @@ public class ContactControllerIT {
         )));
     }
 
-    private void shouldUpdateSomeFieldsOfAContact(String user) throws Exception {
+
+    private void shouldUpdateSomeFieldsOfAContact(UUID contactId, String user) throws Exception {
         final String requestBody = """
         {
             "name": "Bill",
@@ -237,7 +238,7 @@ public class ContactControllerIT {
         }
         """;
 
-        mockMvc.perform(put("/api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef")
+        mockMvc.perform(put("/api/contacts/"+contactId)
             .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON)
