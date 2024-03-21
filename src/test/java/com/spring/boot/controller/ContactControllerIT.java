@@ -236,6 +236,21 @@ public class ContactControllerIT {
     void should_update_some_fields_of_a_contacts_for_the_user_Robert() throws Exception {
         shouldUpdateSomeFieldsOfAContact(UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"), "robert");
     }
+
+    @Test
+    @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> 400 BAD_REQUEST")
+    void should_respond_400_when_trying_to_update_a_concat_that_does_not_belong_to_the_current_user() throws Exception {
+        assertHttpError(
+            AssertHttpErrorType.builder()
+                .contactId(UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"))
+                .errorMessage("Contact does not belong to the user: joe")
+                .httpStatus(HttpStatus.BAD_REQUEST)
+                .httpMethod(HttpMethod.PUT)
+                .user("joe")
+                .build()
+        );
+    }
+
     private void shouldUpdateSomeFieldsOfAContact(UUID contactId, String user) throws Exception {
         final String requestBody = """
         {
