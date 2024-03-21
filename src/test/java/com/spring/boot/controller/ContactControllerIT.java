@@ -25,8 +25,6 @@ import java.util.function.Function;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -284,6 +282,20 @@ public class ContactControllerIT {
     @DisplayName("DELETE /api/contacts/8fb2bd75-9aec-4cc5-b77b-a95f06081388 -> 200 OK")
     public void should_delete_a_contact_successfully_for_the_user_Robert() throws Exception {
         shouldDeleteSuccessfully("robert", UUID.fromString("8fb2bd75-9aec-4cc5-b77b-a95f06081388"));
+    }
+
+    @Test
+    @DisplayName("DELETE /api/contacts/8fb2bd75-9aec-4cc5-b77b-a95f06081388 -> 400 BAD_REQUEST")
+    public void should_respond_400_when_deleting_a_concat_whose_user_does_not_own_it() throws Exception {
+        assertHttpError(
+            AssertHttpErrorType.builder()
+                .contactId(UUID.fromString("8fb2bd75-9aec-4cc5-b77b-a95f06081388"))
+                .httpMethod(HttpMethod.DELETE)
+                .errorMessage("Contact does not belong to the user: joe")
+                .httpStatus(HttpStatus.BAD_REQUEST)
+                .user("joe")
+                .build()
+        );
     }
 
     private void shouldDeleteSuccessfully(String user, UUID contactId) throws Exception {
