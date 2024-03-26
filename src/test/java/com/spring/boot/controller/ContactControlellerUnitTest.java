@@ -1,6 +1,9 @@
 package com.spring.boot.controller;
 
 import com.spring.boot.TestResources;
+import com.spring.boot.controller.types.AssertHttpErrorType;
+import com.spring.boot.controller.types.ShouldRespondWithAllTheContactsType;
+import com.spring.boot.controller.types.ShouldReturnAContactType;
 import com.spring.boot.controllers.ContactController;
 import com.spring.boot.controllers.GlobalErrorController;
 import com.spring.boot.entities.Contact;
@@ -11,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -43,75 +47,113 @@ public class ContactControlellerUnitTest {
     @Test
     @DisplayName("GET /api/contacts -> OK 200")
     void should_response_all_the_contacts_for_Joe_with_OK_200() throws Exception {
-        shouldReturnAllContacts("joe", 5, 4, 3, "Greg from accounting", "Coworker Fred", "Sister Monica");
+        shouldRespondWithAllTheContacts(
+            ShouldRespondWithAllTheContactsType.builder()
+                .username("joe")
+                .phoneNumberSize(5)
+                .addressesSize(4)
+                .emailsSize(3)
+                .names(new String[]{"Greg from accounting", "Coworker Fred", "Sister Monica"})
+                .build()
+        );
     }
 
     @Test
     @DisplayName("GET /api/contacts -> OK 200")
     void should_return_all_the_contacts_for_Robert_with_OK_200() throws Exception {
-        shouldReturnAllContacts("robert", 7, 7, 7, "Best friend Julia", "Mom", "Pizza and burgers", "Uncle Jeff");
+        shouldRespondWithAllTheContacts(
+            ShouldRespondWithAllTheContactsType.builder()
+                .username("robert")
+                .phoneNumberSize(7)
+                .addressesSize(7)
+                .emailsSize(7)
+                .names(new String[]{"Best friend Julia", "Mom", "Pizza and burgers", "Uncle Jeff"})
+                .build()
+        );
     }
 
-    private void shouldReturnAllContacts(String user, int phoneNumberSize, int addressesSize, int emailsSize, String... names) throws Exception {
-        when(contactManagerService.findAllByUsername(eq(user)))
-            .thenReturn(user.equals("joe") ? TestResources.getContactsForJoe() : TestResources.getContactsForRobert());
+    private void shouldRespondWithAllTheContacts(ShouldRespondWithAllTheContactsType input) throws Exception {
+        when(contactManagerService.findAllByUsername(eq(input.getUsername())))
+            .thenReturn(input.getUsername().equals("joe") ? TestResources.getContactsForJoe() : TestResources.getContactsForRobert());
 
         mockMvc.perform(get("/api/contacts")
-            .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
+            .header("Authorization", "Bearer "+(input.getUsername().equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
             .accept(MediaType.APPLICATION_JSON)
         )
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$[*].name").value(containsInAnyOrder(names)))
-        .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(phoneNumberSize)))
-        .andExpect(jsonPath("$[*].addresses.*").value(hasSize(addressesSize)))
-        .andExpect(jsonPath("$[*].emails.*").value(hasSize(emailsSize)));
+        .andExpect(jsonPath("$[*].name").value(containsInAnyOrder(input.getNames())))
+        .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(input.getPhoneNumberSize())))
+        .andExpect(jsonPath("$[*].addresses.*").value(hasSize(input.getAddressesSize())))
+        .andExpect(jsonPath("$[*].emails.*").value(hasSize(input.getEmailsSize())));
 
-        verify(contactManagerService, times(1)).findAllByUsername(eq(user));
+        verify(contactManagerService, times(1)).findAllByUsername(eq(input.getUsername()));
         verifyNoMoreInteractions(contactManagerService);
     }
 
     @Test
     @DisplayName("GET /api/contacts/4fe25947-ecab-489c-a881-e0057124e408 -> OK 200")
     void should_return_a_contact_for_the_user_Joe_with_OK_200() throws Exception {
-        final UUID contactId = UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408");
-        shouldReturnAContact("joe", 3, contactId, "Coworker Fred");
+        shouldReturnAContact(
+            ShouldReturnAContactType.builder()
+                .user("joe")
+                .phoneNumberSize(3)
+                .addressesSize(1)
+                .contactId(UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408"))
+                .contactName("Coworker Fred")
+                .build()
+        );
     }
 
     @Test
     @DisplayName("GET /api/contacts/84edd1b9-89a5-4107-a84d-435676c2b8f5 -> 200 OK")
     void should_return_a_contact_for_the_user_Robert_with_OK_200() throws Exception {
-        final UUID contactId = UUID.fromString("84edd1b9-89a5-4107-a84d-435676c2b8f5");
-        shouldReturnAContact("robert", 1, contactId, "Mom");
+        shouldReturnAContact(
+            ShouldReturnAContactType.builder()
+                .user("robert")
+                .phoneNumberSize(1)
+                .addressesSize(1)
+                .contactId(UUID.fromString("84edd1b9-89a5-4107-a84d-435676c2b8f5"))
+                .contactName("Mom")
+                .build()
+        );
     }
 
-    private void shouldReturnAContact(String user, int phoneNumberSize, UUID contactId, String contactName) throws Exception {
-        when(contactManagerService.findByIdWithUser(eq(contactId), eq(user)))
-                .thenReturn(TestResources.getContactById(contactId));
+    private void shouldReturnAContact(ShouldReturnAContactType input) throws Exception {
+        when(contactManagerService.findByIdWithUser(eq(input.getContactId()), eq(input.getUser())))
+                .thenReturn(TestResources.getContactById(input.getContactId()));
 
-        mockMvc.perform(get("/api/contacts/"+contactId)
-            .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
+        mockMvc.perform(get("/api/contacts/"+input.getContactId())
+            .header("Authorization", "Bearer "+(input.getUser().equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
             .accept(MediaType.APPLICATION_JSON)
         )
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.name").value(contactName))
-        .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(phoneNumberSize)))
+        .andExpect(jsonPath("$.name").value(input.getContactName()))
+        .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(input.getPhoneNumberSize())))
         .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
         .andExpect(jsonPath("$.addresses.*").value(hasSize(1)));
 
-        verify(contactManagerService, times(1)).findByIdWithUser(eq(contactId), eq(user));
+        verify(contactManagerService, times(1)).findByIdWithUser(eq(input.getContactId()), eq(input.getUser()));
         verifyNoMoreInteractions(contactManagerService);
     }
 
     @Test
     @DisplayName("GET /api/contacts/c97775aa-b7f3-49c0-a586-d0466ba592bf -> 404 NOT FOUND")
-    void should_respond_404_NOT_FOUND_when_requesting_for_a_contact_that_does_not_exist() throws Exception {
+    void should_respond_404_when_requesting_for_a_contact_that_does_not_exist() throws Exception {
         final UUID contactId = UUID.fromString("c97775aa-b7f3-49c0-a586-d0466ba592bf");
-        when(contactManagerService.findByIdWithUser(eq(contactId), eq("robert")))
+        when(contactManagerService.findByIdWithUser(eq(contactId), eq("joe")))
             .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
 
-        assertNotFound("robert", "GET", contactId);
+        assertHttpError(
+            AssertHttpErrorType.builder()
+                .user("joe")
+                .httpStatus(HttpStatus.NOT_FOUND)
+                .contactId(contactId)
+                .httpMethod(HttpMethod.GET)
+                .errorMessage("Contact not found")
+                .build()
+        );
     }
 
     @Test
@@ -120,9 +162,17 @@ public class ContactControlellerUnitTest {
         final UUID contactId = UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408");
         final String errorMessage = "Contact does not belong to the user: robert";
         when(contactManagerService.findByIdWithUser(eq(contactId), eq("robert")))
-            .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage));
+            .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage));
 
-        assertNotFound("robert", "GET", contactId, errorMessage);
+        assertHttpError(
+            AssertHttpErrorType.builder()
+                .user("robert")
+                .httpStatus(HttpStatus.BAD_REQUEST)
+                .contactId(contactId)
+                .httpMethod(HttpMethod.GET)
+                .errorMessage(errorMessage)
+                .build()
+        );
     }
 
     @Test
@@ -205,16 +255,16 @@ public class ContactControlellerUnitTest {
     @Test
     @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> OK 200")
     void should_update_custom_fields_of_a_contact_for_the_Robert_successfully() throws Exception {
-        shouldUpdateCustomFields("robert");
+        shouldUpdateCustomFieldsOfAContact("robert");
     }
 
     @Test
     @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> OK 200")
     void should_update_custom_fields_of_a_contact_for_the_Joe_successfully() throws Exception {
-        shouldUpdateCustomFields("joe");
+        shouldUpdateCustomFieldsOfAContact("joe");
     }
 
-    private void shouldUpdateCustomFields(String user) throws Exception {
+    private void shouldUpdateCustomFieldsOfAContact(String user) throws Exception {
         doNothing().when(contactManagerService).updateWithUser(any(Contact.class), eq(user));
 
         final String requestBody = """
@@ -238,6 +288,42 @@ public class ContactControlellerUnitTest {
 
         verify(contactManagerService, times(1)).updateWithUser(any(Contact.class), eq(user));
         verifyNoMoreInteractions(contactManagerService);
+    }
+
+    @Test
+    @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> 400 BAD_REQUEST")
+    void should_respond_400_when_trying_to_update_a_contact_whose_user_is_not_the_owner() throws Exception {
+        final UUID contactId = UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef");
+        final String errorMessage = "Contact does not belong to the user: joe";
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage))
+            .when(contactManagerService).updateWithUser(any(Contact.class), eq("joe"));
+
+        assertHttpError(AssertHttpErrorType.builder()
+            .contactId(contactId)
+            .user("joe")
+            .httpStatus(HttpStatus.BAD_REQUEST)
+            .httpMethod(HttpMethod.PUT)
+            .errorMessage(errorMessage)
+            .build()
+        );
+    }
+
+    @Test
+    @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> 404 NOT FOUND")
+    void should_respond_404_when_trying_to_update_a_contact_that_does_not_exist() throws Exception {
+        final UUID contactId = UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef");
+        final String errorMessage = "Contact not found";
+        doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage))
+            .when(contactManagerService).updateWithUser(any(Contact.class), eq("joe"));
+
+        assertHttpError(AssertHttpErrorType.builder()
+            .contactId(contactId)
+            .user("joe")
+            .httpStatus(HttpStatus.NOT_FOUND)
+            .httpMethod(HttpMethod.PUT)
+            .errorMessage(errorMessage)
+            .build()
+        );
     }
 
     @Test
@@ -268,36 +354,71 @@ public class ContactControlellerUnitTest {
     }
 
     @Test
+    @DisplayName("DELETE /api/contacts/8fb2bd75-9aec-4cc5-b77b-a95f06081388 -> 400 BAD_REQUEST")
+    public void should_respond_400_when_deleting_a_concat_whose_user_does_not_own_it() throws Exception {
+        final UUID contactId = UUID.fromString("8fb2bd75-9aec-4cc5-b77b-a95f06081388");
+
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contact does not belong to the user: joe"))
+                .when(contactManagerService).deleteByIdWithUser(eq(contactId), eq("joe"));
+
+        assertHttpError(
+            AssertHttpErrorType.builder()
+                .contactId(contactId)
+                .httpMethod(HttpMethod.DELETE)
+                .errorMessage("Contact does not belong to the user: joe")
+                .httpStatus(HttpStatus.BAD_REQUEST)
+                .user("joe")
+                .build()
+        );
+
+        verify(contactManagerService, times(1)).deleteByIdWithUser(eq(contactId), eq("joe"));
+        verifyNoMoreInteractions(contactManagerService);
+    }
+
+
+    @Test
     @DisplayName("DELETE /api/contacts/35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7 -> 404 NOT_FOUND")
     void should_respond_404_when_trying_to_delete_a_contact_that_does_not_exist() throws Exception {
         final UUID contactId = UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7");
         doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"))
             .when(contactManagerService).deleteByIdWithUser(eq(contactId), eq("joe"));
 
-        assertNotFound("joe", "DELETE", contactId);
+        assertHttpError(
+            AssertHttpErrorType.builder()
+                .contactId(contactId)
+                .httpMethod(HttpMethod.DELETE)
+                .errorMessage("Contact not found")
+                .httpStatus(HttpStatus.NOT_FOUND)
+                .user("joe")
+                .build()
+        );
     }
 
-    private void assertNotFound(String user, String httpMethod, UUID contactId) throws Exception {
-        assertNotFound(user, httpMethod, contactId, "Contact not found");
-    }
+    private void assertHttpError(AssertHttpErrorType input) throws Exception {
+        final Map<HttpMethod, Function<String, MockHttpServletRequestBuilder>> httpMethodPicker = new HashMap<>();
+        httpMethodPicker.put(HttpMethod.GET, MockMvcRequestBuilders::get);
+        httpMethodPicker.put(HttpMethod.DELETE, MockMvcRequestBuilders::delete);
+        httpMethodPicker.put(HttpMethod.PUT, MockMvcRequestBuilders::put);
 
-    private void assertNotFound(String user, String httpMethod, UUID contactId, String errorMessage) throws Exception {
-        final Map<String, Function<String, MockHttpServletRequestBuilder>> httpMethodPicker = new HashMap<>();
-        httpMethodPicker.put("GET", MockMvcRequestBuilders::get);
-        httpMethodPicker.put("DELETE", MockMvcRequestBuilders::delete);
+        final MockHttpServletRequestBuilder mockHttp =
+            httpMethodPicker.get(input.getHttpMethod()).apply("/api/contacts/"+input.getContactId())
+                .header("Authorization", "Bearer "+(input.getUser().equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
+                .accept(MediaType.ALL);
 
-        mockMvc.perform(httpMethodPicker.get(httpMethod).apply("/api/contacts/"+contactId)
-            .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
-            .accept(MediaType.ALL)
-        )
-        .andExpect(status().isNotFound())
-        .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-        .andExpect(content().string(errorMessage));
+        if (input.getHttpMethod().matches("PUT"))
+            mockHttp.content("{\"name\": \"Billy\"}").contentType(MediaType.APPLICATION_JSON);
 
-        if (httpMethod.equals("DELETE"))
-            verify(contactManagerService, times(1)).deleteByIdWithUser(eq(contactId), eq(user));
-        if (httpMethod.equals("GET"))
-            verify(contactManagerService, times(1)).findByIdWithUser(eq(contactId), eq("robert"));
+        mockMvc.perform(mockHttp)
+            .andExpect(status().is(input.getHttpStatus().value()))
+            .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+            .andExpect(content().string(input.getErrorMessage()));
+
+        if (input.getHttpMethod().matches("DELETE"))
+            verify(contactManagerService, times(1)).deleteByIdWithUser(eq(input.getContactId()), eq(input.getUser()));
+        if (input.getHttpMethod().matches("GET"))
+            verify(contactManagerService, times(1)).findByIdWithUser(eq(input.getContactId()), eq(input.getUser()));
+        if (input.getHttpMethod().matches("PUT"))
+            verify(contactManagerService, times(1)).updateWithUser(any(Contact.class), eq(input.getUser()));
 
         verifyNoMoreInteractions(contactManagerService);
     }
