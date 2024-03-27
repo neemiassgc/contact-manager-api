@@ -1,27 +1,18 @@
 package com.spring.boot.controller;
 
 import com.spring.boot.TestResources;
-import com.spring.boot.controller.types.AssertHttpErrorType;
-import com.spring.boot.controller.types.ShouldRespondWithAllTheContactsType;
-import com.spring.boot.controller.types.ShouldReturnAContactType;
 import com.spring.boot.services.ContactManagerService;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
-import java.util.function.Function;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
@@ -39,163 +30,228 @@ public class ContactControllerIT {
     @Autowired
     private MockMvc mockMvc;
 
-    @Test
-    @DisplayName("GET /api/contacts -> 200 OK")
-    public void should_respond_with_all_the_contacts_from_the_user_Joe_with_OK() throws Exception {
-        shouldRespondWithAllTheContacts(
-            ShouldRespondWithAllTheContactsType.builder()
-                .username("joe")
-                .phoneNumberSize(5)
-                .emailsSize(3)
-                .addressesSize(4)
-                .names(new String[]{"Greg from accounting", "Coworker Fred", "Sister Monica"})
-                .build()
-        );
+    @Nested
+    public class TestCasesForJoe {
+
+        @Test
+        @DisplayName("GET /api/contacts -> 200 OK")
+        public void should_respond_with_all_the_contacts() throws Exception {
+            mockMvc.perform(get("/api/contacts")
+                .accept(MediaType.ALL)
+                .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
+            )
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$[*].name").value(containsInAnyOrder("Greg from accounting", "Coworker Fred", "Sister Monica")))
+            .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(5)))
+            .andExpect(jsonPath("$[*].addresses.*").value(hasSize(4)))
+            .andExpect(jsonPath("$[*].emails.*").value(hasSize(3)));
+        }
+
+        @Test
+        @DisplayName("GET /api/contacts/5c21433c-3c70-4253-a4b2-52b157be4167 --> 200 OK")
+        public void should_respond_with_a_contact_successfully() throws Exception {
+            mockMvc.perform(get("/api/contacts/"+UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"))
+                .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
+                .accept(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.name").value("Greg from accounting"))
+            .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(1)))
+            .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
+            .andExpect(jsonPath("$.addresses.*").value(hasSize(2)));
+        }
+
+        @Test
+        @DisplayName("POST /api/contacts -> 201 CREATED")
+        void should_create_a_new_contact_successfully() throws Exception {
+            final String jsonContent = """
+            {
+                "name": "Steve",
+                "phoneNumbers": {
+                    "personal": "+817283640198"
+                },
+                "emails": {
+                    "main": "stevan@mymail.com"
+                },
+                "addresses": {
+                    "home": {
+                        "country": "United States",
+                        "street": "467 Jennifer Lane",
+                        "state": "North Carolina",
+                        "city": "Cary",
+                        "zipcode": "27513"
+                    }
+                }
+            }
+            """;
+
+            mockMvc.perform(post("/api/contacts")
+                .header("Authorization", "Bearer " + TestResources.jwtTokenForJoe())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonContent)
+            )
+            .andExpect(status().isCreated());
+        }
+
+        @Test
+        @DisplayName("PUT /api/contacts/4fe25947-ecab-489c-a881-e0057124e408 -> 200 OK")
+        void should_update_isolated_fields_of_a_contact_successfully() throws Exception {
+            final String requestBody = """
+            {
+                "name": "Bill",
+                "phoneNumbers": {
+                    "cellphone": "+811234567890"
+                },
+                "addresses": {
+                }
+            }
+            """;
+
+            mockMvc.perform(put("/api/contacts/"+UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408"))
+                .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)
+            )
+            .andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("DELETE /api/contacts/5c21433c-3c70-4253-a4b2-52b157be4167 -> 200 OK")
+        public void should_delete_a_contact_successfully() throws Exception {
+            mockMvc.perform(delete("/api/contacts/"+UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"))
+                .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
+                .accept(MediaType.ALL)
+            )
+            .andExpect(status().isOk());
+        }
     }
 
-    @Test
-    @DisplayName("GET /api/contacts -> 200 OK")
-    public void should_respond_with_all_the_contacts_from_the_user_Robert_with_OK() throws Exception {
-        shouldRespondWithAllTheContacts(
-            ShouldRespondWithAllTheContactsType.builder()
-                .username("robert")
-                .phoneNumberSize(7)
-                .addressesSize(7)
-                .emailsSize(7)
-                .names(new String[]{"Best friend Julia", "Mom", "Pizza and burgers", "Uncle Jeff"})
-                .build()
-        );
-    }
+    @Nested
+    public class TestCasesForRobert {
 
-    private void shouldRespondWithAllTheContacts(ShouldRespondWithAllTheContactsType input) throws Exception {
-        final String userToken = input.getUsername().equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert();
+        @Test
+        @DisplayName("GET /api/contacts -> 200 OK")
+        public void should_respond_with_all_the_contacts() throws Exception {
+            mockMvc.perform(get("/api/contacts")
+                .accept(MediaType.ALL)
+                .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
+            )
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$[*].name").value(containsInAnyOrder("Best friend Julia", "Mom", "Pizza and burgers", "Uncle Jeff")))
+            .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(7)))
+            .andExpect(jsonPath("$[*].addresses.*").value(hasSize(7)))
+            .andExpect(jsonPath("$[*].emails.*").value(hasSize(7)));
+        }
 
-        mockMvc.perform(get("/api/contacts")
-            .accept(MediaType.ALL)
-            .header("Authorization", "Bearer "+userToken)
-        )
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$[*].name").value(containsInAnyOrder(input.getNames())))
-        .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(input.getPhoneNumberSize())))
-        .andExpect(jsonPath("$[*].addresses.*").value(hasSize(input.getAddressesSize())))
-        .andExpect(jsonPath("$[*].emails.*").value(hasSize(input.getEmailsSize())));
-    }
+        @Test
+        @DisplayName("GET /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef --> 200 OK")
+        public void should_respond_with_a_contact_successfully() throws Exception {
+            mockMvc.perform(get("/api/contacts/"+UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"))
+                .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
+                .accept(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.name").value("Uncle Jeff"))
+            .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(2)))
+            .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
+            .andExpect(jsonPath("$.addresses.*").value(hasSize(2)));
+        }
 
-    @Test
-    @DisplayName("GET /api/contacts/5c21433c-3c70-4253-a4b2-52b157be4167")
-    public void should_respond_with_a_contact_for_the_user_John_successfully() throws Exception {
-        shouldReturnAContact(
-            ShouldReturnAContactType.builder()
-                .user("joe")
-                .contactId(UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"))
-                .phoneNumberSize(1)
-                .addressesSize(2)
-                .contactName("Greg from accounting")
-                .build()
-        );
-    }
+        @Test
+        @DisplayName("POST /api/contacts -> 201 CREATED")
+        void should_create_a_new_contact_successfully() throws Exception {
+            final String jsonContent = """
+            {
+                "name": "Steve",
+                "phoneNumbers": {
+                    "personal": "+817283640198"
+                },
+                "emails": {
+                    "main": "stevan@mymail.com"
+                },
+                "addresses": {
+                    "home": {
+                        "country": "United States",
+                        "street": "467 Jennifer Lane",
+                        "state": "North Carolina",
+                        "city": "Cary",
+                        "zipcode": "27513"
+                    }
+                }
+            }
+            """;
 
-    @Test
-    @DisplayName("GET /api/contacts/5c21433c-3c70-4253-a4b2-52b157be4167")
-    public void should_respond_with_a_contact_for_the_user_Robert_successfully() throws Exception {
-        shouldReturnAContact(
-            ShouldReturnAContactType.builder()
-                .user("robert")
-                .contactId(UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"))
-                .phoneNumberSize(2)
-                .addressesSize(2)
-                .contactName("Uncle Jeff")
-                .build()
-        );
-    }
+            mockMvc.perform(post("/api/contacts")
+                .header("Authorization", "Bearer " + TestResources.jwtTokenForRobert())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonContent)
+            )
+            .andExpect(status().isCreated());
+        }
 
-    private void shouldReturnAContact(ShouldReturnAContactType input) throws Exception {
-        mockMvc.perform(get("/api/contacts/"+input.getContactId())
-            .header("Authorization", "Bearer "+(input.getUser().equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
-            .accept(MediaType.APPLICATION_JSON)
-        )
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.name").value(input.getContactName()))
-        .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(input.getPhoneNumberSize())))
-        .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
-        .andExpect(jsonPath("$.addresses.*").value(hasSize(input.getAddressesSize())));
+        @Test
+        @DisplayName("PUT /api/contacts/84edd1b9-89a5-4107-a84d-435676c2b8f5 -> 200 OK")
+        void should_update_isolated_fields_of_a_contact_successfully() throws Exception {
+            final String requestBody = """
+            {
+                "name": "Bill",
+                "phoneNumbers": {
+                    "cellphone": "+811234567890"
+                },
+                "addresses": {
+                }
+            }
+            """;
+
+            mockMvc.perform(put("/api/contacts/"+UUID.fromString("84edd1b9-89a5-4107-a84d-435676c2b8f5"))
+                .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)
+            )
+            .andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("DELETE /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> 200 OK")
+        public void should_delete_a_contact_successfully() throws Exception {
+            mockMvc.perform(delete("/api/contacts/"+UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"))
+                .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
+                .accept(MediaType.ALL)
+            )
+            .andExpect(status().isOk());
+        }
     }
 
     @Test
     @DisplayName("GET /api/contacts/c97775aa-b7f3-49c0-a586-d0466ba592bf -> 404 NOT FOUND")
     void should_respond_404_NOT_FOUND_when_requesting_for_a_contact_that_does_not_exist() throws Exception {
-        final UUID contactId = UUID.fromString("c97775aa-b7f3-49c0-a586-d0466ba592bf");
-
-        assertHttpError(
-            AssertHttpErrorType.builder()
-                .contactId(contactId)
-                .user("robert")
-                .errorMessage("Contact not found")
-                .httpMethod(HttpMethod.GET)
-                .httpStatus(HttpStatus.NOT_FOUND)
-                .build()
-        );
-    }
-
-    @Test
-    @DisplayName("GET /api/contacts/4fe25947-ecab-489c-a881-e0057124e408 -> 404 NOT FOUND")
-    void should_respond_404_NOT_FOUND_when_requesting_for_a_contact_that_does_not_belong_to_the_current_user() throws Exception {
-        final UUID contactId = UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408");
-
-        assertHttpError(
-            AssertHttpErrorType.builder()
-                .contactId(contactId)
-                .user("robert")
-                .errorMessage("Contact does not belong to the user: robert")
-                .httpMethod(HttpMethod.GET)
-                .httpStatus(HttpStatus.BAD_REQUEST)
-                .build()
-        );
-    }
-
-    @Test
-    @DisplayName("POST /api/contacts -> 201 CREATED")
-    void should_create_a_contact_for_the_user_Joe_successfully() throws Exception {
-        shouldCreateAContact("joe");
-    }
-
-    @Test
-    @DisplayName("POST /api/contacts -> 201 CREATED")
-    void should_create_a_contact_for_the_user_Robert_successfully() throws Exception {
-        shouldCreateAContact("robert");
-    }
-
-    private void shouldCreateAContact(String user) throws Exception {
-        final String jsonContent = """
-        {
-            "name": "Steve",
-            "phoneNumbers": {
-                "personal": "+817283640198"
-            },
-            "emails": {
-                "main": "stevan@mymail.com"
-            },
-            "addresses": {
-                "home": {
-                    "country": "United States",
-                    "street": "467 Jennifer Lane",
-                    "state": "North Carolina",
-                    "city": "Cary",
-                    "zipcode": "27513"
-                }
-            }
-        }
-        """;
-
-        mockMvc.perform(post("/api/contacts")
-            .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
-            .accept(MediaType.APPLICATION_JSON)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(jsonContent)
+        mockMvc.perform(get("/api/contacts/"+UUID.fromString("c97775aa-b7f3-49c0-a586-d0466ba592bf"))
+            .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
+            .accept(MediaType.ALL)
         )
-        .andExpect(status().isCreated());
+        .andExpect(status().isNotFound())
+        .andExpect(content().contentType(MediaType.TEXT_PLAIN))
+        .andExpect(content().string("Contact not found"));
+    }
+
+    @Test
+    @DisplayName("GET /api/contacts/4fe25947-ecab-489c-a881-e0057124e408 -> 400 BAD REQUEST")
+    void should_respond_400_when_requesting_for_a_contact_that_does_not_belong_to_the_current_user() throws Exception {
+        mockMvc.perform(get("/api/contacts/"+UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408"))
+            .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
+            .accept(MediaType.ALL)
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(content().contentType(MediaType.TEXT_PLAIN))
+        .andExpect(content().string("Contact does not belong to the user: robert"));
     }
 
     @Test
@@ -226,98 +282,28 @@ public class ContactControllerIT {
     }
 
     @Test
-    @DisplayName("PUT /api/contacts/4fe25947-ecab-489c-a881-e0057124e408 -> 200 OK")
-    void should_update_some_fields_of_a_contacts_for_the_user_Joe() throws Exception {
-        shouldUpdateSomeFieldsOfAContact(UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408"), "joe");
-    }
-
-    @Test
-    @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> 200 OK")
-    void should_update_some_fields_of_a_contacts_for_the_user_Robert() throws Exception {
-        shouldUpdateSomeFieldsOfAContact(UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"), "robert");
-    }
-
-    @Test
-    @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> 400 BAD_REQUEST")
+    @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> 400 BAD REQUEST")
     void should_respond_400_when_trying_to_update_a_concat_that_does_not_belong_to_the_current_user() throws Exception {
-        assertHttpError(
-            AssertHttpErrorType.builder()
-                .contactId(UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"))
-                .errorMessage("Contact does not belong to the user: joe")
-                .httpStatus(HttpStatus.BAD_REQUEST)
-                .httpMethod(HttpMethod.PUT)
-                .user("joe")
-                .build()
-        );
-    }
-
-    private void shouldUpdateSomeFieldsOfAContact(UUID contactId, String user) throws Exception {
-        final String requestBody = """
-        {
-            "name": "Bill",
-            "phoneNumbers": {
-                "cellphone": "+811234567890"
-            },
-            "addresses": {
-            }
-        }
-        """;
-
-        mockMvc.perform(put("/api/contacts/"+contactId)
-            .header("Authorization", "Bearer "+(user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
-            .accept(MediaType.APPLICATION_JSON)
+        mockMvc.perform(put("/api/contacts/"+UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"))
+            .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
             .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody)
+            .content("{\"name\": \"Billy\"}")
+            .accept(MediaType.ALL)
         )
-        .andExpect(status().isOk());
-    }
-
-    @Test
-    @DisplayName("DELETE /api/contacts/5c21433c-3c70-4253-a4b2-52b157be4167 -> 200 OK")
-    public void should_delete_a_contact_successfully_for_the_user_Joe() throws Exception {
-        shouldDeleteSuccessfully("joe", UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"));
-    }
-
-    @Test
-    @DisplayName("DELETE /api/contacts/8fb2bd75-9aec-4cc5-b77b-a95f06081388 -> 200 OK")
-    public void should_delete_a_contact_successfully_for_the_user_Robert() throws Exception {
-        shouldDeleteSuccessfully("robert", UUID.fromString("8fb2bd75-9aec-4cc5-b77b-a95f06081388"));
+        .andExpect(status().isBadRequest())
+        .andExpect(content().contentType(MediaType.TEXT_PLAIN))
+        .andExpect(content().string("Contact does not belong to the user: joe"));
     }
 
     @Test
     @DisplayName("DELETE /api/contacts/8fb2bd75-9aec-4cc5-b77b-a95f06081388 -> 400 BAD_REQUEST")
     public void should_respond_400_when_deleting_a_concat_whose_user_does_not_own_it() throws Exception {
-        assertHttpError(
-            AssertHttpErrorType.builder()
-                .contactId(UUID.fromString("8fb2bd75-9aec-4cc5-b77b-a95f06081388"))
-                .httpMethod(HttpMethod.DELETE)
-                .errorMessage("Contact does not belong to the user: joe")
-                .httpStatus(HttpStatus.BAD_REQUEST)
-                .user("joe")
-                .build()
-        );
-    }
-
-    private void shouldDeleteSuccessfully(String user, UUID contactId) throws Exception {
-        mockMvc.perform(delete("/api/contacts/" + contactId)
-            .header("Authorization", "Bearer " + (user.equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
+        mockMvc.perform(delete("/api/contacts/"+UUID.fromString("8fb2bd75-9aec-4cc5-b77b-a95f06081388"))
+            .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
             .accept(MediaType.ALL)
         )
-        .andExpect(status().isOk());
-    }
-
-    private void assertHttpError(AssertHttpErrorType input) throws Exception {
-        final Map<HttpMethod, Function<String, MockHttpServletRequestBuilder>> httpMethodPicker = new HashMap<>();
-        httpMethodPicker.put(HttpMethod.GET, MockMvcRequestBuilders::get);
-        httpMethodPicker.put(HttpMethod.DELETE, MockMvcRequestBuilders::delete);
-        httpMethodPicker.put(HttpMethod.PUT, MockMvcRequestBuilders::delete);
-
-        mockMvc.perform(httpMethodPicker.get(input.getHttpMethod()).apply("/api/contacts/"+input.getContactId())
-            .header("Authorization", "Bearer "+(input.getUser().equals("joe") ? TestResources.jwtTokenForJoe() : TestResources.jwtTokenForRobert()))
-            .accept(MediaType.ALL)
-        )
-        .andExpect(status().is(input.getHttpStatus().value()))
-        .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-        .andExpect(content().string(input.getErrorMessage()));
+        .andExpect(status().isBadRequest())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+        .andExpect(content().string("Contact does not belong to the user: joe"));
     }
 }
