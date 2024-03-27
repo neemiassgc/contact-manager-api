@@ -1,5 +1,6 @@
 package com.spring.boot.entities;
 
+import com.spring.boot.entities.projections.SimpleUser;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -26,6 +27,7 @@ public class User {
     @Setter
     private String username;
 
+    @Setter
     private String avatarUri;
 
     public User(final String username) {
@@ -45,5 +47,11 @@ public class User {
             Objects.equals(id, thatUser.getId()) &&
             Objects.equals(username, thatUser.getUsername()) &&
             Objects.equals(avatarUri, thatUser.getAvatarUri());
+    }
+
+    public static User toUser(final SimpleUser simpleUser) {
+        final User newUser = new User(simpleUser.getUsername());
+        newUser.setAvatarUri(simpleUser.getAvatarUri());
+        return newUser;
     }
 }
