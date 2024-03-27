@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 
 @SpringBootTest
 @Transactional
-public class ContactManagerServiceIT {
+public class ContactManagerServiceIntegrationTest {
 
     @Autowired
     private ContactManagerService contactManagerService;

@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
 @Transactional
-public class ContactControllerIT {
+public class ContactControllerIntegrationTest {
 
     @Autowired
     private ContactManagerService contactManagerService;
