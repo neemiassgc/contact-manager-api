@@ -11,11 +11,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @SpringBootTest
 public class UserServiceTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     void should_return_a_user_by_its_username() {
@@ -33,5 +38,16 @@ public class UserServiceTest {
         assertThat(throwable).isInstanceOf(ResponseStatusException.class);
         assertThat(((ResponseStatusException) throwable).getReason()).isEqualTo("User not found");
         assertThat(((ResponseStatusException) throwable).getStatusCode()).isEqualTo(HttpStatusCode.valueOf(404));
+    }
+
+    @Test
+    void should_create_a_new_user_successfully() {
+        final User newUser = new User("Kevin");
+
+        userService.create(newUser);
+
+        final List<User> actualUsers = userRepository.findAll();
+
+        assertThat(actualUsers).hasSize(3);
     }
 }
