@@ -2,6 +2,7 @@ package com.spring.boot.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -12,9 +13,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SpringSecurityConfig {
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(final HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors(AbstractHttpConfigurer::disable);
+        httpSecurity.authorizeHttpRequests(it -> it.requestMatchers(HttpMethod.POST, "/api/users").hasAuthority("ROLE_admin"));
         httpSecurity.authorizeHttpRequests(it -> it.anyRequest().authenticated());
         httpSecurity.httpBasic(AbstractHttpConfigurer::disable);
         httpSecurity.oauth2ResourceServer(it -> it.jwt(Customizer.withDefaults()));
