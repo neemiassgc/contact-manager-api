@@ -15,7 +15,7 @@ public final class SimpleUser {
     private final String username;
 
     @Pattern(
-        regexp = "^(https?)://[a-zA-Z0-9.-]+\\\\.[a-zA-Z]{2,}(/[/a-zA-Z0-9._-]+)*$",
+        regexp = "^(https?)://[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(/[/a-zA-Z0-9._-]+)*$",
         message = "'avatarUri' must be a valid Url"
     )
     private final String avatarUri;
