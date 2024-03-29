@@ -1,21 +1,15 @@
 package com.spring.boot.controller;
 
 import com.spring.boot.TestResources;
-import com.spring.boot.entities.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.server.ResponseStatusException;
 
-import static com.spring.boot.TestResources.once;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -70,5 +64,18 @@ public class UserControllerIntegrationTest {
         .andExpect(status().isBadRequest())
         .andExpect(content().contentType(MediaType.TEXT_PLAIN))
         .andExpect(content().string("User already exists"));
+    }
+
+    @Test
+    @DisplayName("POST /api/users -> 403 FORBIDDEN")
+    public void access_should_be_denied_when_the_user_does_not_own_admin_role() throws Exception {
+        final String jsonBody = "{\"username\": \"julia\", \"avatarUri\": \"https://example.com/my-avatar.png\"}";
+        mockMvc.perform(post("/api/users")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.ALL)
+            .content(jsonBody)
+            .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
+        )
+        .andExpect(status().isForbidden());
     }
 }
