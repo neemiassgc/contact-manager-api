@@ -3,12 +3,15 @@ package com.spring.boot;
 import com.spring.boot.entities.Contact;
 import com.spring.boot.entities.User;
 import com.spring.boot.entities.embeddables.Address;
+import org.mockito.verification.VerificationMode;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static org.mockito.Mockito.times;
 
 public final class TestResources {
 
@@ -296,5 +299,9 @@ public final class TestResources {
         DgtXXImEV5hxegNIKMe1HyfMRm1ypqElnommSbomhdvVa5lBHoUePn2kcnqPLqu1JE4mA51wXhfss-Wu2ETZ62KkjA1Xg8OsjQ3
         eBhxubTsju7juY6zXMMv5JCJXcwrRhd4bdf4vHOojwA
         """.trim().replaceAll("\\s", "");
+    }
+
+    public static VerificationMode once() {
+        return times(1);
     }
 }

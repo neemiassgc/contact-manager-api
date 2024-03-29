@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static com.spring.boot.TestResources.once;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -444,9 +445,5 @@ public class ContactControlellerUnitTest {
 
         verify(contactManagerService, once()).deleteByIdWithUser(eq(contactId), eq("joe"));
         verifyNoMoreInteractions(contactManagerService);
-    }
-
-    private VerificationMode once() {
-        return times(1);
     }
 }
