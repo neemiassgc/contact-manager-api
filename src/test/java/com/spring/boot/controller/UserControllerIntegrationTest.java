@@ -78,4 +78,16 @@ public class UserControllerIntegrationTest {
         )
         .andExpect(status().isForbidden());
     }
+
+    @Test
+    @DisplayName("POST /api/users -> 403 FORBIDDEN")
+    public void access_should_be_denied_when_there_is_no_authentication() throws Exception {
+        final String jsonBody = "{\"username\": \"julia\", \"avatarUri\": \"https://example.com/my-avatar.png\"}";
+        mockMvc.perform(post("/api/users")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.ALL)
+            .content(jsonBody)
+        )
+        .andExpect(status().isForbidden());
+    }
 }
