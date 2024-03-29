@@ -281,4 +281,20 @@ public final class TestResources {
             DOoykEHQK2w003DePt_JT3uhVRMZIFLAMuyZfTrQ1_JvQ
         """.trim().replaceAll("\\s", "");
     }
+
+    public static String jwtTokenWithAdminAuthority() {
+        return
+        """
+        eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJuNmpaamhHcmtpd2xnT0hmVDB1dEJ5cVQ4aXBSSG5Edzh3cVp
+        DV1RDa2VZIn0.eyJleHAiOjIwMjcwMzE2NzQsImlhdCI6MTcxMTY3MTY3NCwianRpIjoiZTM4NWIwOWQtOTc4My00YTI5LTg2OW
+        EtZmY1Y2IyZDEyOTY1IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDAwL3JlYWxtcy9tYWluIiwic3ViIjoiN2UzOGUwYzMtY
+        zRiZC00YmNiLWFjZTItNWRjYmIyMTlkZWQzIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiY29udGFjdC1tYW5hZ2VyIiwic2Vzc2lv
+        bl9zdGF0ZSI6ImQwMzVmMmM3LThkMmEtNGY3Yi05MmI3LTJhYWUyZTZhMDFjZCIsInNjb3BlIjoiIiwic2lkIjoiZDAzNWYyYzc
+        tOGQyYS00ZjdiLTkyYjctMmFhZTJlNmEwMWNkIiwiYXV0aG9yaXRpZXMiOlsiYWRtaW4iXSwidXNlcm5hbWUiOiJyb290In0.KY
+        yJuEPhR9W8GF_it3y__Cgnv1fKrFhCEU6YCL3iT3-nEERS66N9KraSNqe1hzw4zt0X7vIpt-AURc3-qzt1qAj-OnSVjPWg6NcTa
+        BlDrzAhySHxPiOEUSv7WGb-1h1Y-3rkVGcDMZ6U6xVDSWymBu34akuhlnJNHKJToBEEyXeKiHvtzAYLvrhb1rihw9jm5cjwhMkf
+        DgtXXImEV5hxegNIKMe1HyfMRm1ypqElnommSbomhdvVa5lBHoUePn2kcnqPLqu1JE4mA51wXhfss-Wu2ETZ62KkjA1Xg8OsjQ3
+        eBhxubTsju7juY6zXMMv5JCJXcwrRhd4bdf4vHOojwA
+        """.trim().replaceAll("\\s", "");
+    }
 }
