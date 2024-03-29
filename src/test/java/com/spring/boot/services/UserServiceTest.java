@@ -1,10 +1,7 @@
 package com.spring.boot.services;
 
 import com.spring.boot.entities.User;
-import static org.assertj.core.api.Assertions.*;
-
 import com.spring.boot.repositories.UserRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,6 +9,9 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 @SpringBootTest
 public class UserServiceTest {
@@ -49,5 +49,17 @@ public class UserServiceTest {
         final List<User> actualUsers = userRepository.findAll();
 
         assertThat(actualUsers).hasSize(3);
+    }
+
+    @Test
+    void should_throw_an_error_when_trying_to_create_a_user_that_already_exists() {
+        final User newUser = new User("joe");
+
+        final Throwable throwable = catchThrowable(() -> userService.create(newUser));
+
+        assertThat(throwable).isNotNull();
+        assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+        assertThat(((ResponseStatusException) throwable).getReason()).isEqualTo("User already exists");
+        assertThat(((ResponseStatusException) throwable).getStatusCode()).isEqualTo(HttpStatusCode.valueOf(400));
     }
 }
