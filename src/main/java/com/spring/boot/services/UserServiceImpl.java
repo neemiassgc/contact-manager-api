@@ -24,6 +24,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void create(User user) {
-        userRepository.save(user);
+        try {
+            findByUsername(user.getUsername());
+        }
+        catch (ResponseStatusException ignored) {
+            userRepository.save(user);
+            return;
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already exists");
     }
 }
