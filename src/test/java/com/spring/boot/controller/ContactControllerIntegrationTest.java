@@ -12,8 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -51,7 +49,7 @@ public class ContactControllerIntegrationTest {
         @Test
         @DisplayName("GET /api/contacts/5c21433c-3c70-4253-a4b2-52b157be4167 --> 200 OK")
         public void should_respond_with_a_contact_successfully() throws Exception {
-            mockMvc.perform(get("/api/contacts/"+UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"))
+            mockMvc.perform(get("/api/contacts/5c21433c-3c70-4253-a4b2-52b157be4167")
                 .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
                 .accept(MediaType.APPLICATION_JSON)
             )
@@ -110,7 +108,7 @@ public class ContactControllerIntegrationTest {
             }
             """;
 
-            mockMvc.perform(put("/api/contacts/"+UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408"))
+            mockMvc.perform(put("/api/contacts/4fe25947-ecab-489c-a881-e0057124e408")
                 .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -122,7 +120,7 @@ public class ContactControllerIntegrationTest {
         @Test
         @DisplayName("DELETE /api/contacts/5c21433c-3c70-4253-a4b2-52b157be4167 -> 200 OK")
         public void should_delete_a_contact_successfully() throws Exception {
-            mockMvc.perform(delete("/api/contacts/"+UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"))
+            mockMvc.perform(delete("/api/contacts/5c21433c-3c70-4253-a4b2-52b157be4167")
                 .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
                 .accept(MediaType.ALL)
             )
@@ -151,7 +149,7 @@ public class ContactControllerIntegrationTest {
         @Test
         @DisplayName("GET /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef --> 200 OK")
         public void should_respond_with_a_contact_successfully() throws Exception {
-            mockMvc.perform(get("/api/contacts/"+UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"))
+            mockMvc.perform(get("/api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef")
                 .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
                 .accept(MediaType.APPLICATION_JSON)
             )
@@ -210,7 +208,7 @@ public class ContactControllerIntegrationTest {
             }
             """;
 
-            mockMvc.perform(put("/api/contacts/"+UUID.fromString("84edd1b9-89a5-4107-a84d-435676c2b8f5"))
+            mockMvc.perform(put("/api/contacts/84edd1b9-89a5-4107-a84d-435676c2b8f5")
                 .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -222,7 +220,7 @@ public class ContactControllerIntegrationTest {
         @Test
         @DisplayName("DELETE /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> 200 OK")
         public void should_delete_a_contact_successfully() throws Exception {
-            mockMvc.perform(delete("/api/contacts/"+UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"))
+            mockMvc.perform(delete("/api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef")
                 .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
                 .accept(MediaType.ALL)
             )
@@ -233,7 +231,7 @@ public class ContactControllerIntegrationTest {
     @Test
     @DisplayName("GET /api/contacts/c97775aa-b7f3-49c0-a586-d0466ba592bf -> 404 NOT FOUND")
     void should_respond_404_NOT_FOUND_when_requesting_for_a_contact_that_does_not_exist() throws Exception {
-        mockMvc.perform(get("/api/contacts/"+UUID.fromString("c97775aa-b7f3-49c0-a586-d0466ba592bf"))
+        mockMvc.perform(get("/api/contacts/c97775aa-b7f3-49c0-a586-d0466ba592bf")
             .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
             .accept(MediaType.ALL)
         )
@@ -245,7 +243,7 @@ public class ContactControllerIntegrationTest {
     @Test
     @DisplayName("GET /api/contacts/4fe25947-ecab-489c-a881-e0057124e408 -> 400 BAD REQUEST")
     void should_respond_400_when_requesting_for_a_contact_that_does_not_belong_to_the_current_user() throws Exception {
-        mockMvc.perform(get("/api/contacts/"+UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408"))
+        mockMvc.perform(get("/api/contacts/4fe25947-ecab-489c-a881-e0057124e408")
             .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
             .accept(MediaType.ALL)
         )
@@ -284,7 +282,7 @@ public class ContactControllerIntegrationTest {
     @Test
     @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> 400 BAD REQUEST")
     void should_respond_400_when_trying_to_update_a_concat_that_does_not_belong_to_the_current_user() throws Exception {
-        mockMvc.perform(put("/api/contacts/"+UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"))
+        mockMvc.perform(put("/api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef")
             .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
             .contentType(MediaType.APPLICATION_JSON)
             .content("{\"name\": \"Billy\"}")
@@ -298,7 +296,7 @@ public class ContactControllerIntegrationTest {
     @Test
     @DisplayName("DELETE /api/contacts/8fb2bd75-9aec-4cc5-b77b-a95f06081388 -> 400 BAD_REQUEST")
     public void should_respond_400_when_deleting_a_concat_whose_user_does_not_own_it() throws Exception {
-        mockMvc.perform(delete("/api/contacts/"+UUID.fromString("8fb2bd75-9aec-4cc5-b77b-a95f06081388"))
+        mockMvc.perform(delete("/api/contacts/8fb2bd75-9aec-4cc5-b77b-a95f06081388")
             .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
             .accept(MediaType.ALL)
         )
