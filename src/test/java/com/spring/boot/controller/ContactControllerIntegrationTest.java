@@ -311,4 +311,11 @@ public class ContactControllerIntegrationTest {
         mockMvc.perform(get("/api/contacts").accept(MediaType.ALL))
         .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    @DisplayName("GET /api/contacts/8fb2bd75-9aec-4cc5-b77b-a95f06081388")
+    public void access_should_be_denied_when_tried_get_a_contact_without_authorization() throws Exception {
+        mockMvc.perform(get("/api/contacts/8fb2bd75-9aec-4cc5-b77b-a95f06081388").accept(MediaType.ALL))
+        .andExpect(status().isUnauthorized());
+    }
 }
