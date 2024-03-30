@@ -304,4 +304,11 @@ public class ContactControllerIntegrationTest {
         .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
         .andExpect(content().string("Contact does not belong to the user: joe"));
     }
+
+    @Test
+    @DisplayName("GET /api/contacts -> 401 UNAUTHORIZED")
+    public void should_deny_access_when_trying_to_get_contacts_with_no_authentication() throws Exception {
+        mockMvc.perform(get("/api/contacts").accept(MediaType.ALL))
+        .andExpect(status().isUnauthorized());
+    }
 }
