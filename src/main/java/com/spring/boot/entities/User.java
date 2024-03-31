@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "cm_users")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
