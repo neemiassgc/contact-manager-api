@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Entity
 @Getter
 @Setter(AccessLevel.PRIVATE)
-@Table(name = "cm_contacts")
+@Table(name = "contacts")
 @NoArgsConstructor
 public class Contact {
 
