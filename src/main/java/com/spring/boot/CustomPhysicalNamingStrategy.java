@@ -8,12 +8,12 @@ public final class CustomPhysicalNamingStrategy implements PhysicalNamingStrateg
 
     @Override
     public Identifier toPhysicalCatalogName(Identifier logicalName, JdbcEnvironment jdbcEnvironment) {
-        return null;
+        return logicalName;
     }
 
     @Override
     public Identifier toPhysicalSchemaName(Identifier logicalName, JdbcEnvironment jdbcEnvironment) {
-        return null;
+        return logicalName;
     }
 
     @Override
@@ -23,11 +23,11 @@ public final class CustomPhysicalNamingStrategy implements PhysicalNamingStrateg
 
     @Override
     public Identifier toPhysicalSequenceName(Identifier logicalName, JdbcEnvironment jdbcEnvironment) {
-        return null;
+        return logicalName;
     }
 
     @Override
     public Identifier toPhysicalColumnName(Identifier logicalName, JdbcEnvironment jdbcEnvironment) {
-        return null;
+        return logicalName;
     }
 }
