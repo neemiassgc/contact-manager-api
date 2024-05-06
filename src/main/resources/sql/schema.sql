@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS cm_contacts (
     user_id UUID NOT NULL,
     CONSTRAINT fk_users
         FOREIGN KEY (user_id)
-        REFERENCES users (user_id)
+        REFERENCES cm_users (user_id)
         ON DELETE CASCADE
 );
 
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS cm_emails (
     contact_id UUID NOT NULL,
     CONSTRAINT fk_contacts
         FOREIGN KEY (contact_id)
-        REFERENCES contacts (contact_id)
+        REFERENCES cm_contacts (contact_id)
         ON DELETE CASCADE,
     PRIMARY KEY (type, contact_id)
 );
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS cm_phone_numbers (
     contact_id UUID NOT NULL,
     CONSTRAINT fk_contacts
         FOREIGN KEY (contact_id)
-        REFERENCES contacts (contact_id)
+        REFERENCES cm_contacts (contact_id)
         ON DELETE CASCADE,
     PRIMARY KEY (type, contact_id)
 );
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS cm_addresses (
     contact_id UUID NOT NULL,
     CONSTRAINT fk_contacts
         FOREIGN KEY (contact_id)
-        REFERENCES contacts (contact_id)
+        REFERENCES cm_contacts (contact_id)
         ON DELETE CASCADE,
     PRIMARY KEY (type, contact_id)
 );

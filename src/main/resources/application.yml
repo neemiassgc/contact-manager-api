@@ -12,7 +12,7 @@ spring:
     hibernate:
       ddl-auto: none
       naming:
-        physical-strategy: com.spring.boot.CustomPhysicalNamingStrategy
+        physical-strategy: spring.manager.api.misc.CustomPhysicalNamingStrategy
     open-in-view: false
 
   sql:
