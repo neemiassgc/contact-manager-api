@@ -20,31 +20,31 @@ public class ContactController {
 
     @GetMapping()
     public List<ContactSummary> getAllContacts(@AuthenticationPrincipal Jwt jwt) {
-        return Contact.toListOfContactSummary(contactManagerService.findAllByUsername(getCurrentUser(jwt)));
+        return Contact.toListOfContactSummary(contactManagerService.findAllByUserId(getUserFromSub(jwt)));
     }
 
     @GetMapping("/{id}")
     public ContactSummary getById(@PathVariable("id") UUID id, @AuthenticationPrincipal Jwt jwt) {
-        return contactManagerService.findByIdWithUser(id, getCurrentUser(jwt)).toContactSummary();
+        return contactManagerService.findByIdWithUser(id, getUserFromSub(jwt)).toContactSummary();
     }
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@RequestBody @Validated ContactSummary contactSummary, @AuthenticationPrincipal Jwt jwt) {
-        contactManagerService.saveWithUser(Contact.toContact(contactSummary), getCurrentUser(jwt));
+        contactManagerService.saveWithUser(Contact.toContact(contactSummary), getUserFromSub(jwt));
     }
 
     @PutMapping("/{id}")
     public void update(@PathVariable("id") UUID id, @RequestBody ContactSummary contactSummary, @AuthenticationPrincipal Jwt jwt) {
-        contactManagerService.updateWithUser(Contact.toContact(contactSummary, id), getCurrentUser(jwt));
+        contactManagerService.updateWithUser(Contact.toContact(contactSummary, id), getUserFromSub(jwt));
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") UUID id, @AuthenticationPrincipal Jwt jwt) {
-        contactManagerService.deleteByIdWithUser(id, getCurrentUser(jwt));
+        contactManagerService.deleteByIdWithUser(id, getUserFromSub(jwt));
     }
 
-    private String getCurrentUser(final Jwt jwt) {
-        return jwt.getClaimAsString("username");
+    private String getUserFromSub(final Jwt jwt) {
+        return jwt.getClaimAsString("sub");
     }
 }

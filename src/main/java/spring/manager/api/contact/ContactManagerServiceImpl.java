@@ -22,8 +22,8 @@ public class ContactManagerServiceImpl implements ContactManagerService {
     private UserService userService;
 
     @Override
-    public List<Contact> findAllByUsername(String username) {
-        return contactRepository.findAllByUsername(username);
+    public List<Contact> findAllByUserId(String userId) {
+        return contactRepository.findAllByUserId(userId);
     }
 
     @Override
@@ -32,23 +32,24 @@ public class ContactManagerServiceImpl implements ContactManagerService {
     }
 
     @Override
-    public Contact findByIdWithUser(UUID id, String username) {
-        final Contact contact = findById(id);
-        if (!contact.getUser().getUsername().equals(username))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contact does not belong to the user: "+username);
+    public Contact findByIdWithUser(UUID contactId, String userId) {
+        final Contact contact = findById(contactId);
+        final User user = contact.getUser();
+        if (!user.getId().equals(userId))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contact does not belong to the user: "+user.getUsername());
         return contact;
     }
 
     @Override
-    public void saveWithUser(final Contact contact, final String auth0UserId) {
-        final User user = userService.findById(auth0UserId);
+    public void saveWithUser(final Contact contact, final String userId) {
+        final User user = userService.findById(userId);
         contact.setUser(user);
         save(contact);
     }
 
     @Override
-    public void updateWithUser(Contact freshContact, String username) {
-        final Contact contactFromStorage = findByIdWithUser(freshContact.getId(), username);
+    public void updateWithUser(Contact freshContact, String userId) {
+        final Contact contactFromStorage = findByIdWithUser(freshContact.getId(), userId);
         contactFromStorage.merge(freshContact);
     }
 
@@ -59,9 +60,9 @@ public class ContactManagerServiceImpl implements ContactManagerService {
     }
 
     @Override
-    public void deleteByIdWithUser(UUID id, String username) {
-        findByIdWithUser(id, username);
-        contactRepository.deleteById(id);
+    public void deleteByIdWithUser(UUID contactId, String userId) {
+        findByIdWithUser(contactId, userId);
+        contactRepository.deleteById(contactId);
     }
 
     @Override
