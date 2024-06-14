@@ -20,8 +20,8 @@ public final class TestResources {
 
     static {
         final User thomas = new User("auth0|86676d5cda7cb5dc3b594f45", "thomas");
-        final User joe = new User("auth0|7c6584b28aa69d5ba73631a9", "joe");
-        final User robert = new User("auth0|6e863a3c66ed49c82c7c4f15", "robert");
+        final User joe = new User("auth0|3baa9bc92c9c5decbda32f76", "joe");
+        final User robert = new User("auth0|94afd9e7294a59e73e6abfbd", "robert");
 
         final Contact contact1 = new Contact("Craig Bennett", UUID.randomUUID());
         contact1.setUser(thomas);
@@ -254,11 +254,11 @@ public final class TestResources {
     }
 
     public static Jwt jwtForJoe() {
-        return createJwt().subject("auth0|4bd51bb8a9323572f6a8e5ef").build();
+        return createJwt().subject("auth0|3baa9bc92c9c5decbda32f76").build();
     }
 
     public static Jwt jwtForRobert() {
-        return createJwt().subject("auth0|23e64ea959753442a8e71b39").build();
+        return createJwt().subject("auth0|94afd9e7294a59e73e6abfbd").build();
     }
 
     public static Jwt jwtForJulia() {
