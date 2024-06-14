@@ -1,15 +1,15 @@
 insert into cm_users (user_id, username) values
-('773d20b6-bbf1-4c10-b743-5e7b693ef3ee', 'robert'),
-('91b18ecd-1824-402e-961b-a3285fdaa1b8', 'joe');
+('auth0|94afd9e7294a59e73e6abfbd', 'robert'),
+('auth0|3baa9bc92c9c5decbda32f76', 'joe');
 
 insert into cm_contacts (contact_id, name, user_id) values
-('5c21433c-3c70-4253-a4b2-52b157be4167', 'Greg from accounting', '91b18ecd-1824-402e-961b-a3285fdaa1b8'),
-('4fe25947-ecab-489c-a881-e0057124e408', 'Coworker Fred', '91b18ecd-1824-402e-961b-a3285fdaa1b8'),
-('35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7', 'Sister Monica', '91b18ecd-1824-402e-961b-a3285fdaa1b8'),
-('7f23057f-77bd-4568-ac64-e933abae9a09', 'Best friend Julia', '773d20b6-bbf1-4c10-b743-5e7b693ef3ee'),
-('84edd1b9-89a5-4107-a84d-435676c2b8f5', 'Mom', '773d20b6-bbf1-4c10-b743-5e7b693ef3ee'),
-('8fb2bd75-9aec-4cc5-b77b-a95f06081388', 'Pizza and burgers', '773d20b6-bbf1-4c10-b743-5e7b693ef3ee'),
-('b621650d-4a81-4016-a917-4a8a4992aaef', 'Uncle Jeff', '773d20b6-bbf1-4c10-b743-5e7b693ef3ee');
+('5c21433c-3c70-4253-a4b2-52b157be4167', 'Greg from accounting', 'auth0|3baa9bc92c9c5decbda32f76'),
+('4fe25947-ecab-489c-a881-e0057124e408', 'Coworker Fred', 'auth0|3baa9bc92c9c5decbda32f76'),
+('35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7', 'Sister Monica', 'auth0|3baa9bc92c9c5decbda32f76'),
+('7f23057f-77bd-4568-ac64-e933abae9a09', 'Best friend Julia', 'auth0|94afd9e7294a59e73e6abfbd'),
+('84edd1b9-89a5-4107-a84d-435676c2b8f5', 'Mom', 'auth0|94afd9e7294a59e73e6abfbd'),
+('8fb2bd75-9aec-4cc5-b77b-a95f06081388', 'Pizza and burgers', 'auth0|94afd9e7294a59e73e6abfbd'),
+('b621650d-4a81-4016-a917-4a8a4992aaef', 'Uncle Jeff', 'auth0|94afd9e7294a59e73e6abfbd');
 
 insert into cm_phone_numbers (phone_number, contact_id, type) values
 ('+359(26)5948-0427', '5c21433c-3c70-4253-a4b2-52b157be4167', 'home'),

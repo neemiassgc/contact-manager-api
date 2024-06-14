@@ -1,7 +1,7 @@
 package spring.manager.api.contact;
 
-import spring.manager.api.user.UserService;
 import spring.manager.api.user.User;
+import spring.manager.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -40,8 +40,8 @@ public class ContactManagerServiceImpl implements ContactManagerService {
     }
 
     @Override
-    public void saveWithUser(final Contact contact, final String username) {
-        final User user = userService.findByUsername(username);
+    public void saveWithUser(final Contact contact, final String auth0UserId) {
+        final User user = userService.findById(auth0UserId);
         contact.setUser(user);
         save(contact);
     }

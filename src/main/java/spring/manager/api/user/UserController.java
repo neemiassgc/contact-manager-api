@@ -2,6 +2,8 @@ package spring.manager.api.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +16,7 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
-    public void create(@RequestBody @Validated SimpleUser simpleUser) {
-        userService.create(User.toUser(simpleUser));
+    public void create(@RequestBody @Validated Username username, @AuthenticationPrincipal Jwt jwt) {
+        userService.create(new User(jwt.getSubject(), username.getValue()));
     }
 }

@@ -1,13 +1,12 @@
 CREATE TABLE IF NOT EXISTS cm_users (
-    user_id UUID PRIMARY KEY,
-    username VARCHAR(20) NOT NULL UNIQUE,
-    avatar_uri VARCHAR(255)
+    user_id VARCHAR(30) PRIMARY KEY,
+    username VARCHAR(20) NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS cm_contacts (
     contact_id UUID PRIMARY KEY,
     name VARCHAR(140) NOT NULL,
-    user_id UUID NOT NULL,
+    user_id VARCHAR(30) NOT NULL,
     CONSTRAINT fk_users
         FOREIGN KEY (user_id)
         REFERENCES cm_users (user_id)

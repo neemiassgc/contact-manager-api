@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Transactional
@@ -15,20 +17,16 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public User findByUsername(final String username) {
-        return userRepository.findByUsername(username)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    public void create(User user) {
+        final Optional<User> userOptional = userRepository.findById(user.getId());
+        if (userOptional.isPresent())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already exists");
+        userRepository.save(user);
     }
 
     @Override
-    public void create(User user) {
-        try {
-            findByUsername(user.getUsername());
-        }
-        catch (ResponseStatusException ignored) {
-            userRepository.save(user);
-            return;
-        }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already exists");
+    public User findById(String id) {
+        return userRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 }

@@ -1,13 +1,13 @@
 package spring.manager.api.contact;
 
-import spring.manager.api.misc.Tools;
-import spring.manager.api.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
+import spring.manager.api.misc.Tools;
+import spring.manager.api.user.User;
 
 import java.util.*;
 import java.util.stream.Collectors;
