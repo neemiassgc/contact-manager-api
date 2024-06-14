@@ -1,5 +1,6 @@
 package spring.manager.api.contact;
 
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import spring.manager.api.misc.TestResources;
 import spring.manager.api.global.GlobalErrorController;
 import org.junit.jupiter.api.DisplayName;
@@ -22,10 +23,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static spring.manager.api.misc.TestResources.*;
 
 @WebMvcTest(value = {ContactController.class, GlobalErrorController.class})
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
-public class ContactControlellerUnitTest {
+public class ContactControllerUnitTest {
 
     @MockBean
     private ContactManagerService contactManagerService;
@@ -33,18 +35,17 @@ public class ContactControlellerUnitTest {
     @Autowired
     private MockMvc mockMvc;
 
-
     @Nested
     public class TestCasesForJoe {
 
         @Test
         @DisplayName("GET /api/contacts -> OK 200")
         void should_response_all_the_contacts_with_OK_200() throws Exception {
-            when(contactManagerService.findAllByUsername(eq("joe")))
+            when(contactManagerService.findAllByUserId(eq(idForJoe())))
                 .thenReturn(TestResources.getContactsForJoe());
 
             mockMvc.perform(get("/api/contacts")
-                .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJoe()))
                 .accept(MediaType.APPLICATION_JSON)
             )
             .andExpect(status().isOk())
@@ -54,7 +55,7 @@ public class ContactControlellerUnitTest {
             .andExpect(jsonPath("$[*].addresses.*").value(hasSize(4)))
             .andExpect(jsonPath("$[*].emails.*").value(hasSize(3)));
 
-            verify(contactManagerService, TestResources.once()).findAllByUsername(eq("joe"));
+            verify(contactManagerService, TestResources.once()).findAllByUserId(eq(idForJoe()));
             verifyNoMoreInteractions(contactManagerService);
         }
 
@@ -62,11 +63,11 @@ public class ContactControlellerUnitTest {
         @DisplayName("GET /api/contacts/4fe25947-ecab-489c-a881-e0057124e408 -> OK 200")
         void should_return_a_contact_with_OK_200() throws Exception {
             final UUID contactId = UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408");
-            when(contactManagerService.findByIdWithUser(eq(contactId), eq("joe")))
+            when(contactManagerService.findByIdWithUser(eq(contactId), eq(idForJoe())))
                 .thenReturn(TestResources.getContactById(contactId));
 
             mockMvc.perform(get("/api/contacts/" + contactId)
-                .header("Authorization", "Bearer " + TestResources.jwtTokenForJoe())
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJoe()))
                 .accept(MediaType.APPLICATION_JSON)
             )
             .andExpect(status().isOk())
@@ -76,14 +77,14 @@ public class ContactControlellerUnitTest {
             .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
             .andExpect(jsonPath("$.addresses.*").value(hasSize(1)));
 
-            verify(contactManagerService, TestResources.once()).findByIdWithUser(eq(contactId), eq("joe"));
+            verify(contactManagerService, TestResources.once()).findByIdWithUser(eq(contactId), eq(idForJoe()));
             verifyNoMoreInteractions(contactManagerService);
         }
 
         @Test
         @DisplayName("POST /api/contacts -> CREATED 201")
         void should_create_a_new_contact_successfully() throws Exception {
-            doNothing().when(contactManagerService).saveWithUser(any(Contact.class), eq("joe"));
+            doNothing().when(contactManagerService).saveWithUser(any(Contact.class), eq(idForJoe()));
 
             final String jsonContent = """
             {
@@ -107,21 +108,21 @@ public class ContactControlellerUnitTest {
             """;
 
             mockMvc.perform(post("/api/contacts")
-                .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJoe()))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonContent)
             )
             .andExpect(status().isCreated());
 
-            verify(contactManagerService).saveWithUser(any(Contact.class), eq("joe"));
+            verify(contactManagerService).saveWithUser(any(Contact.class), eq(idForJoe()));
             verifyNoMoreInteractions(contactManagerService);
         }
 
         @Test
         @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> OK 200")
         void should_update_isolated_fields_of_a_contact_successfully() throws Exception {
-            doNothing().when(contactManagerService).updateWithUser(any(Contact.class), eq("joe"));
+            doNothing().when(contactManagerService).updateWithUser(any(Contact.class), eq(idForJoe()));
 
             final String requestBody = """
             {
@@ -135,14 +136,14 @@ public class ContactControlellerUnitTest {
             """;
 
             mockMvc.perform(put("/api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef")
-                .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJoe()))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody)
             )
             .andExpect(status().isOk());
 
-            verify(contactManagerService, TestResources.once()).updateWithUser(any(Contact.class), eq("joe"));
+            verify(contactManagerService, TestResources.once()).updateWithUser(any(Contact.class), eq(idForJoe()));
             verifyNoMoreInteractions(contactManagerService);
         }
 
@@ -150,15 +151,15 @@ public class ContactControlellerUnitTest {
         @DisplayName("DELETE /api/contacts/4fe25947-ecab-489c-a881-e0057124e408 -> OK 200")
         void should_delete_a_contact_successfully() throws Exception {
             final UUID contactId = UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408");
-            doNothing().when(contactManagerService).deleteByIdWithUser(eq(contactId), eq("joe"));
+            doNothing().when(contactManagerService).deleteByIdWithUser(eq(contactId), eq(idForJoe()));
 
             mockMvc.perform(delete("/api/contacts/"+contactId)
-                .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJoe()))
                 .accept(MediaType.ALL)
             )
             .andExpect(status().isOk());
 
-            verify(contactManagerService, TestResources.once()).deleteByIdWithUser(eq(contactId), eq("joe"));
+            verify(contactManagerService, TestResources.once()).deleteByIdWithUser(eq(contactId), eq(idForJoe()));
             verifyNoMoreInteractions(contactManagerService);
         }
     }
@@ -169,11 +170,11 @@ public class ContactControlellerUnitTest {
         @Test
         @DisplayName("GET /api/contacts -> OK 200")
         void should_return_all_the_contacts_with_OK_200() throws Exception {
-            when(contactManagerService.findAllByUsername(eq("robert")))
+            when(contactManagerService.findAllByUserId(eq(idForRobert())))
                 .thenReturn(TestResources.getContactsForRobert());
 
             mockMvc.perform(get("/api/contacts")
-                .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForRobert()))
                 .accept(MediaType.APPLICATION_JSON)
             )
             .andExpect(status().isOk())
@@ -183,7 +184,7 @@ public class ContactControlellerUnitTest {
             .andExpect(jsonPath("$[*].addresses.*").value(hasSize(7)))
             .andExpect(jsonPath("$[*].emails.*").value(hasSize(7)));
 
-            verify(contactManagerService, TestResources.once()).findAllByUsername(eq("robert"));
+            verify(contactManagerService, TestResources.once()).findAllByUserId(eq(idForRobert()));
             verifyNoMoreInteractions(contactManagerService);
         }
 
@@ -191,11 +192,11 @@ public class ContactControlellerUnitTest {
         @DisplayName("GET /api/contacts/84edd1b9-89a5-4107-a84d-435676c2b8f5 -> 200 OK")
         void should_return_a_contact_with_OK_200() throws Exception {
             final UUID contactId = UUID.fromString("84edd1b9-89a5-4107-a84d-435676c2b8f5");
-            when(contactManagerService.findByIdWithUser(eq(contactId), eq("robert")))
+            when(contactManagerService.findByIdWithUser(eq(contactId), eq(idForRobert())))
                 .thenReturn(TestResources.getContactById(contactId));
 
             mockMvc.perform(get("/api/contacts/"+contactId)
-                .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForRobert()))
                 .accept(MediaType.APPLICATION_JSON)
             )
             .andExpect(status().isOk())
@@ -205,14 +206,14 @@ public class ContactControlellerUnitTest {
             .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
             .andExpect(jsonPath("$.addresses.*").value(hasSize(1)));
 
-            verify(contactManagerService, TestResources.once()).findByIdWithUser(eq(contactId), eq("robert"));
+            verify(contactManagerService, TestResources.once()).findByIdWithUser(eq(contactId), eq(idForRobert()));
             verifyNoMoreInteractions(contactManagerService);
         }
 
         @Test
         @DisplayName("POST /api/contacts -> CREATED 201")
         void should_create_a_new_contact_successfully() throws Exception {
-            doNothing().when(contactManagerService).saveWithUser(any(Contact.class), eq("robert"));
+            doNothing().when(contactManagerService).saveWithUser(any(Contact.class), eq(idForRobert()));
 
             final String jsonContent = """
             {
@@ -236,21 +237,21 @@ public class ContactControlellerUnitTest {
             """;
 
             mockMvc.perform(post("/api/contacts")
-                .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForRobert()))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonContent)
             )
             .andExpect(status().isCreated());
 
-            verify(contactManagerService).saveWithUser(any(Contact.class), eq("robert"));
+            verify(contactManagerService).saveWithUser(any(Contact.class), eq(idForRobert()));
             verifyNoMoreInteractions(contactManagerService);
         }
 
         @Test
         @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> OK 200")
         void should_update_isolated_fields_of_a_contact_successfully() throws Exception {
-            doNothing().when(contactManagerService).updateWithUser(any(Contact.class), eq("robert"));
+            doNothing().when(contactManagerService).updateWithUser(any(Contact.class), eq(idForRobert()));
 
             final String requestBody = """
             {
@@ -264,14 +265,14 @@ public class ContactControlellerUnitTest {
             """;
 
             mockMvc.perform(put("/api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef")
-                .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForRobert()))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody)
             )
             .andExpect(status().isOk());
 
-            verify(contactManagerService, TestResources.once()).updateWithUser(any(Contact.class), eq("robert"));
+            verify(contactManagerService, TestResources.once()).updateWithUser(any(Contact.class), eq(idForRobert()));
             verifyNoMoreInteractions(contactManagerService);
         }
 
@@ -279,15 +280,15 @@ public class ContactControlellerUnitTest {
         @DisplayName("DELETE /api/contacts/7f23057f-77bd-4568-ac64-e933abae9a09 -> OK 200")
         void should_delete_a_contact_successfully() throws Exception {
             final UUID contactId = UUID.fromString("7f23057f-77bd-4568-ac64-e933abae9a09");
-            doNothing().when(contactManagerService).deleteByIdWithUser(eq(contactId), eq("robert"));
+            doNothing().when(contactManagerService).deleteByIdWithUser(eq(contactId), eq(idForRobert()));
 
             mockMvc.perform(delete("/api/contacts/"+contactId)
-                .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForRobert()))
                 .accept(MediaType.ALL)
             )
             .andExpect(status().isOk());
 
-            verify(contactManagerService, TestResources.once()).deleteByIdWithUser(eq(contactId), eq("robert"));
+            verify(contactManagerService, TestResources.once()).deleteByIdWithUser(eq(contactId), eq(idForRobert()));
             verifyNoMoreInteractions(contactManagerService);
         }
     }
@@ -296,18 +297,18 @@ public class ContactControlellerUnitTest {
     @DisplayName("GET /api/contacts/c97775aa-b7f3-49c0-a586-d0466ba592bf -> 404 NOT FOUND")
     void should_respond_404_when_requesting_for_a_contact_that_does_not_exist() throws Exception {
         final UUID contactId = UUID.fromString("c97775aa-b7f3-49c0-a586-d0466ba592bf");
-        when(contactManagerService.findByIdWithUser(eq(contactId), eq("joe")))
+        when(contactManagerService.findByIdWithUser(eq(contactId), eq(idForJoe())))
             .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
 
         mockMvc.perform(get("/api/contacts/"+contactId)
             .accept(MediaType.ALL)
-            .header("Authorization", "Bearer "+TestResources.jwtTokenForJoe())
+            .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJoe()))
         )
         .andExpect(status().isNotFound())
         .andExpect(content().contentType(MediaType.TEXT_PLAIN))
         .andExpect(content().string("Contact not found"));
 
-        verify(contactManagerService, TestResources.once()).findByIdWithUser(eq(contactId), eq("joe"));
+        verify(contactManagerService, TestResources.once()).findByIdWithUser(eq(contactId), eq(idForJoe()));
         verifyNoMoreInteractions(contactManagerService);
     }
 
@@ -315,19 +316,19 @@ public class ContactControlellerUnitTest {
     @DisplayName("GET /api/contacts/4fe25947-ecab-489c-a881-e0057124e408 -> 400 BAD_REQUEST")
     void should_respond_400_BAD_REQUEST_when_requesting_for_a_contact_that_does_not_belong_to_the_current_user() throws Exception {
         final UUID contactId = UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408");
-        final String errorMessage = "Contact does not belong to the user: robert";
-        when(contactManagerService.findByIdWithUser(eq(contactId), eq("robert")))
+        final String errorMessage = "Contact belongs to another user";
+        when(contactManagerService.findByIdWithUser(eq(contactId), eq(idForRobert())))
             .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage));
 
         mockMvc.perform(get("/api/contacts/"+contactId)
             .accept(MediaType.ALL)
-            .header("authorization", "Bearer "+TestResources.jwtTokenForRobert())
+            .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForRobert()))
         )
         .andExpect(status().isBadRequest())
         .andExpect(content().contentType(MediaType.TEXT_PLAIN))
         .andExpect(content().string(errorMessage));
 
-        verify(contactManagerService, TestResources.once()).findByIdWithUser(eq(contactId), eq("robert"));
+        verify(contactManagerService, TestResources.once()).findByIdWithUser(eq(contactId), eq(idForRobert()));
         verifyNoMoreInteractions(contactManagerService);
     }
 
@@ -344,7 +345,7 @@ public class ContactControlellerUnitTest {
         """;
 
         mockMvc.perform(post("/api/contacts")
-            .header("Authorization", "Bearer "+TestResources.jwtTokenForRobert())
+            .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForRobert()))
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonContent)
@@ -364,13 +365,13 @@ public class ContactControlellerUnitTest {
     @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> 400 BAD_REQUEST")
     void should_respond_400_when_trying_to_update_a_contact_whose_user_is_not_the_owner() throws Exception {
         final UUID contactId = UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef");
-        final String errorMessage = "Contact does not belong to the user: joe";
+        final String errorMessage = "Contact belongs to another user";
         doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage))
-            .when(contactManagerService).updateWithUser(any(Contact.class), eq("joe"));
+            .when(contactManagerService).updateWithUser(any(Contact.class), eq(idForJoe()));
 
         mockMvc.perform(put("/api/contacts/"+contactId)
             .accept(MediaType.ALL)
-            .header("authorization", "Bearer "+TestResources.jwtTokenForJoe())
+            .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJoe()))
             .content("{\"name\": \"Billy\"}")
             .contentType(MediaType.APPLICATION_JSON)
         )
@@ -378,7 +379,7 @@ public class ContactControlellerUnitTest {
         .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
         .andExpect(content().string(errorMessage));
 
-        verify(contactManagerService, TestResources.once()).updateWithUser(any(Contact.class), eq("joe"));
+        verify(contactManagerService, TestResources.once()).updateWithUser(any(Contact.class), eq(idForJoe()));
         verifyNoMoreInteractions(contactManagerService);
     }
 
@@ -388,11 +389,11 @@ public class ContactControlellerUnitTest {
         final UUID contactId = UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef");
         final String errorMessage = "Contact not found";
         doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage))
-            .when(contactManagerService).updateWithUser(any(Contact.class), eq("joe"));
+            .when(contactManagerService).updateWithUser(any(Contact.class), eq(idForJoe()));
 
         mockMvc.perform(put("/api/contacts/"+contactId)
             .accept(MediaType.ALL)
-            .header("authorization", "Bearer "+TestResources.jwtTokenForJoe())
+            .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJoe()))
             .contentType(MediaType.APPLICATION_JSON)
             .content("{\"name\": \"Billy\"}")
         )
@@ -400,7 +401,7 @@ public class ContactControlellerUnitTest {
         .andExpect(content().contentType(MediaType.TEXT_PLAIN))
         .andExpect(content().string(errorMessage));
 
-        verify(contactManagerService, TestResources.once()).updateWithUser(any(Contact.class), eq("joe"));
+        verify(contactManagerService, TestResources.once()).updateWithUser(any(Contact.class), eq(idForJoe()));
         verifyNoMoreInteractions(contactManagerService);
     }
 
@@ -408,18 +409,18 @@ public class ContactControlellerUnitTest {
     @DisplayName("DELETE /api/contacts/8fb2bd75-9aec-4cc5-b77b-a95f06081388 -> 400 BAD_REQUEST")
     public void should_respond_400_when_deleting_a_concat_whose_user_does_not_own_it() throws Exception {
         final UUID contactId = UUID.fromString("8fb2bd75-9aec-4cc5-b77b-a95f06081388");
-        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contact does not belong to the user: joe"))
-            .when(contactManagerService).deleteByIdWithUser(eq(contactId), eq("joe"));
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contact belongs to another user"))
+            .when(contactManagerService).deleteByIdWithUser(eq(contactId), eq(idForJoe()));
 
         mockMvc.perform(delete("/api/contacts/"+contactId)
             .accept(MediaType.ALL)
-            .header("authorization", "Bearer "+TestResources.jwtTokenForJoe())
+            .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJoe()))
         )
         .andExpect(status().isBadRequest())
         .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-        .andExpect(content().string("Contact does not belong to the user: joe"));
+        .andExpect(content().string("Contact belongs to another user"));
 
-        verify(contactManagerService, TestResources.once()).deleteByIdWithUser(eq(contactId), eq("joe"));
+        verify(contactManagerService, TestResources.once()).deleteByIdWithUser(eq(contactId), eq(idForJoe()));
         verifyNoMoreInteractions(contactManagerService);
     }
 
@@ -428,17 +429,17 @@ public class ContactControlellerUnitTest {
     void should_respond_404_when_trying_to_delete_a_contact_that_does_not_exist() throws Exception {
         final UUID contactId = UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7");
         doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"))
-            .when(contactManagerService).deleteByIdWithUser(eq(contactId), eq("joe"));
+            .when(contactManagerService).deleteByIdWithUser(eq(contactId), eq(idForJoe()));
 
         mockMvc.perform(delete("/api/contacts/"+contactId)
             .accept(MediaType.ALL)
-            .header("authorization", "Bearer "+TestResources.jwtTokenForJoe())
+            .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJoe()))
         )
         .andExpect(status().isNotFound())
         .andExpect(content().contentType(MediaType.TEXT_PLAIN))
         .andExpect(content().string("Contact not found"));
 
-        verify(contactManagerService, TestResources.once()).deleteByIdWithUser(eq(contactId), eq("joe"));
+        verify(contactManagerService, TestResources.once()).deleteByIdWithUser(eq(contactId), eq(idForJoe()));
         verifyNoMoreInteractions(contactManagerService);
     }
 }
