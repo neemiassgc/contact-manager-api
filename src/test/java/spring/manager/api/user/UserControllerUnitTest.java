@@ -1,7 +1,6 @@
 package spring.manager.api.user;
 
-import spring.manager.api.misc.TestResources;
-import spring.manager.api.global.GlobalErrorController;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,13 +9,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.server.ResponseStatusException;
+import spring.manager.api.global.GlobalErrorController;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static spring.manager.api.misc.TestResources.*;
 
 @WebMvcTest(value = {UserController.class, GlobalErrorController.class})
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
@@ -33,34 +34,38 @@ public class UserControllerUnitTest {
     public void should_create_a_new_user_successfully() throws Exception {
         doNothing().when(userService).create(any(User.class));
 
-        final String jsonBody = "{\"username\": \"julia\", \"avatarUri\": \"https://example.com/my-avatar.png\"}";
-        mockMvc.perform(post("/api/users")
+        final String jsonBody = "{\"username\": \"julia\"}";
+        mockMvc.perform(
+            post("/api/users").with(
+                SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJulia())
+            )
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.ALL)
             .content(jsonBody)
-            .header("Authorization", "Bearer "+ TestResources.jwtTokenWithAdminAuthority())
         )
         .andExpect(status().isCreated());
 
-        verify(userService, TestResources.once()).create(any(User.class));
+        verify(userService, once()).create(any(User.class));
         verifyNoMoreInteractions(userService);
     }
 
     @Test
     @DisplayName("POST /api/users -> 400 BAD REQUEST")
     public void should_respond_400_with_feedback_when_sending_an_invalid_json() throws Exception {
-        final String jsonBody = "{\"avatarUri\": \"ftp://example.com/my-avatar.png\"}";
-        mockMvc.perform(post("/api/users")
+        final String jsonBody = "{}";
+        mockMvc.perform(
+            post("/api/users").with(
+                SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForRobert())
+            )
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.ALL)
             .content(jsonBody)
-            .header("Authorization", "Bearer "+ TestResources.jwtTokenWithAdminAuthority())
         )
         .andExpect(status().isBadRequest())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(
             jsonPath("$.fieldViolations[*]",
-            containsInAnyOrder("'avatarUri' must be a valid Url", "'username' must not be null"))
+            Matchers.contains("username is required"))
         );
 
         verifyNoInteractions(userService);
@@ -72,18 +77,20 @@ public class UserControllerUnitTest {
         doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already exists"))
             .when(userService).create(any(User.class));
 
-        final String jsonBody = "{\"username\": \"joe\", \"avatarUri\": \"https://example.com/my-avatar.png\"}";
-        mockMvc.perform(post("/api/users")
+        final String jsonBody = "{\"username\": \"joe\"}";
+        mockMvc.perform(
+            post("/api/users").with(
+                SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJoe())
+            )
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.ALL)
             .content(jsonBody)
-            .header("Authorization", "Bearer "+ TestResources.jwtTokenWithAdminAuthority())
         )
         .andExpect(status().isBadRequest())
         .andExpect(content().contentType(MediaType.TEXT_PLAIN))
         .andExpect(content().string("User already exists"));
 
-        verify(userService, TestResources.once()).create(any(User.class));
+        verify(userService, once()).create(any(User.class));
         verifyNoMoreInteractions(userService);
     }
 }
