@@ -2,7 +2,9 @@ package spring.manager.api.user;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -11,7 +13,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-@SpringBootTest
+@DataJpaTest
+@Import({UserServiceImpl.class})
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class UserServiceTest {
 
     @Autowired
@@ -21,8 +25,8 @@ public class UserServiceTest {
     private UserRepository userRepository;
 
     @Test
-    void should_return_a_user_by_its_username() {
-        final User user = userService.findByUsername("robert");
+    void should_return_a_user_by_its_id() {
+        final User user = userService.findById("auth0|94afd9e7294a59e73e6abfbd");
 
         assertThat(user).isNotNull();
         assertThat(user).extracting("username").isEqualTo("robert");
@@ -30,7 +34,7 @@ public class UserServiceTest {
 
     @Test
     void should_throw_an_error_when_user_does_not_exist() {
-        final Throwable throwable = catchThrowable(() -> userService.findByUsername("fred"));
+        final Throwable throwable = catchThrowable(() -> userService.findById("auth0|adea243241c3754b349213d6"));
 
         assertThat(throwable).isNotNull();
         assertThat(throwable).isInstanceOf(ResponseStatusException.class);
@@ -40,7 +44,7 @@ public class UserServiceTest {
 
     @Test
     void should_create_a_new_user_successfully() {
-        final User newUser = new User("Kevin");
+        final User newUser = new User("auth0|e721524323da766879dfce8b", "Kevin");
 
         userService.create(newUser);
 
@@ -51,7 +55,7 @@ public class UserServiceTest {
 
     @Test
     void should_throw_an_error_when_trying_to_create_a_user_that_already_exists() {
-        final User newUser = new User("joe");
+        final User newUser = new User("auth0|3baa9bc92c9c5decbda32f76", "joe");
 
         final Throwable throwable = catchThrowable(() -> userService.create(newUser));
 
