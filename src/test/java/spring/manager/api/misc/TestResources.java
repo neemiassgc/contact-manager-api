@@ -1,5 +1,6 @@
 package spring.manager.api.misc;
 
+import org.springframework.security.oauth2.jwt.Jwt;
 import spring.manager.api.contact.Contact;
 import spring.manager.api.user.User;
 import spring.manager.api.contact.Address;
@@ -18,9 +19,9 @@ public final class TestResources {
     private final static List<Contact> contacts = new ArrayList<>();
 
     static {
-        final User thomas = new User("thomas");
-        final User joe = new User("joe");
-        final User robert = new User("robert");
+        final User thomas = new User("auth0|86676d5cda7cb5dc3b594f45", "thomas");
+        final User joe = new User("auth0|7c6584b28aa69d5ba73631a9", "joe");
+        final User robert = new User("auth0|6e863a3c66ed49c82c7c4f15", "robert");
 
         final Contact contact1 = new Contact("Craig Bennett", UUID.randomUUID());
         contact1.setUser(thomas);
@@ -242,63 +243,33 @@ public final class TestResources {
         for (final Map.Entry<String, Address> entry : contacToBeCopied.getAddressMap().entrySet()) {
             final Address address = Address.builder()
                 .state(entry.getValue().getState())
-                .street(entry.getValue().getStreet())
-                .city(entry.getValue().getCity())
-                .country(entry.getValue().getCountry())
-                .zipcode(entry.getValue().getZipcode())
-                .build();
-            newContact.putAddress(entry.getKey(), address);
+        .street(entry.getValue().getStreet())
+        .city(entry.getValue().getCity())
+        .country(entry.getValue().getCountry())
+        .zipcode(entry.getValue().getZipcode())
+        .build();
+        newContact.putAddress(entry.getKey(), address);
         }
         return newContact;
     }
 
-    public static String jwtTokenForJoe() {
-        return """
-            eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJuNmpaamhHcmtpd2xnT0hmVDB1dEJ5cV
-            Q4aXBSSG5Edzh3cVpDV1RDa2VZIn0.eyJleHAiOjIwMjE3NzQ1MTYsImlhdCI6MTcwNjQxNDUxNiwianRp
-            IjoiMDY0Yzg0NjMtMTk5Mi00M2YzLTgzZTAtZDZlOWU2NDU1YjgzIiwiaXNzIjoiaHR0cDovL2xvY2FsaG
-            9zdDo4MDAwL3JlYWxtcy9tYWluIiwic3ViIjoiOWRjNjc4YmYtY2UwZi00NGI3LWEyNGQtNjUyMThhMGZl
-            ZGM4IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiY29udGFjdC1tYW5hZ2VyIiwic2Vzc2lvbl9zdGF0ZSI6Ij
-            VhNTA4NjQzLTZiMWYtNDBkOS1hNGNiLTUzY2VjNmJkZWVmZCIsInNjb3BlIjoiY29udGFjdC1tYW5hZ2Vy
-            Iiwic2lkIjoiNWE1MDg2NDMtNmIxZi00MGQ5LWE0Y2ItNTNjZWM2YmRlZWZkIiwidXNlcm5hbWUiOiJqb2
-            UifQ.yMED1qj_q8IzvHBGo4xWkOJ443kISwQp4w2cr-VHjCx2DqzisyyHxavvq5GhZMx5PHOINi_PIZgP0
-            weFV84g9xpm1jjkiuhyrVfwRfaq3z6svwEZcGDWU-d-wy_58zC_ZrpRrm4CRAeNg-SzKLNUwJ1imK24HCG
-            R2yOCdb-rn79az_xkhp8J0-D8KmKiRqeOLNFDyGmMTmcYAP2HOowYQsvIXbGaaNMgG4gEZLBXkspzkLqvm
-            ZrH3nWzioBiqDqJnZQ-5DDIcJ-UbcY1FtRIZv1VYbX9Kqm1z0S7k5Q8dj3IzMRaYJ4l0_hIMgiye-vlNFg
-            izWTT-9WVM2GTjZ_-gw
-        """.trim().replaceAll("\\s", "");
+    public static Jwt jwtForJoe() {
+        return createJwt().subject("auth0|4bd51bb8a9323572f6a8e5ef").build();
     }
 
-    public static String jwtTokenForRobert() {
-        return """
-            eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJuNmpaamhHcmtpd2xnT0hmVDB1dEJ5cVQ4aXBS
-            SG5Edzh3cVpDV1RDa2VZIn0.eyJleHAiOjIwMjE5NDMyOTAsImlhdCI6MTcwNjU4MzI5MCwianRpIjoiMjU3ZDVi
-            M2YtNTRiNS00YjIyLWI2ODYtOWExN2VlNDg4ZDA3IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDAwL3JlYWxt
-            cy9tYWluIiwic3ViIjoiNmE0YmI1M2QtZGRkZi00MGQzLWFiYzQtNDljZDg0NjE4NjY3IiwidHlwIjoiQmVhcmVy
-            IiwiYXpwIjoiY29udGFjdC1tYW5hZ2VyIiwic2Vzc2lvbl9zdGF0ZSI6IjU4NGE3NDQzLTUxMjctNGYzZC04ZDgy
-            LTFkNDljNmVjMDA3MyIsInNjb3BlIjoiY29udGFjdC1tYW5hZ2VyIiwic2lkIjoiNTg0YTc0NDMtNTEyNy00ZjNk
-            LThkODItMWQ0OWM2ZWMwMDczIiwidXNlcm5hbWUiOiJyb2JlcnQifQ.unY-8y94sSTUl5bTSVqu1_sjRThI6wR7t
-            lZypH3WTFhlZ5gSjgC9DfyMEt8ZdT19ue_RPpZJQLSa3zt5u6KmV-g7yQJpeUhn_6blaHp8JLj7sLjDA4N5PtZwR
-            rFtJnV7oliRb4cVW7j6DaH19SEPrQ6Xmyq_6e8OevzoNkCijiFPTR0nrSw9rWm81UiN7YeqdRGUOnmWgkSFQhIUP
-            9NfEUgAvetZOJvMX4nrNZNKFgEvjZoleRLIORIf2-nBmXy2XJ8f68-a_Anb4k__SQFsroLQdrU7LnUR_qxTArPEf
-            DOoykEHQK2w003DePt_JT3uhVRMZIFLAMuyZfTrQ1_JvQ
-        """.trim().replaceAll("\\s", "");
+    public static Jwt jwtForRobert() {
+        return createJwt().subject("auth0|23e64ea959753442a8e71b39").build();
     }
 
-    public static String jwtTokenWithAdminAuthority() {
-        return
-        """
-        eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJuNmpaamhHcmtpd2xnT0hmVDB1dEJ5cVQ4aXBSSG5Edzh3cVp
-        DV1RDa2VZIn0.eyJleHAiOjIwMjcwMzE2NzQsImlhdCI6MTcxMTY3MTY3NCwianRpIjoiZTM4NWIwOWQtOTc4My00YTI5LTg2OW
-        EtZmY1Y2IyZDEyOTY1IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDAwL3JlYWxtcy9tYWluIiwic3ViIjoiN2UzOGUwYzMtY
-        zRiZC00YmNiLWFjZTItNWRjYmIyMTlkZWQzIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiY29udGFjdC1tYW5hZ2VyIiwic2Vzc2lv
-        bl9zdGF0ZSI6ImQwMzVmMmM3LThkMmEtNGY3Yi05MmI3LTJhYWUyZTZhMDFjZCIsInNjb3BlIjoiIiwic2lkIjoiZDAzNWYyYzc
-        tOGQyYS00ZjdiLTkyYjctMmFhZTJlNmEwMWNkIiwiYXV0aG9yaXRpZXMiOlsiYWRtaW4iXSwidXNlcm5hbWUiOiJyb290In0.KY
-        yJuEPhR9W8GF_it3y__Cgnv1fKrFhCEU6YCL3iT3-nEERS66N9KraSNqe1hzw4zt0X7vIpt-AURc3-qzt1qAj-OnSVjPWg6NcTa
-        BlDrzAhySHxPiOEUSv7WGb-1h1Y-3rkVGcDMZ6U6xVDSWymBu34akuhlnJNHKJToBEEyXeKiHvtzAYLvrhb1rihw9jm5cjwhMkf
-        DgtXXImEV5hxegNIKMe1HyfMRm1ypqElnommSbomhdvVa5lBHoUePn2kcnqPLqu1JE4mA51wXhfss-Wu2ETZ62KkjA1Xg8OsjQ3
-        eBhxubTsju7juY6zXMMv5JCJXcwrRhd4bdf4vHOojwA
-        """.trim().replaceAll("\\s", "");
+    public static Jwt jwtForJulia() {
+        return createJwt().subject("auth0|c7b8835b2947d4bcc799dca5").build();
+    }
+
+    private static Jwt.Builder createJwt() {
+        return Jwt.withTokenValue("{}")
+            .header("alg", "RS256")
+            .header("typ", "JWT")
+            .header("kid", "Pgj1sRhThSD2fsOc_c6mX");
     }
 
     public static VerificationMode once() {
