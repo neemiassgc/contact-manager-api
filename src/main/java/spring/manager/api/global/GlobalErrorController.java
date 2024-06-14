@@ -32,7 +32,7 @@ public class GlobalErrorController {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<String> resolveHttpMessageNotReadableException() {
-        return ResponseEntity.badRequest().body("Json format is invalid!");
+    public ResponseEntity<String> resolveHttpMessageNotReadableException(HttpMessageNotReadableException exception) {
+        return ResponseEntity.badRequest().body(exception.getMessage());
     }
 }
