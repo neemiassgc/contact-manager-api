@@ -254,15 +254,15 @@ public final class TestResources {
     }
 
     public static Jwt jwtForJoe() {
-        return createJwt().subject("auth0|3baa9bc92c9c5decbda32f76").build();
+        return createJwt().subject(idForJoe()).build();
     }
 
     public static Jwt jwtForRobert() {
-        return createJwt().subject("auth0|94afd9e7294a59e73e6abfbd").build();
+        return createJwt().subject(idForRobert()).build();
     }
 
     public static Jwt jwtForJulia() {
-        return createJwt().subject("auth0|c7b8835b2947d4bcc799dca5").build();
+        return createJwt().subject(idForJulia()).build();
     }
 
     private static Jwt.Builder createJwt() {
@@ -270,6 +270,18 @@ public final class TestResources {
             .header("alg", "RS256")
             .header("typ", "JWT")
             .header("kid", "Pgj1sRhThSD2fsOc_c6mX");
+    }
+
+    public static String idForJoe() {
+        return "auth0|3baa9bc92c9c5decbda32f76";
+    }
+
+    public static String idForRobert() {
+        return "auth0|94afd9e7294a59e73e6abfbd";
+    }
+
+    public static String idForJulia() {
+        return "auth0|c7b8835b2947d4bcc799dca5";
     }
 
     public static VerificationMode once() {
