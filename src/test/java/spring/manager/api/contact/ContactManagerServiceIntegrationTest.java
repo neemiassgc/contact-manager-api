@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static spring.manager.api.misc.TestResources.*;
 
 @SpringBootTest
 @Transactional
@@ -39,17 +40,20 @@ public class ContactManagerServiceIntegrationTest {
 
     @Test
     void should_return_all_the_contacts_for_a_given_user() {
-        final List<Contact> listOfContacts = contactManagerService.findAllByUsername("robert");
+        final List<Contact> listOfContacts = contactManagerService.findAllByUserId(idForRobert());
 
         assertThat(listOfContacts).hasSize(4);
         assertThat(listOfContacts).extracting(Contact::getName)
             .containsExactly("Best friend Julia", "Mom", "Pizza and burgers", "Uncle Jeff");
+        assertThat(listOfContacts).extracting(Contact::getEmailMap).flatExtracting(Map::keySet).hasSize(7);
+        assertThat(listOfContacts).extracting(Contact::getPhoneNumberMap).flatExtracting(Map::keySet).hasSize(7);
+        assertThat(listOfContacts).extracting(Contact::getAddressMap).flatExtracting(Map::keySet).hasSize(7);
     }
 
     @Test
     void should_get_a_contact_of_a_user_and_all_its_details_successfully() {
         final UUID gregFromAccountingContactId = UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167");
-        final Contact contact = contactManagerService.findByIdWithUser(gregFromAccountingContactId, "joe");
+        final Contact contact = contactManagerService.findByIdWithUser(gregFromAccountingContactId, idForJoe());
 
         assertThat(contact).isNotNull();
         assertThat(contact).extracting(Contact::getName).isEqualTo("Greg from accounting");
@@ -73,7 +77,7 @@ public class ContactManagerServiceIntegrationTest {
 
     @Test
     void should_return_an_empty_list_of_contacts_for_a_user_that_does_not_exist() {
-        final List<Contact> listOfContacts = contactManagerService.findAllByUsername("Lorena");
+        final List<Contact> listOfContacts = contactManagerService.findAllByUserId(idForJulia());
 
         assertThat(listOfContacts).isEmpty();
     }
@@ -82,18 +86,18 @@ public class ContactManagerServiceIntegrationTest {
     void should_throw_an_error_when_a_contact_is_not_found() {
         final UUID contactUUID = UUID.randomUUID();
 
-        final Throwable throwable = catchThrowable(() -> contactManagerService.findByIdWithUser(contactUUID, "joe"));
+        final Throwable throwable = catchThrowable(() -> contactManagerService.findByIdWithUser(contactUUID, idForJoe()));
 
         assertResponseStatusException(throwable, "Contact not found", HttpStatus.NOT_FOUND);
     }
 
     @Test
-    void should_throw_an_error_when_finding_a_contact_that_does_not_belong_to_the_user() {
-        final UUID contactId = UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167");
+    void should_throw_an_error_when_finding_a_contact_that_does_not_belong_to_the_current_user() {
+        final UUID contactId = UUID.fromString("84edd1b9-89a5-4107-a84d-435676c2b8f5");
 
-        final Throwable throwable = catchThrowable(() -> contactManagerService.findByIdWithUser(contactId, "robert"));
+        final Throwable throwable = catchThrowable(() -> contactManagerService.findByIdWithUser(contactId, idForJoe()));
 
-        assertResponseStatusException(throwable, "Contact does not belong to the user: robert", HttpStatus.BAD_REQUEST);
+        assertResponseStatusException(throwable, "Contact belongs to another user", HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -110,7 +114,7 @@ public class ContactManagerServiceIntegrationTest {
             .build();
         newContact.putAddress("work", companyAddress);
 
-        contactManagerService.saveWithUser(newContact, "robert");
+        contactManagerService.saveWithUser(newContact, idForRobert());
 
         final List<Contact> listOfContacts = contactManagerService.findAll();
         assertThat(listOfContacts).hasSize(8);
@@ -133,7 +137,7 @@ public class ContactManagerServiceIntegrationTest {
             .build();
         newContact.putAddress("home", homeAddress);
 
-        final Throwable throwable = catchThrowable(() -> contactManagerService.saveWithUser(newContact, "joe"));
+        final Throwable throwable = catchThrowable(() -> contactManagerService.saveWithUser(newContact, idForJoe()));
 
         assertThat(throwable).isNotNull();
     }
@@ -151,7 +155,7 @@ public class ContactManagerServiceIntegrationTest {
 
         final Contact referenceContact = Contact.toContact(contactSummary, contactSummary.getId());
 
-        contactManagerService.updateWithUser(referenceContact, "joe");
+        contactManagerService.updateWithUser(referenceContact, idForJoe());
 
         final Contact contactFromStorage = contactManagerService.findById(referenceContact.getId());
 
@@ -161,24 +165,24 @@ public class ContactManagerServiceIntegrationTest {
     @Test
     void should_throw_an_exception_when_it_is_tried_to_update_a_contact_that_does_not_exist() {
         final Contact nonExistingContact = TestResources.getFirstContact();
-        final Throwable throwable = catchThrowable(() -> contactManagerService.updateWithUser(nonExistingContact, "joe"));
+        final Throwable throwable = catchThrowable(() -> contactManagerService.updateWithUser(nonExistingContact, idForJoe()));
 
         assertResponseStatusException(throwable, "Contact not found", HttpStatus.NOT_FOUND);
     }
 
     @Test
-    void should_throw_an_exception_when_trying_to_update_a_contact_that_does_not_belong_to_a_user() {
+    void should_throw_an_exception_when_trying_to_update_a_contact_that_does_not_belong_to_the_current_user() {
         final Contact contact = TestResources.getContactById(UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7"));
 
-        final Throwable throwable = catchThrowable(() -> contactManagerService.updateWithUser(contact, "robert"));
+        final Throwable throwable = catchThrowable(() -> contactManagerService.updateWithUser(contact, idForRobert()));
 
-        assertResponseStatusException(throwable, "Contact does not belong to the user: robert", HttpStatus.BAD_REQUEST);
+        assertResponseStatusException(throwable, "Contact belongs to another user", HttpStatus.BAD_REQUEST);
     }
 
     @Test
     void should_delete_a_contact_successfully() {
         final UUID targetUuid = UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7");
-        contactManagerService.deleteByIdWithUser(targetUuid, "joe");
+        contactManagerService.deleteByIdWithUser(targetUuid, idForJoe());
 
         final Throwable throwable = catchThrowable(() -> contactManagerService.findById(targetUuid));
         final long count = contactManagerService.findAll().size();
@@ -191,7 +195,7 @@ public class ContactManagerServiceIntegrationTest {
     void should_throw_an_error_when_trying_to_delete_a_contact_that_does_not_exist() {
         final UUID targetUUID = UUID.randomUUID();
 
-        final Throwable throwable = catchThrowable(() -> contactManagerService.deleteByIdWithUser(targetUUID, "joe"));
+        final Throwable throwable = catchThrowable(() -> contactManagerService.deleteByIdWithUser(targetUUID, idForJoe()));
 
         assertResponseStatusException(throwable, "Contact not found", HttpStatus.NOT_FOUND);
     }
@@ -200,9 +204,9 @@ public class ContactManagerServiceIntegrationTest {
     void should_throw_an_error_when_trying_to_delete_a_contact_that_does_not_belong_to_a_user() {
         final UUID targetUUID = UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7");
 
-        final Throwable throwable = catchThrowable(() -> contactManagerService.deleteByIdWithUser(targetUUID, "robert"));
+        final Throwable throwable = catchThrowable(() -> contactManagerService.deleteByIdWithUser(targetUUID, idForRobert()));
 
-        assertResponseStatusException(throwable, "Contact does not belong to the user: robert", HttpStatus.BAD_REQUEST);
+        assertResponseStatusException(throwable, "Contact belongs to another user", HttpStatus.BAD_REQUEST);
     }
 
     @Test
