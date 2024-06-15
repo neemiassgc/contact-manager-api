@@ -16,8 +16,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static spring.manager.api.misc.TestResources.jwtForJoe;
-import static spring.manager.api.misc.TestResources.jwtForRobert;
+import static spring.manager.api.misc.TestResources.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
@@ -228,6 +227,18 @@ public class ContactControllerIntegrationTest {
             )
             .andExpect(status().isOk());
         }
+    }
+
+    @Test
+    @DisplayName("GET /api/contacts -> 404 NOT FOUND")
+    void should_respond_404_when_requesting_for_all_of_the_contacts_for_a_non_existing_user() throws Exception {
+        mockMvc.perform(get("/api/contacts")
+            .accept(MediaType.ALL)
+            .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJulia()))
+        )
+        .andExpect(status().isNotFound())
+        .andExpect(content().contentType(MediaType.TEXT_PLAIN))
+        .andExpect(content().string("User not found"));
     }
 
     @Test

@@ -201,6 +201,13 @@ public class ContactManagerServiceIntegrationTest {
     }
 
     @Test
+    void should_throw_an_error_when_finding_all_of_the_contacts_for_a_user_that_does_not_exits() {
+        final Throwable throwable = catchThrowable(() -> contactManagerService.findAllByUserId(idForJulia()));
+
+        assertResponseStatusException(throwable, "User not found", HttpStatus.NOT_FOUND);
+    }
+
+    @Test
     void should_throw_an_error_when_trying_to_delete_a_contact_that_does_not_belong_to_a_user() {
         final UUID targetUUID = UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7");
 

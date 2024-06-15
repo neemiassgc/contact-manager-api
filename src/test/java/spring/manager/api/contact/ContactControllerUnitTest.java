@@ -24,6 +24,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static spring.manager.api.misc.TestResources.*;
+import static spring.manager.api.misc.TestResources.idForJulia;
 
 @WebMvcTest(value = {ContactController.class, GlobalErrorController.class})
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
@@ -291,6 +292,24 @@ public class ContactControllerUnitTest {
             verify(contactManagerService, TestResources.once()).deleteByIdWithUser(eq(contactId), eq(idForRobert()));
             verifyNoMoreInteractions(contactManagerService);
         }
+    }
+
+    @Test
+    @DisplayName("GET /api/contacts -> 404 NOT FOUND")
+    void should_respond_404_when_requesting_for_all_of_the_contacts_for_a_non_existing_user() throws Exception {
+        when(contactManagerService.findAllByUserId(eq(idForJulia())))
+            .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        mockMvc.perform(get("/api/contacts")
+            .accept(MediaType.ALL)
+            .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJulia()))
+        )
+        .andExpect(status().isNotFound())
+        .andExpect(content().contentType(MediaType.TEXT_PLAIN))
+        .andExpect(content().string("User not found"));
+
+        verify(contactManagerService, once()).findAllByUserId(eq(idForJulia()));
+        verifyNoMoreInteractions(contactManagerService);
     }
 
     @Test
