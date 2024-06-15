@@ -9,10 +9,16 @@ public interface ExtendedContactRepository {
 
     void save(Contact contact);
 
-    @Query("select c from Contact c join fetch c.phoneNumberMap join fetch c.emailMap join fetch addressMap join fetch c.user")
+    @Query(
+        "select c from Contact c join fetch c.phoneNumberMap join fetch c.emailMap " +
+        "join fetch c.addressMap join fetch c.user order by c.name asc"
+    )
     List<Contact> findAll();
 
-    @Query("select c from Contact c left join fetch c.phoneNumberMap left join fetch c.emailMap left join fetch addressMap where c.user.id = :userId")
+    @Query(
+        "select c from Contact c left join fetch c.phoneNumberMap left join fetch c.emailMap " +
+        "left join fetch c.addressMap where c.user.id = :userId order by c.name asc"
+    )
     List<Contact> findAllByUserId(@Param("userId") String userId);
 
     void deleteAll();
