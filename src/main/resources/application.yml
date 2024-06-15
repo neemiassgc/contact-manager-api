@@ -11,8 +11,6 @@ spring:
     generate-ddl: false
     hibernate:
       ddl-auto: none
-      naming:
-        physical-strategy: spring.manager.api.misc.CustomPhysicalNamingStrategy
     open-in-view: false
 
   sql:

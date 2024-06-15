@@ -1,8 +1,8 @@
-insert into cm_users (user_id, username) values
+insert into users (user_id, username) values
 ('auth0|94afd9e7294a59e73e6abfbd', 'robert'),
 ('auth0|3baa9bc92c9c5decbda32f76', 'joe');
 
-insert into cm_contacts (contact_id, name, user_id) values
+insert into contacts (contact_id, name, user_id) values
 ('5c21433c-3c70-4253-a4b2-52b157be4167', 'Greg from accounting', 'auth0|3baa9bc92c9c5decbda32f76'),
 ('4fe25947-ecab-489c-a881-e0057124e408', 'Coworker Fred', 'auth0|3baa9bc92c9c5decbda32f76'),
 ('35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7', 'Sister Monica', 'auth0|3baa9bc92c9c5decbda32f76'),
@@ -11,7 +11,7 @@ insert into cm_contacts (contact_id, name, user_id) values
 ('8fb2bd75-9aec-4cc5-b77b-a95f06081388', 'Pizza and burgers', 'auth0|94afd9e7294a59e73e6abfbd'),
 ('b621650d-4a81-4016-a917-4a8a4992aaef', 'Uncle Jeff', 'auth0|94afd9e7294a59e73e6abfbd');
 
-insert into cm_phone_numbers (phone_number, contact_id, type) values
+insert into phone_numbers (phone_number, contact_id, type) values
 ('+359(26)5948-0427', '5c21433c-3c70-4253-a4b2-52b157be4167', 'home'),
 ('+52(54)6536-5876', '4fe25947-ecab-489c-a881-e0057124e408', 'home'),
 ('+81(56)4205-8516', '4fe25947-ecab-489c-a881-e0057124e408', 'mobile'),
@@ -25,7 +25,7 @@ insert into cm_phone_numbers (phone_number, contact_id, type) values
 ('+39(80)9464-0706', 'b621650d-4a81-4016-a917-4a8a4992aaef', 'home'),
 ('+31(14)1750-4453', 'b621650d-4a81-4016-a917-4a8a4992aaef', 'mobile');
 
-insert into cm_addresses (type, contact_id, street, country, city, state, zipcode) values
+insert into addresses (type, contact_id, street, country, city, state, zipcode) values
 ('home', '5c21433c-3c70-4253-a4b2-52b157be4167', '343-1199, Tennodai', 'Japan', 'Abiko-shi', 'Chiba', '02169'),
 ('work', '5c21433c-3c70-4253-a4b2-52b157be4167', '127-1121, Hiyamizu', 'Japan', 'Rankoshi-cho Isoya-gun', 'Hokkaido', '02169'),
 ('home', '4fe25947-ecab-489c-a881-e0057124e408', '4454 Steve Hunt Road', 'EUA', 'Miami', 'Florida', '33131'),
@@ -38,7 +38,7 @@ insert into cm_addresses (type, contact_id, street, country, city, state, zipcod
 ('home', 'b621650d-4a81-4016-a917-4a8a4992aaef', '237-1233, Ichihasama Shimmai', 'Japan', 'Kurihara-shi', 'Miyagi', '46231'),
 ('work', 'b621650d-4a81-4016-a917-4a8a4992aaef', '210-1040, Okada', 'Japan', 'Chikushino-shi', 'Fukuoka', '48335');
 
-insert into cm_emails (type, email, contact_id) values
+insert into emails (type, email, contact_id) values
 ('main', 'sailor.greg99@hotmail.co.jp', '5c21433c-3c70-4253-a4b2-52b157be4167'),
 ('main', 'yuki.fred@gmail.com', '4fe25947-ecab-489c-a881-e0057124e408'),
 ('main', 'usermonica01@outlook.com', '35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7'),
