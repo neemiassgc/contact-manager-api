@@ -36,7 +36,7 @@ public class ContactManagerServiceImpl implements ContactManagerService {
         final Contact contact = findById(contactId);
         final User user = contact.getUser();
         if (!user.getId().equals(userId))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contact does not belong to the user: "+user.getUsername());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contact belongs to another user");
         return contact;
     }
 
