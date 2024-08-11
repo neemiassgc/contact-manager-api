@@ -34,7 +34,7 @@ public class ContactController {
         contactManagerService.saveWithUser(Contact.toContact(contactSummary), getUserFromSub(jwt));
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public void update(@PathVariable("id") UUID id, @RequestBody ContactSummary contactSummary, @AuthenticationPrincipal Jwt jwt) {
         contactManagerService.updateWithUser(Contact.toContact(contactSummary, id), getUserFromSub(jwt));
     }
