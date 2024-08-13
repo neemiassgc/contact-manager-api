@@ -76,10 +76,10 @@ public class ContactManagerServiceIntegrationTest {
     }
 
     @Test
-    void should_return_an_empty_list_of_contacts_for_a_user_that_does_not_exist() {
-        final List<Contact> listOfContacts = contactManagerService.findAllByUserId(idForJulia());
+    void should_throw_an_exception_for_when_a_user_does_not_exist() {
+        final Throwable throwable = catchThrowable(() -> contactManagerService.findAllByUserId(idForJulia()));
 
-        assertThat(listOfContacts).isEmpty();
+        assertResponseStatusException(throwable, "User not found", HttpStatus.NOT_FOUND);
     }
 
     @Test
