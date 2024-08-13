@@ -1,7 +1,6 @@
 package spring.manager.api.contact;
 
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import spring.manager.api.misc.TestResources;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -96,7 +95,7 @@ public class ContactControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("PUT /api/contacts/4fe25947-ecab-489c-a881-e0057124e408 -> 200 OK")
+        @DisplayName("PATCH /api/contacts/4fe25947-ecab-489c-a881-e0057124e408 -> 200 OK")
         void should_update_isolated_fields_of_a_contact_successfully() throws Exception {
             final String requestBody = """
             {
@@ -109,13 +108,15 @@ public class ContactControllerIntegrationTest {
             }
             """;
 
-            mockMvc.perform(put("/api/contacts/4fe25947-ecab-489c-a881-e0057124e408")
+            mockMvc.perform(patch("/api/contacts/4fe25947-ecab-489c-a881-e0057124e408")
                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJoe()))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody)
             )
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$").isMap());
         }
 
         @Test
@@ -196,7 +197,7 @@ public class ContactControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("PUT /api/contacts/84edd1b9-89a5-4107-a84d-435676c2b8f5 -> 200 OK")
+        @DisplayName("PATCH /api/contacts/84edd1b9-89a5-4107-a84d-435676c2b8f5 -> 200 OK")
         void should_update_isolated_fields_of_a_contact_successfully() throws Exception {
             final String requestBody = """
             {
@@ -209,13 +210,15 @@ public class ContactControllerIntegrationTest {
             }
             """;
 
-            mockMvc.perform(put("/api/contacts/84edd1b9-89a5-4107-a84d-435676c2b8f5")
+            mockMvc.perform(patch("/api/contacts/84edd1b9-89a5-4107-a84d-435676c2b8f5")
                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForRobert()))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody)
             )
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$").isMap());
         }
 
         @Test
@@ -293,9 +296,9 @@ public class ContactControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("PUT /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> 400 BAD REQUEST")
+    @DisplayName("PATCH /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> 400 BAD REQUEST")
     void should_respond_400_when_trying_to_update_a_concat_that_does_not_belong_to_the_current_user() throws Exception {
-        mockMvc.perform(put("/api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef")
+        mockMvc.perform(patch("/api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef")
             .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJoe()))
             .contentType(MediaType.APPLICATION_JSON)
             .content("{\"name\": \"Billy\"}")

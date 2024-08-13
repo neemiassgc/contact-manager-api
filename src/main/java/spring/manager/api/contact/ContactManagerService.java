@@ -10,7 +10,7 @@ public interface ContactManagerService extends ExtendedContactRepository {
 
     void saveWithUser(Contact contact, String userId);
 
-    void updateWithUser(Contact contact, String userId);
+    Contact updateWithUser(Contact contact, String userId);
 
     void deleteByIdWithUser(UUID contactId, String userId);
 }
