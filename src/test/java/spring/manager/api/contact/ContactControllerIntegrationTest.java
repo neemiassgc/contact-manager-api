@@ -1,6 +1,5 @@
 package spring.manager.api.contact;
 
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -8,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -232,6 +232,75 @@ public class ContactControllerIntegrationTest {
         }
     }
 
+    @Nested
+    public class TestCasesForFieldValidations {
+
+        @Test
+        @DisplayName("POST /api/contacts -> 400 BAD REQUEST")
+        public void should_return_violations_when_adding_a_new_contact_with_missing_fields() throws Exception {
+            final String requestBody = "{}";
+
+            mockMvc.perform(post("/api/contacts")
+                .content(requestBody)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.ALL)
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJoe()))
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.fieldViolations").value(containsInAnyOrder(
+                "phoneNumbers must not be missing",
+                "name must not be missing"
+            )));
+        }
+
+        @Test
+        @DisplayName("POST /api/contacts -> 400 BAD REQUEST")
+        public void should_return_field_violations_when_creating_a_new_contact_with_invalid_data() throws Exception {
+            final String requestBody =
+            """
+            {
+                "emails": {
+                    "main":"roger@gmail."
+                },
+                "phoneNumbers": {
+                    "main": "+287o"
+                },
+                "addresses": {
+                    "home": {
+                        "country": "US",
+                        "state": "St",
+                        "city": "ci",
+                        "zipcode": 3745818473234523452346,
+                        "street": "cit"
+                    }
+                }
+            }
+            """;
+
+            mockMvc.perform(post("/api/contacts")
+                .content(requestBody)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.ALL)
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForJoe()))
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.fieldViolations")
+            .value(containsInAnyOrder(
+                "Street is too short",
+                "Phone number is too short",
+                "City is too short",
+                "Phone number must be just numbers",
+                "Zipcode is too long",
+                "must be a well-formed email address",
+                "State is too short",
+                "name must not be missing",
+                "Country is too short"
+            )));
+        }
+    }
+
     @Test
     @DisplayName("GET /api/contacts -> 404 NOT FOUND")
     void should_respond_404_when_requesting_for_all_of_the_contacts_for_a_non_existing_user() throws Exception {
@@ -266,33 +335,6 @@ public class ContactControllerIntegrationTest {
         .andExpect(status().isBadRequest())
         .andExpect(content().contentType(MediaType.TEXT_PLAIN))
         .andExpect(content().string("Contact belongs to another user"));
-    }
-
-    @Test
-    @DisplayName("POST /api/contacts -> 400 BAD_REQUEST")
-    void should_respond_400_with_field_violation_errors_when_posting_a_bad_formatted_json() throws Exception {
-        final String jsonContent = """
-        {
-            "phoneNumbers": {
-            },
-            "emails": {
-            }
-        }
-        """;
-
-        mockMvc.perform(post("/api/contacts")
-            .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwtForRobert()))
-            .accept(MediaType.APPLICATION_JSON)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(jsonContent)
-        )
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.fieldViolations").value(hasSize(3)))
-        .andExpect(jsonPath("$.fieldViolations[*]").value(containsInAnyOrder(
-            "'phoneNumbers' must have at least 1 item",
-            "'name' must not be null",
-            "'phoneNumbers' must have between 1 and 50 items"
-        )));
     }
 
     @Test
