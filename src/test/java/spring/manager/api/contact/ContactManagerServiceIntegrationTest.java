@@ -60,7 +60,7 @@ public class ContactManagerServiceIntegrationTest {
         assertThat(contact).extracting(Contact::getPhoneNumberMap).satisfies(phoneNumberMap -> {
             assertThat(phoneNumberMap).isNotNull();
             assertThat(phoneNumberMap).hasSize(1);
-            assertThat(phoneNumberMap).containsOnly(Map.entry("home", "+359(26)5948-0427"));
+            assertThat(phoneNumberMap).containsOnly(Map.entry("home", "+3592659480427"));
         });
         assertThat(contact).extracting(Contact::getEmailMap).satisfies(emailMap -> {
             assertThat(emailMap).isNotNull();
@@ -145,7 +145,7 @@ public class ContactManagerServiceIntegrationTest {
     @Test
     void should_update_a_contact_successfully() {
         final String contactNewName = "Alex";
-        final ContactSummary contactSummary =   ContactSummary.builder()
+        final ContactSummary contactSummary =  ContactSummary.builder()
             .id(UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7"))
             .name(contactNewName)
             .addresses(null)
