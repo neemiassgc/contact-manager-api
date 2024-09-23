@@ -2,7 +2,11 @@ package spring.manager.api.contact;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
+import spring.manager.api.contact.constraint.Max;
+import spring.manager.api.contact.constraint.Min;
 
 import java.util.Objects;
 
@@ -14,18 +18,34 @@ import java.util.Objects;
 @AllArgsConstructor
 public class Address {
 
+    @NotNull(message = "Country is missing")
+    @Size
+    @Min(value = 4, message = "Country is too short")
+    @Max(value = 20, message = "Country is too long")
     @Column(nullable = false, length = 20)
     private String country;
 
+    @NotNull(message = "Street is missing")
+    @Min(value = 4, message = "Street is too short")
+    @Max(value = 50, message = "Street is too long")
     @Column(nullable = false, length = 50)
     private String street;
 
+    @NotNull(message = "City is missing")
+    @Min(value = 4, message = "City is too short")
+    @Max(value = 50, message = "City is too long")
     @Column(nullable = false, length = 50)
     private String city;
 
+    @NotNull(message = "State is missing")
+    @Min(value = 4, message = "State is too short")
+    @Max(value = 50, message = "State is too long")
     @Column(nullable = false, length = 50)
     private String state;
 
+    @NotNull(message = "Zipcode is missing")
+    @Min(value = 4, message = "Zipcode is too short")
+    @Max(value = 20, message = "Zipcode is too long")
     @Column(nullable = false, length = 20)
     private String zipcode;
 
