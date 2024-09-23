@@ -17,7 +17,7 @@ import java.util.Map;
 @NoArgsConstructor(force = true)
 public class ContactEntries {
 
-    @Size(min = 1, max = 20, message = "phoneNumbers must have between 1 and 50 items")
+    @Size(min = 1, max = 20, message = "phoneNumbers must have between 1 and 20 items")
     private final Map<String,
         @Pattern(regexp = "^\\+[1-9]\\d+$", message = "Phone number must be just numbers")
         @Min(value = 10, message = "Phone number is too short")

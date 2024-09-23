@@ -20,7 +20,7 @@ public class Address {
 
     @NotNull(message = "Country is missing")
     @Size
-    @Min(value = 4, message = "Country is too short")
+    @Min(value = 3, message = "Country is too short")
     @Max(value = 20, message = "Country is too long")
     @Column(nullable = false, length = 20)
     private String country;
@@ -32,21 +32,21 @@ public class Address {
     private String street;
 
     @NotNull(message = "City is missing")
-    @Min(value = 4, message = "City is too short")
+    @Min(value = 3, message = "City is too short")
     @Max(value = 50, message = "City is too long")
     @Column(nullable = false, length = 50)
     private String city;
 
     @NotNull(message = "State is missing")
-    @Min(value = 4, message = "State is too short")
-    @Max(value = 50, message = "State is too long")
-    @Column(nullable = false, length = 50)
+    @Min(value = 3, message = "State is too short")
+    @Max(value = 20, message = "State is too long")
+    @Column(nullable = false, length = 20)
     private String state;
 
     @NotNull(message = "Zipcode is missing")
-    @Min(value = 4, message = "Zipcode is too short")
-    @Max(value = 20, message = "Zipcode is too long")
-    @Column(nullable = false, length = 20)
+    @Min(value = 5, message = "Zipcode is too short")
+    @Max(value = 15, message = "Zipcode is too long")
+    @Column(nullable = false, length = 15)
     private String zipcode;
 
     @Override
