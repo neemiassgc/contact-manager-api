@@ -1,44 +1,56 @@
 package spring.manager.api.contact;
 
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
+import spring.manager.api.contact.constraint.Max;
+import spring.manager.api.contact.constraint.Min;
 
 import java.util.Map;
 import java.util.UUID;
 
 @Getter
-@Setter
-@RequiredArgsConstructor
-@Builder
-public final class ContactSummary {
+@NoArgsConstructor(force = true)
+public final class ContactSummary extends ContactEntries {
 
     private final UUID id;
 
-    @NotNull(message = "'name' must not be null")
-    @Size(min = 2, max = 140, message = "'name' must have between 2 and 140 characters")
+    @NotNull(message = "name must not be missing")
+    @Min(value = 2, message = "name is too short")
+    @Max(value = 140, message = "name is too long")
     private final String name;
 
-    @NotNull(message = "'phoneNumbers' must not be null")
-    @NotEmpty(message = "'phoneNumbers' must have at least 1 item")
-    @Size(min = 1, max = 50, message = "'phoneNumbers' must have between 1 and 50 items")
-    private final Map<String, String> phoneNumbers;
+    @Builder
+    public ContactSummary(
+        final UUID id,
+        final String name,
+        final Map<String, String> phoneNumbers,
+        final Map<String, String> emails,
+        final Map<String, Address> addresses
+    ) {
+        super(phoneNumbers, emails, addresses);
+        this.id = id;
+        this.name = name;
+    }
 
-    @Size(max = 50, message = "'email' must have a maximum of 50 items")
-    private final Map<String, String> emails;
+    public ContactSummary(final UUID id, final String name, final ContactEntries contactEntries) {
+        this(id, name, contactEntries.getPhoneNumbers(), contactEntries.getEmails(), contactEntries.getAddresses());
+    }
 
-    @Size(max = 50, message = "'email' must have a maximum of 50 items")
-    private final Map<String, Address> addresses;
+    public ContactSummary(final ContactEntries contactEntries) {
+        this(null, null, contactEntries);
+    }
 
     public ContactSummary(final Contact contact) {
+        super(contact.getPhoneNumberMap(), contact.getEmailMap(), contact.getAddressMap());
         this.id = contact.getId();
         this.name = contact.getName();
-        this.phoneNumbers = contact.getPhoneNumberMap();
-        this.emails = contact.getEmailMap();
-        this.addresses = contact.getAddressMap();
+    }
+
+    @Override
+    @NotNull(message = "phoneNumbers must not be missing")
+    public Map<String, String> getPhoneNumbers() {
+        return super.getPhoneNumbers();
     }
 }
