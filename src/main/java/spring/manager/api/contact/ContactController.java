@@ -35,8 +35,8 @@ public class ContactController {
     }
 
     @PatchMapping("/{id}")
-    public ContactSummary update(@PathVariable("id") UUID id, @RequestBody ContactSummary contactSummary, @AuthenticationPrincipal Jwt jwt) {
-        return contactManagerService.updateWithUser(Contact.toContact(contactSummary, id), getUserFromSub(jwt)).toContactSummary();
+    public ContactSummary update(@PathVariable("id") UUID id, @RequestBody @Validated ContactEntries contactEntries, @AuthenticationPrincipal Jwt jwt) {
+        return contactManagerService.updateWithUser(Contact.toContact(new ContactSummary(contactEntries), id), getUserFromSub(jwt)).toContactSummary();
     }
 
     @DeleteMapping("/{id}")
