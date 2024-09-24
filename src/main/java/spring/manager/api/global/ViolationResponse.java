@@ -3,19 +3,21 @@ package spring.manager.api.global;
 import lombok.Getter;
 import org.springframework.validation.FieldError;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+@Getter
 public final class ViolationResponse {
 
-    @Getter
-    private final List<String> fieldViolations = new ArrayList<>();
+    private final Map<String, List<String>> fieldViolations;
 
-    public void putFieldViolation(final String violation) {
-       fieldViolations.add(violation);
-    }
-
-    public void putFieldViolation(final FieldError fieldError) {
-        putFieldViolation(fieldError.getDefaultMessage());
+    ViolationResponse(final List<FieldError> fieldErrors) {
+        this.fieldViolations =
+        fieldErrors.stream().map(FieldError::getDefaultMessage)
+            .collect(Collectors.groupingBy(message -> {
+                assert message != null;
+                return message.split(" ")[0];
+            }));
     }
 }

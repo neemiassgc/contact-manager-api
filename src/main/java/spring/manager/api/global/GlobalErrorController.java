@@ -23,11 +23,7 @@ public class GlobalErrorController {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ViolationResponse> resolveResponseStatusException(final MethodArgumentNotValidException manve) {
-        final ViolationResponse violationResponse = manve
-            .getFieldErrors()
-            .stream()
-            .collect(ViolationResponse::new, ViolationResponse::putFieldViolation, (a, b) -> {});
-
+        final ViolationResponse violationResponse = new ViolationResponse(manve.getFieldErrors());
         return ResponseEntity.badRequest().body(violationResponse);
     }
 
