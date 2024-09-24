@@ -18,34 +18,34 @@ import java.util.Objects;
 @AllArgsConstructor
 public class Address {
 
-    @NotNull(message = "Country is missing")
+    @NotNull(message = "country is missing")
     @Size
-    @Min(value = 3, message = "Country is too short")
-    @Max(value = 20, message = "Country is too long")
+    @Min(value = 3, message = "country is too short")
+    @Max(value = 20, message = "country is too long")
     @Column(nullable = false, length = 20)
     private String country;
 
-    @NotNull(message = "Street is missing")
-    @Min(value = 4, message = "Street is too short")
-    @Max(value = 50, message = "Street is too long")
+    @NotNull(message = "street is missing")
+    @Min(value = 4, message = "street is too short")
+    @Max(value = 50, message = "street is too long")
     @Column(nullable = false, length = 50)
     private String street;
 
-    @NotNull(message = "City is missing")
-    @Min(value = 3, message = "City is too short")
-    @Max(value = 50, message = "City is too long")
+    @NotNull(message = "city is missing")
+    @Min(value = 3, message = "city is too short")
+    @Max(value = 50, message = "city is too long")
     @Column(nullable = false, length = 50)
     private String city;
 
-    @NotNull(message = "State is missing")
-    @Min(value = 3, message = "State is too short")
-    @Max(value = 20, message = "State is too long")
+    @NotNull(message = "state is missing")
+    @Min(value = 3, message = "state is too short")
+    @Max(value = 20, message = "state is too long")
     @Column(nullable = false, length = 20)
     private String state;
 
-    @NotNull(message = "Zipcode is missing")
-    @Min(value = 5, message = "Zipcode is too short")
-    @Max(value = 15, message = "Zipcode is too long")
+    @NotNull(message = "zipcode is missing")
+    @Min(value = 5, message = "zipcode is too short")
+    @Max(value = 15, message = "zipcode is too long")
     @Column(nullable = false, length = 15)
     private String zipcode;
 

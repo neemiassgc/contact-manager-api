@@ -358,15 +358,15 @@ public class ContactControllerUnitTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.fieldViolations")
                 .value(containsInAnyOrder(
-                    "Street is too short",
-                    "Phone number is too short",
-                    "City is too short",
-                    "Phone number must be just numbers",
-                    "Zipcode is too long",
-                    "must be a well-formed email address",
-                    "State is too short",
+                    "street is too short",
+                    "phone number is too short",
+                    "city is too short",
+                    "phone number must be just numbers",
+                    "zipcode is too long",
+                    "email must be a well-formed email address",
+                    "state is too short",
                     "name must not be missing",
-                    "Country is too short"
+                    "country is too short"
                 )));
 
             verifyNoInteractions(contactManagerService);

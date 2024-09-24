@@ -19,12 +19,12 @@ public class ContactEntries {
 
     @Size(min = 1, max = 20, message = "phoneNumbers must have between 1 and 20 items")
     private final Map<String,
-        @Pattern(regexp = "^\\+[1-9]\\d+$", message = "Phone number must be just numbers")
-        @Min(value = 10, message = "Phone number is too short")
-        @Max(value = 15, message = "Phone number is too long") String> phoneNumbers;
+        @Pattern(regexp = "^\\+[1-9]\\d+$", message = "phone number must be just numbers")
+        @Min(value = 10, message = "phone number is too short")
+        @Max(value = 15, message = "phone number is too long") String> phoneNumbers;
 
     @Size(max = 20, message = "emails must have a maximum of 20 items")
-    private final Map<String, @Email String> emails;
+    private final Map<String, @Email(message = "email must be a well-formed email address") String> emails;
 
     @Size(max = 20, message = "addresses must have a maximum of 20 items")
     private final Map<String, @Valid Address> addresses;
