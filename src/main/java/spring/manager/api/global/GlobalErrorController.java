@@ -24,7 +24,7 @@ public class GlobalErrorController {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ViolationResponse> resolveResponseStatusException(final MethodArgumentNotValidException manve) {
         final ViolationResponse violationResponse = new ViolationResponse(manve.getFieldErrors());
-        return ResponseEntity.badRequest().body(violationResponse);
+        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(violationResponse);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
