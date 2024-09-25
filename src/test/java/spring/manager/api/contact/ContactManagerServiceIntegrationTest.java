@@ -145,7 +145,7 @@ public class ContactManagerServiceIntegrationTest {
     @Test
     void should_update_a_contact_successfully() {
         final String contactNewName = "Alex";
-        final ContactSummary contactSummary =  ContactSummary.builder()
+        final ContactInOut contactInOut =  ContactInOut.builder()
             .id(UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7"))
             .name(contactNewName)
             .addresses(null)
@@ -153,7 +153,7 @@ public class ContactManagerServiceIntegrationTest {
             .phoneNumbers(null)
             .build();
 
-        final Contact referenceContact = Contact.toContact(contactSummary, contactSummary.getId());
+        final Contact referenceContact = Contact.toContact(contactInOut, contactInOut.getId());
 
         contactManagerService.updateWithUser(referenceContact, idForJoe());
 

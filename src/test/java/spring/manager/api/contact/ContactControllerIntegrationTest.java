@@ -248,7 +248,7 @@ public class ContactControllerIntegrationTest {
             )
             .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.fieldViolations").value(containsInAnyOrder(
+            .andExpect(jsonPath("$.fieldViolations[*][*]").value(containsInAnyOrder(
                 "phoneNumbers must not be missing",
                 "name must not be missing"
             )));
@@ -286,7 +286,7 @@ public class ContactControllerIntegrationTest {
             )
             .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.fieldViolations")
+            .andExpect(jsonPath("$.fieldViolations[*][*]")
             .value(containsInAnyOrder(
                 "street is too short",
                 "phone number is too short",
