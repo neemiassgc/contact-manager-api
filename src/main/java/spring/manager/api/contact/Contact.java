@@ -87,32 +87,32 @@ public class Contact {
         addressMap.put(type, Objects.requireNonNull(address));
     }
 
-    public ContactSummary toContactSummary() {
-        return new ContactSummary(this);
+    public ContactInOut toContactInOut() {
+        return new ContactInOut(this);
     }
 
-    public static Contact toContact(final ContactSummary contactSummary, final User user) {
-        final Contact newContact = toContact(contactSummary);
+    public static Contact toContact(final ContactInOut contactInOut, final User user) {
+        final Contact newContact = toContact(contactInOut);
         newContact.setUser(user);
         return newContact;
     }
 
-    public static Contact toContact(final ContactSummary contactSummary, final UUID id) {
-        final Contact newContact = toContact(contactSummary);
+    public static Contact toContact(final ContactInOut contactInOut, final UUID id) {
+        final Contact newContact = toContact(contactInOut);
         newContact.setId(id);
         return newContact;
     }
 
-    public static Contact toContact(final ContactSummary contactSummary) {
-        final Contact newContact = new Contact(contactSummary.getName());
-        newContact.setPhoneNumberMap(contactSummary.getPhoneNumbers());
-        newContact.setEmailMap(contactSummary.getEmails());
-        newContact.setAddressMap(contactSummary.getAddresses());
+    public static Contact toContact(final ContactInOut contactInOut) {
+        final Contact newContact = new Contact(contactInOut.getName());
+        newContact.setPhoneNumberMap(contactInOut.getPhoneNumbers());
+        newContact.setEmailMap(contactInOut.getEmails());
+        newContact.setAddressMap(contactInOut.getAddresses());
         return newContact;
     }
 
-    public static List<ContactSummary> toListOfContactSummary(final List<Contact> contacts) {
-        return contacts.stream().map(Contact::toContactSummary).collect(Collectors.toList());
+    public static List<ContactInOut> toListOfContactInOut(final List<Contact> contacts) {
+        return contacts.stream().map(Contact::toContactInOut).collect(Collectors.toList());
     }
 
     public void merge(final Contact contactToMerge) {

@@ -233,14 +233,14 @@ public final class TestResources {
             .collect(Collectors.toList());
     }
 
-    public static Contact makeCopy(final Contact contacToBeCopied) {
-        final Contact newContact = new Contact(contacToBeCopied.getName(), contacToBeCopied.getId());
-        newContact.setUser(contacToBeCopied.getUser());
-        for (final Map.Entry<String, String> entry : contacToBeCopied.getPhoneNumberMap().entrySet())
+    public static Contact makeCopy(final Contact contactToBeCopied) {
+        final Contact newContact = new Contact(contactToBeCopied.getName(), contactToBeCopied.getId());
+        newContact.setUser(contactToBeCopied.getUser());
+        for (final Map.Entry<String, String> entry : contactToBeCopied.getPhoneNumberMap().entrySet())
             newContact.putPhoneNumber(entry.getKey(), entry.getValue());
-        for (final Map.Entry<String, String> entry : contacToBeCopied.getEmailMap().entrySet())
+        for (final Map.Entry<String, String> entry : contactToBeCopied.getEmailMap().entrySet())
             newContact.putEmail(entry.getKey(), entry.getValue());
-        for (final Map.Entry<String, Address> entry : contacToBeCopied.getAddressMap().entrySet()) {
+        for (final Map.Entry<String, Address> entry : contactToBeCopied.getAddressMap().entrySet()) {
             final Address address = Address.builder()
                 .state(entry.getValue().getState())
         .street(entry.getValue().getStreet())
