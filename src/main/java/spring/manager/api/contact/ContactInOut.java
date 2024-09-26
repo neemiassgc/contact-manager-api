@@ -31,7 +31,7 @@ public final class ContactInOut extends ConstrainedContact {
     }
 
     public ContactInOut(final ConstrainedContact constrainedContact) {
-        this(null, null, constrainedContact);
+        this(null, constrainedContact.getName(), constrainedContact);
     }
 
     public ContactInOut(final Contact contact) {

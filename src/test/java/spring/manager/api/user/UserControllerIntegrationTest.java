@@ -52,7 +52,7 @@ public class UserControllerIntegrationTest {
         .andExpect(status().isBadRequest())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(
-            jsonPath("$.fieldViolations[*]",
+            jsonPath("$.fieldViolations[*][*]",
             containsInAnyOrder("username is required"))
         );
     }

@@ -64,7 +64,7 @@ public class UserControllerUnitTest {
         .andExpect(status().isBadRequest())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(
-            jsonPath("$.fieldViolations[*]",
+            jsonPath("$.fieldViolations[*][*]",
             Matchers.contains("username is required"))
         );
 
