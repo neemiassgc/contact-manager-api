@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import spring.manager.api.contact.constraint.Max;
+import spring.manager.api.contact.constraint.Min;
 
 import java.util.Map;
 import java.util.UUID;
@@ -43,5 +45,11 @@ public final class ContactInOut extends ConstrainedContact {
     @NotNull(message = "phoneNumbers must not be missing")
     public Map<String, String> getPhoneNumbers() {
         return super.getPhoneNumbers();
+    }
+
+    @Override
+    @NotNull(message = "name must not be missing")
+    public String getName() {
+        return super.getName();
     }
 }

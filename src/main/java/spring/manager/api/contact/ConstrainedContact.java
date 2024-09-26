@@ -18,7 +18,6 @@ import java.util.Map;
 @NoArgsConstructor(force = true)
 public class ConstrainedContact {
 
-    @NotNull(message = "name must not be missing")
     @Min(value = 2, message = "name is too short")
     @Max(value = 140, message = "name is too long")
     private final String name;
