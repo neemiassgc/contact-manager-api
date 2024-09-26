@@ -1,10 +1,7 @@
 package spring.manager.api.contact;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +31,7 @@ public class ConstrainedContact {
     private final Map<
         @Max(value = 15, message = "label is too long")
         @Min(value = 3, message = "label is too short") String,
+        @NotBlank(message = "email must not be blank")
         @Email(message = "email must be a well-formed email address") String> emails;
 
     @Size(max = 20, message = "addresses must have a maximum of 20 items")
