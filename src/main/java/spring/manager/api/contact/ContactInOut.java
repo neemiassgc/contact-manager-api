@@ -4,8 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import spring.manager.api.contact.constraint.Max;
-import spring.manager.api.contact.constraint.Min;
 
 import java.util.Map;
 import java.util.UUID;

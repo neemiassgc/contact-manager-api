@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS contacts (
 );
 
 CREATE TABLE IF NOT EXISTS emails (
-    label VARCHAR(15) NOT NULL,
+    label VARCHAR(15) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL,
     contact_id UUID NOT NULL,
     CONSTRAINT fk_contacts
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS emails (
 );
 
 CREATE TABLE IF NOT EXISTS phone_numbers (
-    label VARCHAR(15) NOT NULL,
+    label VARCHAR(15) NOT NULL UNIQUE,
     phone_number VARCHAR(15) NOT NULL,
     contact_id UUID NOT NULL,
     CONSTRAINT fk_contacts
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS phone_numbers (
 );
 
 CREATE TABLE IF NOT EXISTS addresses (
-    label VARCHAR(15) NOT NULL,
+    label VARCHAR(15) NOT NULL UNIQUE,
     country VARCHAR(20) NOT NULL,
     street VARCHAR(50) NOT NULL,
     city VARCHAR(50) NOT NULL,

@@ -29,19 +29,19 @@ public class Contact {
 
     @ElementCollection
     @CollectionTable(name = "phone_numbers", joinColumns = @JoinColumn(name = "contact_id"))
-    @MapKeyColumn(name = "label", length = 15)
+    @MapKeyColumn(unique = true, name = "label", length = 15)
     @Column(name = "phone_number", length = 15)
     private Map<String, String> phoneNumberMap = new HashMap<>();
 
     @ElementCollection
     @CollectionTable(name = "emails", joinColumns = @JoinColumn(name = "contact_id"))
-    @MapKeyColumn(name = "label", length = 15)
+    @MapKeyColumn(unique = true, name = "label", length = 15)
     @Column(name = "email", length = 20)
     private Map<String, String> emailMap = new HashMap<>();
 
     @ElementCollection
     @CollectionTable(name = "addresses",  joinColumns = @JoinColumn(name = "contact_id"))
-    @MapKeyColumn(name = "label", length = 15)
+    @MapKeyColumn(unique = true, name = "label", length = 15)
     private Map<String, Address> addressMap = new HashMap<>();
 
     @JoinColumn(name = "user_id")
