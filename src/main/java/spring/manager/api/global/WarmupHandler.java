@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WarmupHandler {
 
     @CrossOrigin("*")
-    @GetMapping("/_ah/warmup")
+    @GetMapping("/warmup")
     @ResponseStatus(HttpStatus.OK)
     public String warmup() {
         return "ok";
