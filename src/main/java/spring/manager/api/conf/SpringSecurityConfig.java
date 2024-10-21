@@ -17,7 +17,7 @@ public class SpringSecurityConfig {
     public SecurityFilterChain securityFilterChain(final HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors(AbstractHttpConfigurer::disable);
         httpSecurity.authorizeHttpRequests(it -> it.requestMatchers(HttpMethod.POST, "/api/users").authenticated());
-        httpSecurity.authorizeHttpRequests(it -> it.requestMatchers(HttpMethod.GET, "/_ah/warmup").permitAll());
+        httpSecurity.authorizeHttpRequests(it -> it.requestMatchers(HttpMethod.GET, "/warmup").permitAll());
         httpSecurity.authorizeHttpRequests(it -> it.anyRequest().authenticated());
         httpSecurity.httpBasic(AbstractHttpConfigurer::disable);
         httpSecurity.oauth2ResourceServer(it -> it.jwt(Customizer.withDefaults()));
