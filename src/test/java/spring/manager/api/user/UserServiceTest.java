@@ -64,4 +64,21 @@ public class UserServiceTest {
         assertThat(((ResponseStatusException) throwable).getReason()).isEqualTo("User already exists");
         assertThat(((ResponseStatusException) throwable).getStatusCode()).isEqualTo(HttpStatusCode.valueOf(400));
     }
+
+    @Test
+    void should_retrieve_a_user_by_their_username_successfully() {
+        final User user = userService.findByUsername("robert");
+
+        assertThat(user).isNotNull();
+    }
+
+    @Test
+    void should_throw_an_exception_when_retrieving_a_user_that_does_not_exist() {
+        final Throwable throwable = catchThrowable(() -> userService.findByUsername("Cris"));
+
+        assertThat(throwable).isNotNull();
+        assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+        assertThat(((ResponseStatusException) throwable).getReason()).isEqualTo("User not found");
+        assertThat(((ResponseStatusException) throwable).getStatusCode()).isEqualTo(HttpStatusCode.valueOf(404));
+    }
 }
