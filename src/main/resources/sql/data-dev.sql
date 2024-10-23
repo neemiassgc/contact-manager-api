@@ -1,6 +1,7 @@
 insert into users (user_id, username) values
 ('auth0|94afd9e7294a59e73e6abfbd', 'robert'),
-('auth0|3baa9bc92c9c5decbda32f76', 'joe');
+('auth0|3baa9bc92c9c5decbda32f76', 'joe'),
+('auth0|66f81f7d9caecc11cdab18d6', 'me@gmail.com');
 
 insert into contacts (contact_id, name, user_id) values
 ('5c21433c-3c70-4253-a4b2-52b157be4167', 'Greg from accounting', 'auth0|3baa9bc92c9c5decbda32f76'),
