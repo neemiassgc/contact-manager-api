@@ -28,6 +28,7 @@ public class SpringSecurityConfig {
                 )
             ).permitAll());
         httpSecurity.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.GET, "/warmup").permitAll());
+        httpSecurity.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**").permitAll());
         httpSecurity.authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
         httpSecurity.httpBasic(AbstractHttpConfigurer::disable);
         httpSecurity.formLogin(AbstractHttpConfigurer::disable);
