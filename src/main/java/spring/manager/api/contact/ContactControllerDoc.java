@@ -25,12 +25,12 @@ interface ContactControllerDoc {
             responseCode = "200",
             content = @Content(
                 mediaType = MediaType.APPLICATION_JSON_VALUE,
-                array = @ArraySchema(minItems = 2, schema = @Schema(implementation = ContactInOut.class))
+                array = @ArraySchema(minItems = 2, schema = @Schema(implementation = ContactData.class))
             )
         ),
         security = @SecurityRequirement(name = "oauth2")
     )
-    List<ContactInOut> getAllContacts(Jwt jwt);
+    List<ContactData> getAllContacts(Jwt jwt);
 
     @Operation(
         description = "Get a user's contact by its id",
@@ -40,7 +40,7 @@ interface ContactControllerDoc {
                 responseCode = "200",
                 content = @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ContactInOut.class)
+                    schema = @Schema(implementation = ContactData.class)
                 )
             ),
             @ApiResponse(
@@ -62,7 +62,7 @@ interface ContactControllerDoc {
         },
         security = @SecurityRequirement(name = "oauth2")
     )
-    ContactInOut getById(UUID id, Jwt jwt);
+    ContactData getById(UUID id, Jwt jwt);
 
     @Operation(
         description = "Create a new contact",
@@ -79,7 +79,7 @@ interface ContactControllerDoc {
         },
         security = @SecurityRequirement(name = "oauth2")
     )
-    void create(ContactInOut contactInOut, Jwt jwt);
+    void create(ContactData contactData, Jwt jwt);
 
     @Operation(
         description = "Update partially a user's contact by its id",
@@ -89,7 +89,7 @@ interface ContactControllerDoc {
                 responseCode = "200",
                 content = @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ContactInOut.class)
+                    schema = @Schema(implementation = ContactData.class)
                 )
             ),
             @ApiResponse(
@@ -117,7 +117,7 @@ interface ContactControllerDoc {
         },
         security = @SecurityRequirement(name = "oauth2")
     )
-    ContactInOut update(UUID id, ConstrainedContact constrainedContact, Jwt jwt);
+    ContactData update(UUID id, ConstrainedContact constrainedContact, Jwt jwt);
 
     @Operation(
         description = "Delete a user's contact by its id",

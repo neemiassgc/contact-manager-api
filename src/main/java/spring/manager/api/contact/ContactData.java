@@ -10,12 +10,12 @@ import java.util.UUID;
 
 @Getter
 @NoArgsConstructor(force = true)
-public final class ContactInOut extends ConstrainedContact {
+public final class ContactData extends ConstrainedContact {
 
     private final UUID id;
 
     @Builder
-    public ContactInOut(
+    public ContactData(
         final UUID id,
         final String name,
         final Map<String, String> phoneNumbers,
@@ -26,15 +26,15 @@ public final class ContactInOut extends ConstrainedContact {
         this.id = id;
     }
 
-    public ContactInOut(final UUID id, final String name, final ConstrainedContact constrainedContact) {
+    public ContactData(final UUID id, final String name, final ConstrainedContact constrainedContact) {
         this(id, name, constrainedContact.getPhoneNumbers(), constrainedContact.getEmails(), constrainedContact.getAddresses());
     }
 
-    public ContactInOut(final ConstrainedContact constrainedContact) {
+    public ContactData(final ConstrainedContact constrainedContact) {
         this(null, constrainedContact.getName(), constrainedContact);
     }
 
-    public ContactInOut(final Contact contact) {
+    public ContactData(final Contact contact) {
         super(contact.getName(), contact.getPhoneNumberMap(), contact.getEmailMap(), contact.getAddressMap());
         this.id = contact.getId();
     }

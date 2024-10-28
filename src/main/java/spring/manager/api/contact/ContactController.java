@@ -19,29 +19,29 @@ public class ContactController implements ContactControllerDoc {
     private final ContactManagerService contactManagerService;
 
     @GetMapping()
-    public List<ContactInOut> getAllContacts(@AuthenticationPrincipal Jwt jwt) {
+    public List<ContactData> getAllContacts(@AuthenticationPrincipal Jwt jwt) {
         return Contact.toListOfContactInOut(contactManagerService.findAllByUserId(getUserFromSub(jwt)));
     }
 
     @GetMapping("/{id}")
-    public ContactInOut getById(@PathVariable("id") UUID id, @AuthenticationPrincipal Jwt jwt) {
+    public ContactData getById(@PathVariable("id") UUID id, @AuthenticationPrincipal Jwt jwt) {
         return contactManagerService.findByIdWithUser(id, getUserFromSub(jwt)).toContactInOut();
     }
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@RequestBody @Validated ContactInOut contactInOut, @AuthenticationPrincipal Jwt jwt) {
-        contactManagerService.saveWithUser(Contact.toContact(contactInOut), getUserFromSub(jwt));
+    public void create(@RequestBody @Validated ContactData contactData, @AuthenticationPrincipal Jwt jwt) {
+        contactManagerService.saveWithUser(Contact.toContact(contactData), getUserFromSub(jwt));
     }
 
     @PatchMapping("/{id}")
-    public ContactInOut update(
+    public ContactData update(
         @PathVariable("id") UUID id,
         @RequestBody @Validated ConstrainedContact constrainedContact,
         @AuthenticationPrincipal Jwt jwt
     ) {
         return contactManagerService
-            .updateWithUser(Contact.toContact(new ContactInOut(constrainedContact), id), getUserFromSub(jwt))
+            .updateWithUser(Contact.toContact(new ContactData(constrainedContact), id), getUserFromSub(jwt))
             .toContactInOut();
     }
 

@@ -87,31 +87,31 @@ public class Contact {
         addressMap.put(type, Objects.requireNonNull(address));
     }
 
-    public ContactInOut toContactInOut() {
-        return new ContactInOut(this);
+    public ContactData toContactInOut() {
+        return new ContactData(this);
     }
 
-    public static Contact toContact(final ContactInOut contactInOut, final User user) {
-        final Contact newContact = toContact(contactInOut);
+    public static Contact toContact(final ContactData contactData, final User user) {
+        final Contact newContact = toContact(contactData);
         newContact.setUser(user);
         return newContact;
     }
 
-    public static Contact toContact(final ContactInOut contactInOut, final UUID id) {
-        final Contact newContact = toContact(contactInOut);
+    public static Contact toContact(final ContactData contactData, final UUID id) {
+        final Contact newContact = toContact(contactData);
         newContact.setId(id);
         return newContact;
     }
 
-    public static Contact toContact(final ContactInOut contactInOut) {
-        final Contact newContact = new Contact(contactInOut.getName());
-        newContact.setPhoneNumberMap(contactInOut.getPhoneNumbers());
-        newContact.setEmailMap(contactInOut.getEmails());
-        newContact.setAddressMap(contactInOut.getAddresses());
+    public static Contact toContact(final ContactData contactData) {
+        final Contact newContact = new Contact(contactData.getName());
+        newContact.setPhoneNumberMap(contactData.getPhoneNumbers());
+        newContact.setEmailMap(contactData.getEmails());
+        newContact.setAddressMap(contactData.getAddresses());
         return newContact;
     }
 
-    public static List<ContactInOut> toListOfContactInOut(final List<Contact> contacts) {
+    public static List<ContactData> toListOfContactInOut(final List<Contact> contacts) {
         return contacts.stream().map(Contact::toContactInOut).collect(Collectors.toList());
     }
 
