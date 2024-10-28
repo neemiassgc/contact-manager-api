@@ -14,7 +14,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/contacts")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class ContactController {
+public class ContactController implements ContactControllerDoc {
 
     private final ContactManagerService contactManagerService;
 
