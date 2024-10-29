@@ -27,7 +27,7 @@ public class SpringSecurityConfig {
                     new AntPathRequestMatcher("/warmup-db", HttpMethod.GET.name())
                 )
             ).permitAll());
-        httpSecurity.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.GET, "/warmup").permitAll());
+        httpSecurity.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.GET, "/warmup", "/files/**").permitAll());
         httpSecurity.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**").permitAll());
         httpSecurity.authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
         httpSecurity.httpBasic(AbstractHttpConfigurer::disable);
