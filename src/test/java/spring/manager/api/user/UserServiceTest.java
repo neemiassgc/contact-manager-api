@@ -50,7 +50,7 @@ public class UserServiceTest {
 
         final List<User> actualUsers = userRepository.findAll();
 
-        assertThat(actualUsers).hasSize(3);
+        assertThat(actualUsers).hasSize(4);
     }
 
     @Test
