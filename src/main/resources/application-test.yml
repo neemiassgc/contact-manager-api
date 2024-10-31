@@ -1,6 +1,17 @@
 spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/std_db
+    username: admin
+    password: pass
+
   sql:
     init:
       data-locations:
         - classpath:sql/exclusion-of-rows.sql
         - classpath:sql/data-dev.sql
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://dev-ml6q5bzm.auth0.com/
