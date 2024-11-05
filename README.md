@@ -51,4 +51,4 @@ Depois disso, a API pode ser acessado em http://localhost:8080. Obs: Um token JW
 
 ### Licença :memo:
 Esse projeto está sob a Mit License
-<img src="https://img.shields.io/badge/Documentation-Swagger-85EA2D?logo=swagger" width="0" height="0" alt="swagger badge"/>
+<img src="https://mythic-guild-431115-g2.uc.r.appspot.com/files/swagger-badge.svg" width="0" height="0" alt="swagger badge"/>
