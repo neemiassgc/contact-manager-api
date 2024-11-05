@@ -1,0 +1,10 @@
+services:
+  pgstd:
+    image: postgres:latest
+
+    environment:
+      POSTGRES_PASSWORD: "pass"
+      POSTGRES_USER: "admin"
+      POSTGRES_DB: "std_db"
+    ports:
+      - "5432:5432"

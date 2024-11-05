@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: pass
+      POSTGRES_USER: admin
+      POSTGRES_DB: std_db
+    ports:
+      - 5432:5432
+
+  app:
+    image: k4mek/contact-manager:app
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/std_db
+      DB_USERNAME: admin
+      DB_PASSWORD: pass
+      JWT_ISSUER_URI: https://dev-ml6q5bzm.auth0.com/
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
