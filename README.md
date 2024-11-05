@@ -9,11 +9,11 @@ Uma API Rest multiusuário, testada e documentada para gerenciar contatos com o 
 ![Core build](https://img.shields.io/badge/Build-Gradle-02303A?logo=gradle)
 ![Postgres provider](https://img.shields.io/badge/Postgres-Supabase-3FCF8E?logo=supabase)
 ![Authentication](https://img.shields.io/badge/Authentication-Oauth2-EB5424)
-<a href="https://hub.docker.com/r/k4mek/contact-manager">
+<a href="https://hub.docker.com/r/k4mek/contact-manager" target="_blank">
     <img src="https://img.shields.io/badge/Container-Docker-2496ED?logo=docker"/>
 </a>
 ![Deployment on Cloud](https://img.shields.io/badge/Deployment-Google%20Cloud-4285F4?logo=google%20cloud)
-<a href="https://mythic-guild-431115-g2.uc.r.appspot.com/swagger-ui/index.html">
+<a href="https://mythic-guild-431115-g2.uc.r.appspot.com/swagger-ui/index.html" target="_blank">
     <img src="https://img.shields.io/badge/Documentation-Swagger-85EA2D?logo=swagger"/>
 </a>
 
