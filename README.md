@@ -1,5 +1,5 @@
+[README in en-US :us:](https://github.com/neemiassgc/contact-manager-api/blob/main/README_en-US)
 # Contact Manager API
-
 Uma API Rest multiusuário, testada e documentada para gerenciar contatos com o propósito de demonstrar operações CRUD.
 
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/t/neemiassgc/contacts-manager-api)
@@ -30,7 +30,7 @@ Uma API Rest multiusuário, testada e documentada para gerenciar contatos com o 
 <img src="https://static-10.s3.sa-east-1.amazonaws.com/contact-manager-api/contact-manager-schema.png" width="960" height="540"/>
 
 ### Demostração :fire:
-visite o projeto [Contact Manager UI](https://github.com/neemiassgc/contacts-manager-ui) que cria uma interface Web para usar esta API.
+Visite o projeto [Contact Manager UI](https://github.com/neemiassgc/contact-manager-ui) que cria uma interface Web para usar esta API.
 
 ### Test :test_tube:
 Para executar os tests, é necessário um banco de dados Postgres. Para fazer isso, com o repositório já clonado, entre na raiz do projeto e execute o seguinte comando docker:
