@@ -1,4 +1,4 @@
-[README in en-US :us:](https://github.com/neemiassgc/contact-manager-api/blob/main/README_en-US)
+[README in en-US :us:](https://github.com/neemiassgc/contact-manager-api/blob/main/README_en-US.md)
 # Contact Manager API
 Uma API Rest multiusuário, testada e documentada para gerenciar contatos com o propósito de demonstrar operações CRUD.
 
