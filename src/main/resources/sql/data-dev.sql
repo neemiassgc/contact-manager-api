@@ -12,7 +12,7 @@ insert into contacts (contact_id, name, user_id) values
 ('8fb2bd75-9aec-4cc5-b77b-a95f06081388', 'Pizza and burgers', 'auth0|94afd9e7294a59e73e6abfbd'),
 ('b621650d-4a81-4016-a917-4a8a4992aaef', 'Uncle Jeff', 'auth0|94afd9e7294a59e73e6abfbd');
 
-insert into phone_numbers (phone_number, contact_id, label) values
+insert into phone_numbers (phone_number, contact_id, mark) values
 ('+3592659480427', '5c21433c-3c70-4253-a4b2-52b157be4167', 'home'),
 ('+525465365876', '4fe25947-ecab-489c-a881-e0057124e408', 'home'),
 ('+815642058516', '4fe25947-ecab-489c-a881-e0057124e408', 'mobile'),
@@ -26,7 +26,7 @@ insert into phone_numbers (phone_number, contact_id, label) values
 ('+398094640706', 'b621650d-4a81-4016-a917-4a8a4992aaef', 'home'),
 ('+311417504453', 'b621650d-4a81-4016-a917-4a8a4992aaef', 'mobile');
 
-insert into addresses (label, contact_id, street, country, city, state, zipcode) values
+insert into addresses (mark, contact_id, street, country, city, state, zipcode) values
 ('home', '5c21433c-3c70-4253-a4b2-52b157be4167', '343-1199, Tennodai', 'Japan', 'Abiko-shi', 'Chiba', '02169'),
 ('work', '5c21433c-3c70-4253-a4b2-52b157be4167', '127-1121, Hiyamizu', 'Japan', 'Rankoshi-cho Isoya-gun', 'Hokkaido', '02169'),
 ('home', '4fe25947-ecab-489c-a881-e0057124e408', '4454 Steve Hunt Road', 'EUA', 'Miami', 'Florida', '33131'),
@@ -39,7 +39,7 @@ insert into addresses (label, contact_id, street, country, city, state, zipcode)
 ('home', 'b621650d-4a81-4016-a917-4a8a4992aaef', '237-1233, Ichihasama Shimmai', 'Japan', 'Kurihara-shi', 'Miyagi', '46231'),
 ('work', 'b621650d-4a81-4016-a917-4a8a4992aaef', '210-1040, Okada', 'Japan', 'Chikushino-shi', 'Fukuoka', '48335');
 
-insert into emails (label, email, contact_id) values
+insert into emails (mark, email, contact_id) values
 ('main', 'sailor.greg99@hotmail.co.jp', '5c21433c-3c70-4253-a4b2-52b157be4167'),
 ('main', 'yuki.fred@gmail.com', '4fe25947-ecab-489c-a881-e0057124e408'),
 ('main', 'usermonica01@outlook.com', '35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7'),
