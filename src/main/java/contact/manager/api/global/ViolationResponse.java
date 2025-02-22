@@ -13,11 +13,10 @@ public final class ViolationResponse {
     private final Map<String, List<String>> fieldViolations;
 
     ViolationResponse(final List<FieldError> fieldErrors) {
-        this.fieldViolations =
-        fieldErrors.stream().map(FieldError::getDefaultMessage)
-            .collect(Collectors.groupingBy(message -> {
-                assert message != null;
-                return message.split(" ")[0];
-            }));
+        this.fieldViolations = fieldErrors.stream()
+            .collect(
+                Collectors.groupingBy(FieldError::getField,
+                Collectors.mapping(FieldError::getDefaultMessage, Collectors.toList())
+            ));
     }
 }
