@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -32,6 +33,14 @@ public class ContactController implements ContactControllerDoc {
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@RequestBody @Validated ContactData contactData, @AuthenticationPrincipal Jwt jwt) {
         contactManagerService.saveWithUser(Contact.toContact(contactData), getUserFromSub(jwt));
+    }
+
+    @PutMapping
+    @ResponseStatus(HttpStatus.OK)
+    public void update(@RequestBody @Validated ContactData contactData, @AuthenticationPrincipal Jwt jwt) {
+        if (Objects.isNull(contactData.getId()))
+            contactManagerService.saveWithUser(Contact.toContact(contactData), getUserFromSub(jwt));
+        else contactManagerService.updateWithUser(Contact.toContact(contactData), getUserFromSub(jwt));
     }
 
     @DeleteMapping("/{id}")
