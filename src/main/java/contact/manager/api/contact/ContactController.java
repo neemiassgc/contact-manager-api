@@ -34,17 +34,6 @@ public class ContactController implements ContactControllerDoc {
         contactManagerService.saveWithUser(Contact.toContact(contactData), getUserFromSub(jwt));
     }
 
-    @PatchMapping("/{id}")
-    public ContactData update(
-        @PathVariable("id") UUID id,
-        @RequestBody @Validated ConstrainedContact constrainedContact,
-        @AuthenticationPrincipal Jwt jwt
-    ) {
-        return contactManagerService
-            .updateWithUser(Contact.toContact(new ContactData(constrainedContact), id), getUserFromSub(jwt))
-            .toContactInOut();
-    }
-
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") UUID id, @AuthenticationPrincipal Jwt jwt) {
         contactManagerService.deleteByIdWithUser(id, getUserFromSub(jwt));
