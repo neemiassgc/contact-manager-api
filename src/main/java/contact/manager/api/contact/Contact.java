@@ -91,12 +91,6 @@ public class Contact {
         return new ContactData(this);
     }
 
-    public static Contact toContact(final ContactData contactData, final User user) {
-        final Contact newContact = toContact(contactData);
-        newContact.setUser(user);
-        return newContact;
-    }
-
     public static Contact toContact(final ContactData contactData, final UUID id) {
         final Contact newContact = toContact(contactData);
         newContact.setId(id);
@@ -113,14 +107,6 @@ public class Contact {
 
     public static List<ContactData> toListOfContactInOut(final List<Contact> contacts) {
         return contacts.stream().map(Contact::toContactInOut).collect(Collectors.toList());
-    }
-
-    public void merge(final Contact contactToMerge) {
-        if (Objects.nonNull(contactToMerge.getName()) && !contactToMerge.getName().isBlank()) setName(contactToMerge.getName());
-        if (Objects.nonNull(contactToMerge.getPhoneNumberMap()) && !contactToMerge.getPhoneNumberMap().isEmpty())
-            setPhoneNumberMap(contactToMerge.getPhoneNumberMap());
-        if (Objects.nonNull(contactToMerge.getEmailMap())) setEmailMap(contactToMerge.getEmailMap());
-        if (Objects.nonNull(contactToMerge.getAddressMap())) setAddressMap(contactToMerge.getAddressMap());
     }
 
     @Override
