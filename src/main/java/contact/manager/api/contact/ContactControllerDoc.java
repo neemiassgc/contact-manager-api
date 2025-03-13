@@ -82,16 +82,9 @@ interface ContactControllerDoc {
     void create(ContactData contactData, Jwt jwt);
 
     @Operation(
-        description = "Update partially a user's contact by its id",
+        description = "Update entirely a user's contact by its id",
         responses = {
-            @ApiResponse(
-                description = "The contact",
-                responseCode = "200",
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ContactData.class)
-                )
-            ),
+            @ApiResponse(responseCode = "200"),
             @ApiResponse(
                 description = "Not found",
                 responseCode = "404",
@@ -117,7 +110,7 @@ interface ContactControllerDoc {
         },
         security = @SecurityRequirement(name = "oauth2")
     )
-    ContactData update(UUID id, ConstrainedContact constrainedContact, Jwt jwt);
+    void update(ContactData contactData, Jwt jwt);
 
     @Operation(
         description = "Delete a user's contact by its id",
