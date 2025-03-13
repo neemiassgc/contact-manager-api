@@ -87,7 +87,7 @@ public class Contact {
         addressMap.put(type, Objects.requireNonNull(address));
     }
 
-    public ContactData toContactInOut() {
+    public ContactData toContactDta() {
         return new ContactData(this);
     }
 
@@ -105,8 +105,8 @@ public class Contact {
         return newContact;
     }
 
-    public static List<ContactData> toListOfContactInOut(final List<Contact> contacts) {
-        return contacts.stream().map(Contact::toContactInOut).collect(Collectors.toList());
+    public static List<ContactData> toListOfContactData(final List<Contact> contacts) {
+        return contacts.stream().map(Contact::toContactDta).collect(Collectors.toList());
     }
 
     @Override

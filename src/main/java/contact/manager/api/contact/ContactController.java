@@ -20,12 +20,12 @@ public class ContactController implements ContactControllerDoc {
 
     @GetMapping()
     public List<ContactData> getAllContacts(@AuthenticationPrincipal Jwt jwt) {
-        return Contact.toListOfContactInOut(contactManagerService.findAllByUserId(getUserFromSub(jwt)));
+        return Contact.toListOfContactData(contactManagerService.findAllByUserId(getUserFromSub(jwt)));
     }
 
     @GetMapping("/{id}")
     public ContactData getById(@PathVariable("id") UUID id, @AuthenticationPrincipal Jwt jwt) {
-        return contactManagerService.findByIdWithUser(id, getUserFromSub(jwt)).toContactInOut();
+        return contactManagerService.findByIdWithUser(id, getUserFromSub(jwt)).toContactDta();
     }
 
     @PostMapping()
