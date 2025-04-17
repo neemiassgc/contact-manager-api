@@ -161,6 +161,7 @@ public class ContactManagerServiceIntegrationTest {
 
         assertThat(referenceContact.getName()).isEqualTo(contactNewName);
     }
+    
 
     @Test
     void should_throw_an_exception_when_it_is_tried_to_update_a_contact_that_does_not_exist() {
