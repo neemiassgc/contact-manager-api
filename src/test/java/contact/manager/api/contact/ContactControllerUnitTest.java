@@ -35,6 +35,32 @@ public class ContactControllerUnitTest {
     @Autowired
     private MockMvc mockMvc;
 
+    private final String JSON_BODY = """
+    {
+        "id": "ff55ef9d-e912-4548-a790-50158470fafa",
+       "name": "Isabella Rodriguez",
+       "phoneNumbers": {
+         "home": "+15551234567",
+         "work": "+15559876543",
+         "mobile": "+15555555555"
+       },
+       "emails": {
+         "personal": "isabella.rodriguez@example.com",
+         "work": "irodriguez@company.com",
+         "other": "bella.r@email.net"
+       },
+       "addresses": {
+         "home": {
+           "country": "United States",
+           "state": "California",
+           "city": "Los Angeles",
+           "zipcode": "90001",
+           "street": "123 Main Street"
+         }
+       }
+    }
+    """;
+
     @Nested
     public class TestCasesForJoe {
 
@@ -120,31 +146,18 @@ public class ContactControllerUnitTest {
         }
 
         @Test
-        @DisplayName("PATCH /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> OK 200")
-        void should_update_isolated_fields_of_a_contact_successfully() throws Exception {
-            when(contactManagerService.updateWithUser(any(Contact.class), ArgumentMatchers.eq(TestResources.idForJoe())))
-                .thenReturn(TestResources.getContactById(UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef")));
+        @DisplayName("PUT /api/contacts -> OK 200")
+        void should_entirely_update_a_contact_successfully() throws Exception {
+            doNothing().when(contactManagerService)
+                .updateWithUser(any(Contact.class), ArgumentMatchers.eq(TestResources.idForJoe()));
 
-            final String requestBody = """
-            {
-                "name": "Bill",
-                "phoneNumbers": {
-                    "cellphone": "+811234567890"
-                },
-                "addresses": {
-                }
-            }
-            """;
-
-            mockMvc.perform(patch("/api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef")
+            mockMvc.perform(put("/api/contacts")
                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJoe()))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody)
+                .content(JSON_BODY)
             )
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$").isMap());
+            .andExpect(status().isOk());
 
             verify(contactManagerService, TestResources.once()).updateWithUser(any(Contact.class), ArgumentMatchers.eq(TestResources.idForJoe()));
             verifyNoMoreInteractions(contactManagerService);
@@ -252,31 +265,18 @@ public class ContactControllerUnitTest {
         }
 
         @Test
-        @DisplayName("PATCH /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> OK 200")
-        void should_update_isolated_fields_of_a_contact_successfully() throws Exception {
-            when(contactManagerService.updateWithUser(any(Contact.class), ArgumentMatchers.eq(TestResources.idForRobert())))
-                .thenReturn(TestResources.getContactById(UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef")));
+        @DisplayName("PUT /api/contacts -> OK 200")
+        void should_update_a_contact_successfully() throws Exception {
+            doNothing().when(contactManagerService)
+                .updateWithUser(any(Contact.class), ArgumentMatchers.eq(TestResources.idForRobert()));
 
-            final String requestBody = """
-            {
-                "name": "Bill",
-                "phoneNumbers": {
-                    "cellphone": "+811234567890"
-                },
-                "addresses": {
-                }
-            }
-            """;
-
-            mockMvc.perform(patch("/api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef")
+            mockMvc.perform(put("/api/contacts")
                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForRobert()))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody)
+                .content(JSON_BODY)
             )
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$").isMap());
+            .andExpect(status().isOk());
 
             verify(contactManagerService, TestResources.once()).updateWithUser(any(Contact.class), ArgumentMatchers.eq(TestResources.idForRobert()));
             verifyNoMoreInteractions(contactManagerService);
@@ -370,6 +370,24 @@ public class ContactControllerUnitTest {
 
             verifyNoInteractions(contactManagerService);
         }
+
+        @Test
+        @DisplayName("PUT /api/contacts -> 400 BAD REQUEST")
+        void should_respond_400_with_field_violations_when_updating_a_contact_that_is_not_correctly_structured() throws Exception {
+            final String requestBody = "{\"name\": \"Bill\"}";
+
+            mockMvc.perform(post("/api/contacts")
+                .content(requestBody)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.ALL)
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJoe()))
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.fieldViolations").isMap());
+
+            verifyNoInteractions(contactManagerService);
+        }
     }
 
     @Test
@@ -430,17 +448,16 @@ public class ContactControllerUnitTest {
     }
 
     @Test
-    @DisplayName("PATCH /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> 400 BAD_REQUEST")
+    @DisplayName("PUT /api/contacts -> 400 BAD_REQUEST")
     void should_respond_400_when_trying_to_update_a_contact_whose_user_is_not_the_owner() throws Exception {
-        final UUID contactId = UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef");
         final String errorMessage = "Contact belongs to another user";
         doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage))
             .when(contactManagerService).updateWithUser(any(Contact.class), ArgumentMatchers.eq(TestResources.idForJoe()));
 
-        mockMvc.perform(patch("/api/contacts/"+contactId)
+        mockMvc.perform(put("/api/contacts")
             .accept(MediaType.ALL)
             .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJoe()))
-            .content("{\"name\": \"Billy\"}")
+            .content(JSON_BODY)
             .contentType(MediaType.APPLICATION_JSON)
         )
         .andExpect(status().isBadRequest())
@@ -452,21 +469,19 @@ public class ContactControllerUnitTest {
     }
 
     @Test
-    @DisplayName("PATCH /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> 404 NOT FOUND")
+    @DisplayName("PUT /api/contacts -> 404 NOT FOUND")
     void should_respond_404_when_trying_to_update_a_contact_that_does_not_exist() throws Exception {
-        final UUID contactId = UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef");
         final String errorMessage = "Contact not found";
         doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage))
             .when(contactManagerService).updateWithUser(any(Contact.class), ArgumentMatchers.eq(TestResources.idForJoe()));
 
-        mockMvc.perform(patch("/api/contacts/"+contactId)
+        mockMvc.perform(put("/api/contacts")
             .accept(MediaType.ALL)
             .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJoe()))
             .contentType(MediaType.APPLICATION_JSON)
-            .content("{\"name\": \"Billy\"}")
+            .content(JSON_BODY)
         )
         .andExpect(status().isNotFound())
-        .andExpect(content().contentType(MediaType.TEXT_PLAIN))
         .andExpect(content().string(errorMessage));
 
         verify(contactManagerService, TestResources.once()).updateWithUser(any(Contact.class), ArgumentMatchers.eq(TestResources.idForJoe()));
