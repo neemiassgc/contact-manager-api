@@ -38,4 +38,9 @@ public class ContactManagerServiceUnitTests {
             verifyNoMoreInteractions(contactManagerService);
         }
     }
+
+    @Nested
+    public class FindAllByUserId {
+        
+    }
 }
