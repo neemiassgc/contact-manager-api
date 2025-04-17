@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 public class ContactManagerServiceUnitTests {
 
     @MockBean
-    private ContactManagerService contactManagerService;
+    private ContactRepository contactRepository;
 
     @MockBean
     private UserService userService;
@@ -27,20 +27,20 @@ public class ContactManagerServiceUnitTests {
     public class FindAll {
 
         @Test
-        void shouldReturnAllContactsAvailable() {
-            when(contactManagerService.findAll()).thenReturn(TestResources.getAFewContacts(10));
+        void shouldReturnAllOfTheContactsAvailable() {
+            when(contactRepository.findAll()).thenReturn(TestResources.getAFewContacts(10));
 
-            List<Contact> actualContacts = contactManagerService.findAll();
+            List<Contact> actualContacts = contactRepository.findAll();
 
             assertThat(actualContacts).hasSize(10);
 
-            verify(contactManagerService, once()).findAll();
-            verifyNoMoreInteractions(contactManagerService);
+            verify(contactRepository, once()).findAll();
+            verifyNoMoreInteractions(contactRepository);
         }
     }
 
     @Nested
     public class FindAllByUserId {
-        
+
     }
 }
