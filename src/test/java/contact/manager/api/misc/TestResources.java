@@ -287,4 +287,8 @@ public final class TestResources {
     public static VerificationMode once() {
         return times(1);
     }
+
+    public static User getMockedUser() {
+        return new User("123408973423", "Jessi");
+    }
 }

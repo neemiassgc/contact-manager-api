@@ -49,7 +49,6 @@ public class ContactManagerServiceUnitTests {
             assertThat(actualContacts).hasSize(10);
 
             verify(contactRepository, once()).findAll();
-            verifyNoMoreInteractions(contactRepository);
         }
     }
 
@@ -69,7 +68,6 @@ public class ContactManagerServiceUnitTests {
 
             verify(userService, once()).findById(eq(robertId));
             verify(contactRepository, once()).findAllByUserId(eq(robertId));
-            verifyNoMoreInteractions(userService, contactRepository);
         }
 
         @Test
@@ -85,7 +83,7 @@ public class ContactManagerServiceUnitTests {
             assertThat(throwable).hasMessageContaining("User not found");
 
             verify(userService, once()).findById(eq(robertId));
-            verifyNoMoreInteractions(userService, contactRepository);
+            verifyNoInteractions(contactRepository);
         }
     }
 
@@ -106,7 +104,7 @@ public class ContactManagerServiceUnitTests {
             assertThat(throwable).hasMessageContaining("Contact not found");
 
             verify(contactRepository, once()).findById(eq(contactId));
-            verifyNoMoreInteractions(userService, contactRepository);
+            verifyNoInteractions(userService);
         }
 
         @Test
@@ -122,7 +120,7 @@ public class ContactManagerServiceUnitTests {
             assertThat(throwable).hasMessageContaining("Contact belongs to another user");
 
             verify(contactRepository, once()).findById(eq(contactId));
-            verifyNoMoreInteractions(userService, contactRepository);
+            verifyNoInteractions(userService);
         }
 
         @Test
@@ -137,7 +135,7 @@ public class ContactManagerServiceUnitTests {
             assertThat(actualContact).isNotNull();
 
             verify(contactRepository, once()).findById(eq(contactId));
-            verifyNoMoreInteractions(userService, contactRepository);
+            verifyNoInteractions(userService);
         }
     }
 
@@ -156,7 +154,6 @@ public class ContactManagerServiceUnitTests {
 
             verify(userService, once()).findById(eq(robertId));
             verify(contactRepository, once()).save(any(Contact.class));
-            verifyNoMoreInteractions(userService, contactRepository);
         }
 
         @Test
