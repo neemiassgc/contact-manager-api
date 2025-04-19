@@ -124,5 +124,20 @@ public class ContactManagerServiceUnitTests {
             verify(contactRepository, once()).findById(eq(contactId));
             verifyNoMoreInteractions(userService, contactRepository);
         }
+
+        @Test
+        @DisplayName("When provided contactId and userId then should return a contact successfully")
+        public void whenProvidedContactIdAndUserId_thenShouldReturnAContactSuccessfully() {
+            String robertId = TestResources.idForRobert();
+            UUID contactId = UUID.fromString("7f23057f-77bd-4568-ac64-e933abae9a09");
+            when(contactRepository.findById(eq(contactId))).thenReturn(Optional.of(TestResources.getContactById(contactId)));
+
+            Contact actualContact = contactManagerServiceUnderTest.findByIdWithUser(contactId, robertId);
+
+            assertThat(actualContact).isNotNull();
+
+            verify(contactRepository, once()).findById(eq(contactId));
+            verifyNoMoreInteractions(userService, contactRepository);
+        }
     }
 }
