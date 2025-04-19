@@ -51,5 +51,20 @@ public class ContactManagerServiceUnitTests {
     @Nested
     public class FindAllByUserId {
 
+        @Test
+        @DisplayName("Given a valid user id then should return all of the contacts owned by the user")
+        void whenUserIdIsValid_thenShouldReturnAllOfTheContactsOwnedByTheUser() {
+            String robertId = TestResources.idForRobert();
+            when(userService.findById(eq(robertId))).thenReturn(TestResources.getMockedUser());
+            when(contactRepository.findAllByUserId(eq(robertId))).thenReturn(TestResources.getContactsForRobert());
+
+            List<Contact> actualContacts = contactManagerServiceUnderTest.findAllByUserId(robertId);
+
+            assertThat(actualContacts).hasSize(4);
+
+            verify(userService, once()).findById(eq(robertId));
+            verify(contactRepository, once()).findAllByUserId(eq(robertId));
+            verifyNoMoreInteractions(userService, contactRepository);
+        }
     }
 }
