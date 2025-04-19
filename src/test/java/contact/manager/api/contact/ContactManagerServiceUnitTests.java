@@ -140,4 +140,23 @@ public class ContactManagerServiceUnitTests {
             verifyNoMoreInteractions(userService, contactRepository);
         }
     }
+
+    @Nested
+    public class SaveWithUser {
+
+        @Test
+        @DisplayName("When contact and userId are provided then should save the contact successfully")
+        public void whenProvidedContactAndUserId_thenShouldSaveTheContactSuccessfully() {
+            Contact contact = TestResources.getFirstContact();
+            String robertId = TestResources.idForRobert();
+            when(userService.findById(eq(robertId))).thenReturn(TestResources.getMockedUser());
+            doNothing().when(contactRepository).save(any(Contact.class));
+
+            contactManagerServiceUnderTest.saveWithUser(contact, robertId);
+
+            verify(userService, once()).findById(eq(robertId));
+            verify(contactRepository, once()).save(any(Contact.class));
+            verifyNoMoreInteractions(userService, contactRepository);
+        }
+    }
 }
