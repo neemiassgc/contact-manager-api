@@ -158,5 +158,23 @@ public class ContactManagerServiceUnitTests {
             verify(contactRepository, once()).save(any(Contact.class));
             verifyNoMoreInteractions(userService, contactRepository);
         }
+
+        @Test
+        @DisplayName("When provided a userId that does not exist then should throw ResponseStatusException User not found")
+        public void whenUserIdDoesNotExist_thenShouldThrowAnException() {
+            Contact contact = TestResources.getFirstContact();
+            String robertId = TestResources.idForRobert();
+            when(userService.findById(eq(robertId)))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+            Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.saveWithUser(contact, robertId));
+
+            assertThat(throwable).isNotNull();
+            assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+            assertThat(throwable).hasMessageContaining("User not found");
+
+            verify(userService, once()).findById(eq(robertId));
+            verifyNoInteractions(contactRepository);
+        }
     }
 }
