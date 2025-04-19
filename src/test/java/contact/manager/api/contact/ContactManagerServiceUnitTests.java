@@ -266,4 +266,24 @@ public class ContactManagerServiceUnitTests {
             verifyNoInteractions(userService);
         }
     }
+
+    @Nested
+    public class DeleteByIdWithUser {
+
+        @Test
+        @DisplayName("When provided contactId and userId then should delete a contact successfully")
+        public void whenProvidedContactIdAndUserId_thenShouldDeleteAContactSuccessfully() {
+            String robertId = TestResources.idForRobert();
+            UUID contactId = UUID.fromString("7f23057f-77bd-4568-ac64-e933abae9a09");
+            when(contactRepository.findById(eq(contactId)))
+                .thenReturn(Optional.of(TestResources.getContactById(contactId)));
+            doNothing().when(contactRepository).deleteById(eq(contactId));
+
+            contactManagerServiceUnderTest.deleteByIdWithUser(contactId, robertId);
+
+            verify(contactRepository, once()).findById(eq(contactId));
+            verify(contactRepository, once()).deleteById(contactId);
+            verifyNoInteractions(userService);
+        }
+    }
 }
