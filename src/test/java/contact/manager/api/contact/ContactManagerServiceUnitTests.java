@@ -195,5 +195,23 @@ public class ContactManagerServiceUnitTests {
             verify(contactRepository, once()).findById(eq(contact.getId()));
             verifyNoInteractions(userService);
         }
+
+        @Test
+        @DisplayName("When a contact does not belong to the user then should throw an exception")
+        public void whenAContactDoesNotBelongToTheUser_thenShouldThrowAnException() {
+            String robertId = TestResources.idForRobert();
+            Contact contact = TestResources.getFirstContact();
+            when(contactRepository.findById(eq(contact.getId())))
+                .thenReturn(Optional.of(TestResources.getFirstContact()));
+
+            Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.updateWithUser(contact, robertId));
+
+            assertThat(throwable).isNotNull();
+            assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+            assertThat(throwable).hasMessageContaining("Contact belongs to another user");
+
+            verify(contactRepository, once()).findById(eq(contact.getId()));
+            verifyNoInteractions(userService);
+        }
     }
 }
