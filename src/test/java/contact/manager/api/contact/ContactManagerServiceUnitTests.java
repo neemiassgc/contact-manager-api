@@ -13,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.UUID;
 
 import static contact.manager.api.misc.TestResources.once;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -83,6 +84,27 @@ public class ContactManagerServiceUnitTests {
             assertThat(throwable).hasMessageContaining("User not found");
 
             verify(userService, once()).findById(eq(robertId));
+            verifyNoMoreInteractions(userService, contactRepository);
+        }
+    }
+
+    @Nested
+    public class FindByIdWithUser {
+
+        @Test
+        @DisplayName("When ContactId does not exist then should throw ResponseStatusException Contact not found")
+        public void whenContactIdDoesNotExist_thenShouldThrowAnException() {
+            String robertId = TestResources.idForRobert();
+            UUID contactId = UUID.fromString("37414529-e28f-47bc-a4fa-99c2aa79ca90");
+            when(contactRepository.findById(eq(contactId)))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
+
+            Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.findByIdWithUser(contactId, robertId));
+
+            assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+            assertThat(throwable).hasMessageContaining("Contact not found");
+
+            verify(contactRepository, once()).findById(eq(contactId));
             verifyNoMoreInteractions(userService, contactRepository);
         }
     }
