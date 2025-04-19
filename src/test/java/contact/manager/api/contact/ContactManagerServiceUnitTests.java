@@ -13,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static contact.manager.api.misc.TestResources.once;
@@ -103,6 +104,22 @@ public class ContactManagerServiceUnitTests {
 
             assertThat(throwable).isInstanceOf(ResponseStatusException.class);
             assertThat(throwable).hasMessageContaining("Contact not found");
+
+            verify(contactRepository, once()).findById(eq(contactId));
+            verifyNoMoreInteractions(userService, contactRepository);
+        }
+
+        @Test
+        @DisplayName("When a contact does not belong to the user then should throw ResponseStatusException")
+        public void whenContactDoesNotBelongToTheUser_thenShouldThrowAnException() {
+            String robertId = TestResources.idForRobert();
+            UUID contactId = UUID.fromString("37414529-e28f-47bc-a4fa-99c2aa79ca90");
+            when(contactRepository.findById(eq(contactId))).thenReturn(Optional.of(TestResources.getFirstContact()));
+
+            Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.findByIdWithUser(contactId, robertId));
+
+            assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+            assertThat(throwable).hasMessageContaining("Contact belongs to another user");
 
             verify(contactRepository, once()).findById(eq(contactId));
             verifyNoMoreInteractions(userService, contactRepository);
