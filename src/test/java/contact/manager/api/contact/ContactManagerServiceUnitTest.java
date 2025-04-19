@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.*;
 
 @ExtendWith({SpringExtension.class})
-public class ContactManagerServiceUnitTests {
+public class ContactManagerServiceUnitTest {
 
     @MockBean
     private ContactRepository contactRepository;
