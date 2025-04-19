@@ -176,7 +176,7 @@ public class ContactManagerServiceUnitTests {
     }
 
     @Nested
-    public class updateWithUser {
+    public class UpdateWithUser {
 
         @Test
         @DisplayName("When provided a non existing contact then should throw ResponseStatusException Contact not found")
@@ -227,6 +227,27 @@ public class ContactManagerServiceUnitTests {
 
             verify(contactRepository, once()).findById(eq(contactId));
             verify(contactRepository, once()).save(any(Contact.class));
+            verifyNoInteractions(userService);
+        }
+    }
+
+    @Nested
+    public class FindById {
+
+        @Test
+        @DisplayName("When a contact is not found then should throw an exception")
+        public void whenContactIsNotFound_thenShouldThrowAnException() {
+            UUID contactId = UUID.fromString("7f23057f-77bd-4568-ac64-e933abae9a09");
+            when(contactRepository.findById(eq(contactId)))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
+
+            Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.findById(contactId));
+
+            assertThat(throwable).isNotNull();
+            assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+            assertThat(throwable).hasMessageContaining("Contact not found");
+
+            verify(contactRepository, once()).findById(eq(contactId));
             verifyNoInteractions(userService);
         }
     }
