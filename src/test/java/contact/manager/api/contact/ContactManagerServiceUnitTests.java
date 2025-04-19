@@ -2,6 +2,8 @@ package contact.manager.api.contact;
 
 import contact.manager.api.misc.TestResources;
 import contact.manager.api.user.UserService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +25,13 @@ public class ContactManagerServiceUnitTests {
     @MockBean
     private UserService userService;
 
+    private ContactManagerService contactManagerServiceUnderTest;
+
+    @BeforeEach
+    void beforeEach() {
+        contactManagerServiceUnderTest = new ContactManagerServiceImpl(contactRepository, userService);
+    }
+
     @Nested
     public class FindAll {
 
@@ -30,7 +39,7 @@ public class ContactManagerServiceUnitTests {
         void shouldReturnAllOfTheContactsAvailable() {
             when(contactRepository.findAll()).thenReturn(TestResources.getAFewContacts(10));
 
-            List<Contact> actualContacts = contactRepository.findAll();
+            List<Contact> actualContacts = contactManagerServiceUnderTest.findAll();
 
             assertThat(actualContacts).hasSize(10);
 
