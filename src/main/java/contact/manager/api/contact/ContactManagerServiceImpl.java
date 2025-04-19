@@ -2,6 +2,7 @@ package contact.manager.api.contact;
 
 import contact.manager.api.user.User;
 import contact.manager.api.user.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,13 +14,12 @@ import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ContactManagerServiceImpl implements ContactManagerService {
 
-    @Autowired
-    private ContactRepository contactRepository;
+    private final ContactRepository contactRepository;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @Override
     public List<Contact> findAllByUserId(String userId) {
