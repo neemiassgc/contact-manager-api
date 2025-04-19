@@ -174,4 +174,26 @@ public class ContactManagerServiceUnitTests {
             verifyNoInteractions(contactRepository);
         }
     }
+
+    @Nested
+    public class updateWithUser {
+
+        @Test
+        @DisplayName("When provided a non existing contact then should throw ResponseStatusException Contact not found")
+        public void whenProvidedANonExistingContact_whenShouldThrowAnException() {
+            String robertId = TestResources.idForRobert();
+            Contact contact = TestResources.getFirstContact();
+            when(contactRepository.findById(eq(contact.getId())))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
+
+            Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.updateWithUser(contact, robertId));
+
+            assertThat(throwable).isNotNull();
+            assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+            assertThat(throwable).hasMessageContaining("Contact not found");
+
+            verify(contactRepository, once()).findById(eq(contact.getId()));
+            verifyNoInteractions(userService);
+        }
+    }
 }
