@@ -8,7 +8,7 @@ spring:
     init:
       data-locations:
         - classpath:sql/exclusion-of-rows.sql
-        - classpath:sql/data-test.sql
+        - classpath:sql/data-dev.sql
 
   security:
     oauth2:

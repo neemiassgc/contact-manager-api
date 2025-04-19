@@ -4,13 +4,28 @@ insert into users (user_id, username) values
 ('auth0|66f81f7d9caecc11cdab18d6', 'me@gmail.com');
 
 insert into contacts (contact_id, name, user_id) values
-('5c21433c-3c70-4253-a4b2-52b157be4167', 'Greg from accounting', 'auth0|3baa9bc92c9c5decbda32f76'),
-('4fe25947-ecab-489c-a881-e0057124e408', 'Coworker Fred', 'auth0|3baa9bc92c9c5decbda32f76'),
-('35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7', 'Sister Monica', 'auth0|3baa9bc92c9c5decbda32f76'),
-('7f23057f-77bd-4568-ac64-e933abae9a09', 'Best friend Julia', 'auth0|94afd9e7294a59e73e6abfbd'),
-('84edd1b9-89a5-4107-a84d-435676c2b8f5', 'Mom', 'auth0|94afd9e7294a59e73e6abfbd'),
-('8fb2bd75-9aec-4cc5-b77b-a95f06081388', 'Pizza and burgers', 'auth0|94afd9e7294a59e73e6abfbd'),
-('b621650d-4a81-4016-a917-4a8a4992aaef', 'Uncle Jeff', 'auth0|94afd9e7294a59e73e6abfbd');
+('5c21433c-3c70-4253-a4b2-52b157be4167', 'Greg from accounting', 'auth0|66f81f7d9caecc11cdab18d6'),
+('4fe25947-ecab-489c-a881-e0057124e408', 'Coworker Fred', 'auth0|66f81f7d9caecc11cdab18d6'),
+('35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7', 'Sister Monica', 'auth0|66f81f7d9caecc11cdab18d6'),
+('7f23057f-77bd-4568-ac64-e933abae9a09', 'Best friend Julia', 'auth0|66f81f7d9caecc11cdab18d6'),
+('84edd1b9-89a5-4107-a84d-435676c2b8f5', 'Mom', 'auth0|66f81f7d9caecc11cdab18d6'),
+('8fb2bd75-9aec-4cc5-b77b-a95f06081388', 'Pizza and burgers', 'auth0|66f81f7d9caecc11cdab18d6'),
+('b621650d-4a81-4016-a917-4a8a4992aaef', 'Uncle Jeff', 'auth0|66f81f7d9caecc11cdab18d6'),
+('933e1c6b-887f-4740-9694-870020108906', 'Alice Smith', 'auth0|66f81f7d9caecc11cdab18d6'),
+('02672776-8575-4749-8041-9a7428805f42', 'Bob Johnson', 'auth0|66f81f7d9caecc11cdab18d6'),
+('286d8048-b4b1-4c07-9759-33512e096472', 'Charlie Brown', 'auth0|66f81f7d9caecc11cdab18d6'),
+('5e2f9859-9941-4712-9844-48601614945d', 'David Lee', 'auth0|66f81f7d9caecc11cdab18d6'),
+('02760233-a615-4654-8c81-4560d268a0a9', 'Eve Wilson', 'auth0|66f81f7d9caecc11cdab18d6'),
+('866d9f0f-0749-417c-a02b-a01494d4d126', 'Frank Garcia', 'auth0|66f81f7d9caecc11cdab18d6'),
+('8685141e-f3b1-4a46-886f-22a49800d923', 'Grace Rodriguez', 'auth0|66f81f7d9caecc11cdab18d6'),
+('213c4155-22d7-4c03-b072-f8150499d63c', 'Henry Martinez', 'auth0|66f81f7d9caecc11cdab18d6'),
+('09d57a6e-71c1-4b13-a442-99890a8a8167', 'Ivy Anderson', 'auth0|66f81f7d9caecc11cdab18d6'),
+('654877d5-d97a-493e-8c83-75b282496a75', 'Jack Thomas', 'auth0|66f81f7d9caecc11cdab18d6'),
+('76850f4a-73d7-4008-8e81-f5383f9828d1', 'Kelly Jackson', 'auth0|66f81f7d9caecc11cdab18d6'),
+('137d2f92-963d-4c5e-8848-0c64188b3943', 'Liam White', 'auth0|66f81f7d9caecc11cdab18d6'),
+('9a502479-7a32-485a-b9c1-7917818e385b', 'Mia Harris', 'auth0|66f81f7d9caecc11cdab18d6'),
+('09867990-2646-444a-93a8-444391690412', 'Noah Martin', 'auth0|66f81f7d9caecc11cdab18d6'),
+('1c0d3810-7451-412e-ab51-939e14a1f599', 'Olivia Thompson', 'auth0|66f81f7d9caecc11cdab18d6');
 
 insert into phone_numbers (phone_number, contact_id, mark) values
 ('+3592659480427', '5c21433c-3c70-4253-a4b2-52b157be4167', 'home'),
@@ -24,10 +39,24 @@ insert into phone_numbers (phone_number, contact_id, mark) values
 ('+659167889156', '84edd1b9-89a5-4107-a84d-435676c2b8f5', 'home'),
 ('+817886064615', '8fb2bd75-9aec-4cc5-b77b-a95f06081388', 'main'),
 ('+398094640706', 'b621650d-4a81-4016-a917-4a8a4992aaef', 'home'),
-('+311417504453', 'b621650d-4a81-4016-a917-4a8a4992aaef', 'mobile');
+('+311417504453', 'b621650d-4a81-4016-a917-4a8a4992aaef', 'mobile'),
+('+311417504453', '02672776-8575-4749-8041-9a7428805f42', 'mobile'),
+('+311417504453', '286d8048-b4b1-4c07-9759-33512e096472', 'mobile'),
+('+311417504453', '5e2f9859-9941-4712-9844-48601614945d', 'mobile'),
+('+311417504453', '02760233-a615-4654-8c81-4560d268a0a9', 'mobile'),
+('+311417504453', '866d9f0f-0749-417c-a02b-a01494d4d126', 'mobile'),
+('+311417504453', '8685141e-f3b1-4a46-886f-22a49800d923', 'mobile'),
+('+311417504453', '213c4155-22d7-4c03-b072-f8150499d63c', 'mobile'),
+('+311417504453', '09d57a6e-71c1-4b13-a442-99890a8a8167', 'mobile'),
+('+311417504453', '654877d5-d97a-493e-8c83-75b282496a75', 'mobile'),
+('+311417504453', '76850f4a-73d7-4008-8e81-f5383f9828d1', 'mobile'),
+('+311417504453', '137d2f92-963d-4c5e-8848-0c64188b3943', 'mobile'),
+('+311417504453', '9a502479-7a32-485a-b9c1-7917818e385b', 'mobile'),
+('+311417504453', '09867990-2646-444a-93a8-444391690412', 'mobile'),
+('+311417504453', '1c0d3810-7451-412e-ab51-939e14a1f599', 'mobile');
 
 insert into addresses (mark, contact_id, street, country, city, state, zipcode) values
-('home', '5c21433c-3c70-4253-a4b2-52b157be4167', '343-1199, Tennodai', 'Japan', 'Abiko-shi', 'Chiba', '02169'),
+('home', '5c21433c-3c70-4253-a4b2-52b157be4167',  '343-1199, Tennodai', 'Japan', 'Abiko-shi', 'Chiba', '02169'),
 ('work', '5c21433c-3c70-4253-a4b2-52b157be4167', '127-1121, Hiyamizu', 'Japan', 'Rankoshi-cho Isoya-gun', 'Hokkaido', '02169'),
 ('home', '4fe25947-ecab-489c-a881-e0057124e408', '4454 Steve Hunt Road', 'EUA', 'Miami', 'Florida', '33131'),
 ('home', '35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7', '4529 Jehovah Drive', 'EUA', 'Waynesboro', 'Virginia', '22980'),
