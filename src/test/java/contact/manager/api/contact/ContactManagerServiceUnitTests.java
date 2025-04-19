@@ -250,5 +250,20 @@ public class ContactManagerServiceUnitTests {
             verify(contactRepository, once()).findById(eq(contactId));
             verifyNoInteractions(userService);
         }
+
+        @Test
+        @DisplayName("When a contact is found then should return it successfully")
+        public void whenContactIsFound_thenShouldReturnItSuccessfully() {
+            UUID contactId = UUID.fromString("7f23057f-77bd-4568-ac64-e933abae9a09");
+            when(contactRepository.findById(eq(contactId)))
+                    .thenReturn(Optional.of(TestResources.getContactById(contactId)));
+
+            Contact actualContact = contactManagerServiceUnderTest.findById(contactId);
+
+            assertThat(actualContact).isNotNull();
+
+            verify(contactRepository, once()).findById(eq(contactId));
+            verifyNoInteractions(userService);
+        }
     }
 }
