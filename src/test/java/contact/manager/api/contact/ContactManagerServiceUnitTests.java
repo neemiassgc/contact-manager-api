@@ -213,5 +213,21 @@ public class ContactManagerServiceUnitTests {
             verify(contactRepository, once()).findById(eq(contact.getId()));
             verifyNoInteractions(userService);
         }
+
+        @Test
+        @DisplayName("When provided contact and userId then should entirely update the contact successfully")
+        public void whenProvidedContactAndUserId_thenShouldUpdateTheContactSuccessfully() {
+            String robertId = TestResources.idForRobert();
+            UUID contactId = UUID.fromString("7f23057f-77bd-4568-ac64-e933abae9a09");
+            Contact contact = TestResources.getContactById(contactId);
+            when(contactRepository.findById(eq(contactId))).thenReturn(Optional.of(contact));
+            doNothing().when(contactRepository).save(any(Contact.class));
+
+            contactManagerServiceUnderTest.updateWithUser(contact, robertId);
+
+            verify(contactRepository, once()).findById(eq(contactId));
+            verify(contactRepository, once()).save(any(Contact.class));
+            verifyNoInteractions(userService);
+        }
     }
 }
