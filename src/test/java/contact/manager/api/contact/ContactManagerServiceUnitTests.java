@@ -8,12 +8,15 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 import static contact.manager.api.misc.TestResources.once;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.*;
 
 @ExtendWith({SpringExtension.class})
@@ -64,6 +67,22 @@ public class ContactManagerServiceUnitTests {
 
             verify(userService, once()).findById(eq(robertId));
             verify(contactRepository, once()).findAllByUserId(eq(robertId));
+            verifyNoMoreInteractions(userService, contactRepository);
+        }
+
+        @Test
+        @DisplayName("Given an invalid user id then should throw ResponseStatusException NOT FOUND")
+        void whenUserIdIsInvalid_thenShouldThrowAnException() {
+            String robertId = TestResources.idForRobert();
+            when(userService.findById(eq(robertId)))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+            Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.findAllByUserId(robertId));
+
+            assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+            assertThat(throwable).hasMessageContaining("User not found");
+
+            verify(userService, once()).findById(eq(robertId));
             verifyNoMoreInteractions(userService, contactRepository);
         }
     }
