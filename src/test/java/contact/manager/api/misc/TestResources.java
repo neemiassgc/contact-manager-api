@@ -285,6 +285,10 @@ public final class TestResources {
     }
 
     public static User getMockedUser() {
-        return new User("123408973423", "Jessi");
+        return getMockedUser("123408973423", "Jessi");
+    }
+
+    public static User getMockedUser(String userId, String username) {
+        return new User(userId, username);
     }
 }
