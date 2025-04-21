@@ -210,10 +210,6 @@ public final class TestResources {
         return contacts.get(0);
     }
 
-    public static Contact getRealContact() {
-        return contacts.get(contacts.size() - 1);
-    }
-
     public static List<Contact> getAFewContacts(final int count) {
         return contacts.subList(0, count > contacts.size() ? contacts.size() - 1 : count);
     }
