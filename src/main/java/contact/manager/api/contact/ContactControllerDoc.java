@@ -30,7 +30,7 @@ interface ContactControllerDoc {
         ),
         security = @SecurityRequirement(name = "oauth2")
     )
-    List<ContactData> getAllContacts(Jwt jwt);
+    List<ContactData> getAll(Jwt jwt);
 
     @Operation(
         description = "Get a user's contact by its id",

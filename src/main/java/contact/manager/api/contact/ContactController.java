@@ -20,7 +20,7 @@ public class ContactController implements ContactControllerDoc {
     private final ContactManagerService contactManagerService;
 
     @GetMapping()
-    public List<ContactData> getAllContacts(@AuthenticationPrincipal Jwt jwt) {
+    public List<ContactData> getAll(@AuthenticationPrincipal Jwt jwt) {
         return Contact.toListOfContactData(contactManagerService.findAllByUserId(getUserFromSub(jwt)));
     }
 
