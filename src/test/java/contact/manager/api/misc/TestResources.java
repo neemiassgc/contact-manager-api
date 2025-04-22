@@ -250,19 +250,20 @@ public final class TestResources {
     }
 
     public static Jwt jwtForJoe() {
-        return createJwt().subject(idForJoe()).build();
+        return createJwt("joe").subject(idForJoe()).build();
     }
 
     public static Jwt jwtForRobert() {
-        return createJwt().subject(idForRobert()).build();
+        return createJwt("robert").subject(idForRobert()).build();
     }
 
     public static Jwt jwtForJulia() {
-        return createJwt().subject(idForJulia()).build();
+        return createJwt("julia").subject(idForJulia()).build();
     }
 
-    private static Jwt.Builder createJwt() {
+    private static Jwt.Builder createJwt(String username) {
         return Jwt.withTokenValue("{}")
+            .claim("username", username)
             .header("alg", "RS256")
             .header("typ", "JWT")
             .header("kid", "Pgj1sRhThSD2fsOc_c6mX");
