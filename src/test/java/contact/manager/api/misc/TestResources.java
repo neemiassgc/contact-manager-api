@@ -12,11 +12,14 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.junit.jupiter.api.Named.named;
 import static org.mockito.Mockito.times;
 
 public final class TestResources {
 
     private final static List<Contact> contacts = new ArrayList<>();
+
+    private TestResources() {}
 
     static {
         final User thomas = new User("auth0|86676d5cda7cb5dc3b594f45", "thomas");
