@@ -1,6 +1,5 @@
 package contact.manager.api.contact;
 
-import contact.manager.api.misc.TestResources;
 import contact.manager.api.user.UserService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -22,6 +21,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static contact.manager.api.misc.TestResources.*;
 
 @SpringBootTest
 @Transactional
@@ -57,7 +57,7 @@ public class ContactManagerServiceIntegrationTest {
         @Test
         @DisplayName("Should return all of the contacts for a given user successfully")
         void shouldReturnAllOfTheContactsForAGivenUserSuccessfully() {
-            final List<Contact> listOfContacts = contactManagerServiceUnderTest.findAllByUserId(TestResources.idForRobert());
+            final List<Contact> listOfContacts = contactManagerServiceUnderTest.findAllByUserId(Users.ROBERT.id());
 
             Assertions.assertThat(listOfContacts).hasSize(4);
             Assertions.assertThat(listOfContacts).extracting(Contact::getName)
@@ -84,7 +84,7 @@ public class ContactManagerServiceIntegrationTest {
         @DisplayName("When provided a contactId then should return a contact of a user successfully")
         void whenProvidedAContactId_thenShouldReturnAContactOfAUserSuccessfully() {
             final UUID gregFromAccountingContactId = UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167");
-            final Contact contact = contactManagerServiceUnderTest.findByIdWithUser(gregFromAccountingContactId, TestResources.idForJoe());
+            final Contact contact = contactManagerServiceUnderTest.findByIdWithUser(gregFromAccountingContactId, Users.JOE.id());
 
             assertThat(contact).isNotNull();
             assertThat(contact).extracting(Contact::getName).isEqualTo("Greg from accounting");
@@ -111,7 +111,7 @@ public class ContactManagerServiceIntegrationTest {
         void whenAContactIsNotFound_thenShouldThrowAnException() {
             final UUID contactId = UUID.fromString("5b530070-5840-4b26-a41b-3d13f5ee79d5");
 
-            final Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.findByIdWithUser(contactId, TestResources.idForJoe()));
+            final Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.findByIdWithUser(contactId, Users.JOE.id()));
 
             assertResponseStatusException(throwable, "Contact not found", HttpStatus.NOT_FOUND);
         }
@@ -121,7 +121,7 @@ public class ContactManagerServiceIntegrationTest {
         void whenAContactDoesNotBelongToAUser_thenShouldThrowAnException() {
             final UUID contactId = UUID.fromString("84edd1b9-89a5-4107-a84d-435676c2b8f5");
 
-            final Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.findByIdWithUser(contactId, TestResources.idForJoe()));
+            final Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.findByIdWithUser(contactId, Users.JOE.id()));
 
             assertResponseStatusException(throwable, "Contact belongs to another user", HttpStatus.BAD_REQUEST);
         }
@@ -145,7 +145,7 @@ public class ContactManagerServiceIntegrationTest {
                 .build();
             newContact.putAddress("work", companyAddress);
 
-            contactManagerServiceUnderTest.saveWithUser(newContact, TestResources.idForRobert());
+            contactManagerServiceUnderTest.saveWithUser(newContact, Users.ROBERT.id());
 
             final List<Contact> listOfContacts = contactRepository.findAll();
             Assertions.assertThat(listOfContacts).hasSize(8);
@@ -169,7 +169,7 @@ public class ContactManagerServiceIntegrationTest {
                 .build();
             newContact.putAddress("home", homeAddress);
 
-            final Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.saveWithUser(newContact, TestResources.idForJoe()));
+            final Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.saveWithUser(newContact, Users.JOE.id()));
 
             assertThat(throwable).isNotNull();
         }
@@ -205,16 +205,16 @@ public class ContactManagerServiceIntegrationTest {
         void shouldUpdateAContactForAUserSuccessfully() {
             final String contactNewName = "Alex";
             final ContactData contactData =  ContactData.builder()
-                .id(TestResources.getContactsForJoe().get(0).getId())
+                .id(getContactsForJoe().get(0).getId())
                 .name(contactNewName)
                 .addresses(Collections.emptyMap())
                 .emails(Collections.emptyMap())
                 .phoneNumbers(Collections.emptyMap())
                 .build();
 
-            final Contact contact = Contact.toContact(contactData, TestResources.getMockedUser(TestResources.idForJoe(), "joe"));
+            final Contact contact = Contact.toContact(contactData, getMockedUser(Users.JOE.id(), "joe"));
 
-            contactManagerServiceUnderTest.updateWithUser(contact, TestResources.idForJoe());
+            contactManagerServiceUnderTest.updateWithUser(contact, Users.JOE.id());
 
             final Contact contactFromDatabase = contactRepository.findById(contactData.getId()).orElse(null);
 
@@ -225,9 +225,9 @@ public class ContactManagerServiceIntegrationTest {
         @Test
         @DisplayName("When provided a non-existing contact to update then should throw an exception")
         void whenProvidedANonExistingContactToUpdate_thenShouldThrowAnException() {
-            final Contact nonExistingContact = TestResources.getFirstContact();
+            final Contact nonExistingContact = getFirstContact();
             final Throwable throwable = catchThrowable(() ->
-                contactManagerServiceUnderTest.updateWithUser(nonExistingContact, TestResources.idForJoe())
+                contactManagerServiceUnderTest.updateWithUser(nonExistingContact, Users.JOE.id())
             );
 
             assertResponseStatusException(throwable, "Contact not found", HttpStatus.NOT_FOUND);
@@ -237,7 +237,7 @@ public class ContactManagerServiceIntegrationTest {
         @ValueSource(strings = {"", "9uja48sg908","auth0|c7b8835b2947d4bcc799dca5" })
         @DisplayName("When provided an unknown userId then should throw an exception")
         void whenProvidedAnUnknownUserId_thenShouldThrowAnException(String userId) {
-            final Contact contact = TestResources.getContactById(UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7"));
+            final Contact contact = getContactById(UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7"));
 
             final Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.updateWithUser(contact, userId));
 
@@ -280,7 +280,7 @@ public class ContactManagerServiceIntegrationTest {
         void shouldDeleteAContactForAUserSuccessfully() {
             final UUID targetUuid = UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7");
 
-            contactManagerServiceUnderTest.deleteByIdWithUser(targetUuid, TestResources.idForJoe());
+            contactManagerServiceUnderTest.deleteByIdWithUser(targetUuid, Users.JOE.id());
 
             final List<Contact> actualContacts = contactRepository.findAll();
 
@@ -293,7 +293,7 @@ public class ContactManagerServiceIntegrationTest {
         void whenProvidedANonExistingContactId_thenShouldThrowAnException() {
             final UUID targetUUID = UUID.fromString("bc27c837-d7ec-4d5f-890f-c92277799fa5");
 
-            final Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.deleteByIdWithUser(targetUUID, TestResources.idForJoe()));
+            final Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.deleteByIdWithUser(targetUUID, Users.JOE.id()));
 
             assertResponseStatusException(throwable, "Contact not found", HttpStatus.NOT_FOUND);
         }
@@ -303,7 +303,7 @@ public class ContactManagerServiceIntegrationTest {
         void whenTryingToDeleteAContactThatDoesNotBelongToAUser_thenShouldThrowAnException() {
             final UUID targetUUID = UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7");
 
-            final Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.deleteByIdWithUser(targetUUID, TestResources.idForRobert()));
+            final Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.deleteByIdWithUser(targetUUID, Users.ROBERT.id()));
 
             assertResponseStatusException(throwable, "Contact belongs to another user", HttpStatus.BAD_REQUEST);
         }

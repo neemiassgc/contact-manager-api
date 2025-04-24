@@ -1,6 +1,5 @@
 package contact.manager.api.contact;
 
-import contact.manager.api.misc.TestResources;
 import contact.manager.api.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,10 +15,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static contact.manager.api.misc.TestResources.once;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.*;
+import static contact.manager.api.misc.TestResources.*;
 
 @ExtendWith({SpringExtension.class})
 public class ContactManagerServiceUnitTest {
@@ -42,7 +41,7 @@ public class ContactManagerServiceUnitTest {
 
         @Test
         void shouldReturnAllOfTheContactsAvailable() {
-            when(contactRepository.findAll()).thenReturn(TestResources.getAFewContacts(10));
+            when(contactRepository.findAll()).thenReturn(getAFewContacts(10));
 
             List<Contact> actualContacts = contactManagerServiceUnderTest.findAll();
 
@@ -58,9 +57,9 @@ public class ContactManagerServiceUnitTest {
         @Test
         @DisplayName("Given a valid user id then should return all of the contacts owned by the user")
         void whenUserIdIsValid_thenShouldReturnAllOfTheContactsOwnedByTheUser() {
-            String robertId = TestResources.idForRobert();
-            when(userService.findById(eq(robertId))).thenReturn(TestResources.getMockedUser());
-            when(contactRepository.findAllByUserId(eq(robertId))).thenReturn(TestResources.getContactsForRobert());
+            String robertId = Users.ROBERT.id();
+            when(userService.findById(eq(robertId))).thenReturn(getMockedUser());
+            when(contactRepository.findAllByUserId(eq(robertId))).thenReturn(getContactsForRobert());
 
             List<Contact> actualContacts = contactManagerServiceUnderTest.findAllByUserId(robertId);
 
@@ -73,7 +72,7 @@ public class ContactManagerServiceUnitTest {
         @Test
         @DisplayName("Given an invalid user id then should throw ResponseStatusException NOT FOUND")
         void whenUserIdIsInvalid_thenShouldThrowAnException() {
-            String robertId = TestResources.idForRobert();
+            String robertId = Users.ROBERT.id();
             when(userService.findById(eq(robertId)))
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
@@ -93,7 +92,7 @@ public class ContactManagerServiceUnitTest {
         @Test
         @DisplayName("When ContactId does not exist then should throw ResponseStatusException Contact not found")
         public void whenContactIdDoesNotExist_thenShouldThrowAnException() {
-            String robertId = TestResources.idForRobert();
+            String robertId = Users.ROBERT.id();
             UUID contactId = UUID.fromString("37414529-e28f-47bc-a4fa-99c2aa79ca90");
             when(contactRepository.findById(eq(contactId)))
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
@@ -110,9 +109,9 @@ public class ContactManagerServiceUnitTest {
         @Test
         @DisplayName("When a contact does not belong to the user then should throw ResponseStatusException")
         public void whenContactDoesNotBelongToTheUser_thenShouldThrowAnException() {
-            String robertId = TestResources.idForRobert();
+            String robertId = Users.ROBERT.id();
             UUID contactId = UUID.fromString("37414529-e28f-47bc-a4fa-99c2aa79ca90");
-            when(contactRepository.findById(eq(contactId))).thenReturn(Optional.of(TestResources.getFirstContact()));
+            when(contactRepository.findById(eq(contactId))).thenReturn(Optional.of(getFirstContact()));
 
             Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.findByIdWithUser(contactId, robertId));
 
@@ -126,9 +125,9 @@ public class ContactManagerServiceUnitTest {
         @Test
         @DisplayName("When provided contactId and userId then should return a contact successfully")
         public void whenProvidedContactIdAndUserId_thenShouldReturnAContactSuccessfully() {
-            String robertId = TestResources.idForRobert();
+            String robertId = Users.ROBERT.id();
             UUID contactId = UUID.fromString("7f23057f-77bd-4568-ac64-e933abae9a09");
-            when(contactRepository.findById(eq(contactId))).thenReturn(Optional.of(TestResources.getContactById(contactId)));
+            when(contactRepository.findById(eq(contactId))).thenReturn(Optional.of(getContactById(contactId)));
 
             Contact actualContact = contactManagerServiceUnderTest.findByIdWithUser(contactId, robertId);
 
@@ -145,9 +144,9 @@ public class ContactManagerServiceUnitTest {
         @Test
         @DisplayName("When contact and userId are provided then should save the contact successfully")
         public void whenProvidedContactAndUserId_thenShouldSaveTheContactSuccessfully() {
-            Contact contact = TestResources.getFirstContact();
-            String robertId = TestResources.idForRobert();
-            when(userService.findById(eq(robertId))).thenReturn(TestResources.getMockedUser());
+            Contact contact = getFirstContact();
+            String robertId = Users.ROBERT.id();
+            when(userService.findById(eq(robertId))).thenReturn(getMockedUser());
             doNothing().when(contactRepository).save(any(Contact.class));
 
             contactManagerServiceUnderTest.saveWithUser(contact, robertId);
@@ -159,8 +158,8 @@ public class ContactManagerServiceUnitTest {
         @Test
         @DisplayName("When provided a userId that does not exist then should throw ResponseStatusException User not found")
         public void whenUserIdDoesNotExist_thenShouldThrowAnException() {
-            Contact contact = TestResources.getFirstContact();
-            String robertId = TestResources.idForRobert();
+            Contact contact = getFirstContact();
+            String robertId = Users.ROBERT.id();
             when(userService.findById(eq(robertId)))
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
@@ -181,8 +180,8 @@ public class ContactManagerServiceUnitTest {
         @Test
         @DisplayName("When provided a non existing contact then should throw ResponseStatusException Contact not found")
         public void whenProvidedANonExistingContact_whenShouldThrowAnException() {
-            String robertId = TestResources.idForRobert();
-            Contact contact = TestResources.getFirstContact();
+            String robertId = Users.ROBERT.id();
+            Contact contact = getFirstContact();
             when(contactRepository.findById(eq(contact.getId())))
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
 
@@ -199,10 +198,10 @@ public class ContactManagerServiceUnitTest {
         @Test
         @DisplayName("When a contact does not belong to the user then should throw an exception")
         public void whenAContactDoesNotBelongToTheUser_thenShouldThrowAnException() {
-            String robertId = TestResources.idForRobert();
-            Contact contact = TestResources.getFirstContact();
+            String robertId = Users.ROBERT.id();
+            Contact contact = getFirstContact();
             when(contactRepository.findById(eq(contact.getId())))
-                .thenReturn(Optional.of(TestResources.getFirstContact()));
+                .thenReturn(Optional.of(getFirstContact()));
 
             Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.updateWithUser(contact, robertId));
 
@@ -217,9 +216,9 @@ public class ContactManagerServiceUnitTest {
         @Test
         @DisplayName("When provided contact and userId then should entirely update the contact successfully")
         public void whenProvidedContactAndUserId_thenShouldUpdateTheContactSuccessfully() {
-            String robertId = TestResources.idForRobert();
+            String robertId = Users.ROBERT.id();
             UUID contactId = UUID.fromString("7f23057f-77bd-4568-ac64-e933abae9a09");
-            Contact contact = TestResources.getContactById(contactId);
+            Contact contact = getContactById(contactId);
             when(contactRepository.findById(eq(contactId))).thenReturn(Optional.of(contact));
             doNothing().when(contactRepository).save(any(Contact.class));
 
@@ -256,7 +255,7 @@ public class ContactManagerServiceUnitTest {
         public void whenContactIsFound_thenShouldReturnItSuccessfully() {
             UUID contactId = UUID.fromString("7f23057f-77bd-4568-ac64-e933abae9a09");
             when(contactRepository.findById(eq(contactId)))
-                    .thenReturn(Optional.of(TestResources.getContactById(contactId)));
+                .thenReturn(Optional.of(getContactById(contactId)));
 
             Contact actualContact = contactManagerServiceUnderTest.findById(contactId);
 
@@ -273,10 +272,10 @@ public class ContactManagerServiceUnitTest {
         @Test
         @DisplayName("When provided contactId and userId then should delete a contact successfully")
         public void whenProvidedContactIdAndUserId_thenShouldDeleteAContactSuccessfully() {
-            String robertId = TestResources.idForRobert();
+            String robertId = Users.ROBERT.id();
             UUID contactId = UUID.fromString("7f23057f-77bd-4568-ac64-e933abae9a09");
             when(contactRepository.findById(eq(contactId)))
-                .thenReturn(Optional.of(TestResources.getContactById(contactId)));
+                .thenReturn(Optional.of(getContactById(contactId)));
             doNothing().when(contactRepository).deleteById(eq(contactId));
 
             contactManagerServiceUnderTest.deleteByIdWithUser(contactId, robertId);
@@ -289,7 +288,7 @@ public class ContactManagerServiceUnitTest {
         @Test
         @DisplayName("When a contact is not found then should throw an exception")
         public void whenContactIsNotFound_thenShouldThrowAnException() {
-            String robertId = TestResources.idForRobert();
+            String robertId = Users.ROBERT.id();
             UUID contactId = UUID.fromString("7f23057f-77bd-4568-ac64-e933abae9a09");
             when(contactRepository.findById(eq(contactId)))
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Contact not found"));
@@ -307,10 +306,10 @@ public class ContactManagerServiceUnitTest {
         @Test
         @DisplayName("When a contact does not belong to the user then should throw an exception")
         public void whenAContactDoesNotBelongToTheUser_thenShouldThrowAnException() {
-            String robertId = TestResources.idForRobert();
+            String robertId = Users.ROBERT.id();
             UUID contactId = UUID.fromString("7f23057f-77bd-4568-ac64-e933abae9a09");
             when(contactRepository.findById(eq(contactId)))
-                .thenReturn(Optional.of(TestResources.getFirstContact()));
+                .thenReturn(Optional.of(getFirstContact()));
 
             Throwable throwable = catchThrowable(() -> contactManagerServiceUnderTest.deleteByIdWithUser(contactId, robertId));
 

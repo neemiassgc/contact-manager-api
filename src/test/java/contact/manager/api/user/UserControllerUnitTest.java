@@ -1,6 +1,5 @@
 package contact.manager.api.user;
 
-import contact.manager.api.misc.TestResources;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +17,7 @@ import contact.manager.api.global.GlobalErrorController;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static contact.manager.api.misc.TestResources.*;
 
 @WebMvcTest(value = {UserController.class, GlobalErrorController.class})
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
@@ -37,7 +37,7 @@ public class UserControllerUnitTest {
         final String jsonBody = "{\"username\": \"julia\"}";
         mockMvc.perform(
             post("/api/users").with(
-                SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJulia())
+                SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JULIA.jwt())
             )
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.ALL)
@@ -45,7 +45,7 @@ public class UserControllerUnitTest {
         )
         .andExpect(status().isCreated());
 
-        verify(userService, TestResources.once()).create(any(User.class));
+        verify(userService, once()).create(any(User.class));
         verifyNoMoreInteractions(userService);
     }
 
@@ -55,7 +55,7 @@ public class UserControllerUnitTest {
         final String jsonBody = "{}";
         mockMvc.perform(
             post("/api/users").with(
-                SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForRobert())
+                SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.ROBERT.jwt())
             )
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.ALL)
@@ -80,7 +80,7 @@ public class UserControllerUnitTest {
         final String jsonBody = "{\"username\": \"joe\"}";
         mockMvc.perform(
             post("/api/users").with(
-                SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJoe())
+                SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JOE.jwt())
             )
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.ALL)
@@ -90,7 +90,7 @@ public class UserControllerUnitTest {
         .andExpect(content().contentType(MediaType.TEXT_PLAIN))
         .andExpect(content().string("User already exists"));
 
-        verify(userService, TestResources.once()).create(any(User.class));
+        verify(userService, once()).create(any(User.class));
         verifyNoMoreInteractions(userService);
     }
 }

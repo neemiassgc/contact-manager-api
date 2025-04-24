@@ -1,6 +1,5 @@
 package contact.manager.api.user;
 
-import contact.manager.api.misc.TestResources;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static contact.manager.api.misc.TestResources.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc(printOnlyOnFailure = false)
@@ -27,7 +27,7 @@ public class UserControllerIntegrationTest {
         final String jsonBody = "{\"username\": \"julia\"}";
         mockMvc.perform(
             post("/api/users").with(
-                SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJulia())
+                SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JULIA.jwt())
             )
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.ALL)
@@ -42,7 +42,7 @@ public class UserControllerIntegrationTest {
         final String jsonBody = "{}";
         mockMvc.perform(
             post("/api/users").with(
-                SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJulia())
+                SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JULIA.jwt())
             )
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.ALL)
@@ -62,7 +62,7 @@ public class UserControllerIntegrationTest {
         final String jsonBody = "{\"username\": \"joe\"}";
         mockMvc.perform(
             post("/api/users").with(
-                SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJoe())
+                SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JOE.jwt())
             )
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.ALL)
