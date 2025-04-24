@@ -1,6 +1,7 @@
 package contact.manager.api.misc;
 
 import contact.manager.api.user.User;
+import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.security.oauth2.jwt.Jwt;
 import contact.manager.api.contact.Contact;
 import contact.manager.api.contact.Address;
@@ -225,6 +226,10 @@ public final class TestResources {
         return filterContactsByUser("robert");
     }
 
+    public static List<Contact> getContactsByUser(final String username) {
+        return filterContactsByUser(username);
+    }
+
     private static List<Contact> filterContactsByUser(final String username) {
         return contacts
             .stream()
@@ -242,46 +247,14 @@ public final class TestResources {
         for (final Map.Entry<String, Address> entry : contactToBeCopied.getAddressMap().entrySet()) {
             final Address address = Address.builder()
                 .state(entry.getValue().getState())
-        .street(entry.getValue().getStreet())
-        .city(entry.getValue().getCity())
-        .country(entry.getValue().getCountry())
-        .zipcode(entry.getValue().getZipcode())
-        .build();
-        newContact.putAddress(entry.getKey(), address);
+                .street(entry.getValue().getStreet())
+                .city(entry.getValue().getCity())
+                .country(entry.getValue().getCountry())
+                .zipcode(entry.getValue().getZipcode())
+                .build();
+            newContact.putAddress(entry.getKey(), address);
         }
         return newContact;
-    }
-
-    public static Jwt jwtForJoe() {
-        return createJwt("joe").subject(idForJoe()).build();
-    }
-
-    public static Jwt jwtForRobert() {
-        return createJwt("robert").subject(idForRobert()).build();
-    }
-
-    public static Jwt jwtForJulia() {
-        return createJwt("julia").subject(idForJulia()).build();
-    }
-
-    private static Jwt.Builder createJwt(String username) {
-        return Jwt.withTokenValue("{}")
-            .claim("username", username)
-            .header("alg", "RS256")
-            .header("typ", "JWT")
-            .header("kid", "Pgj1sRhThSD2fsOc_c6mX");
-    }
-
-    public static String idForJoe() {
-        return "auth0|3baa9bc92c9c5decbda32f76";
-    }
-
-    public static String idForRobert() {
-        return "auth0|94afd9e7294a59e73e6abfbd";
-    }
-
-    public static String idForJulia() {
-        return "auth0|c7b8835b2947d4bcc799dca5";
     }
 
     public static VerificationMode once() {
@@ -294,5 +267,64 @@ public final class TestResources {
 
     public static User getMockedUser(String userId, String username) {
         return new User(userId, username);
+    }
+
+    public static Args methodSourceArgs() {
+        return new Args();
+    }
+
+    public static class Args {
+        private static final List<Arguments> args = new ArrayList<>(3);
+
+        private Args() {}
+
+        public Args jwtWithUUIDFor(Users user, String uuid) {
+            args.add(Arguments.arguments(named(user.name(), user.jwt()), UUID.fromString(uuid)));
+            return this;
+        }
+
+        public Args jwtFor(Users user) {
+            args.add(Arguments.arguments(named(user.name(), user.jwt())));
+            return this;
+        }
+
+        public List<Arguments> done() {
+            List<Arguments> copy = List.copyOf(args);
+            args.clear();
+            return copy;
+        }
+    }
+
+    public enum Users {
+        ROBERT(jwtFor("robert", "auth0|94afd9e7294a59e73e6abfbd")),
+        JULIA(jwtFor("julia", "auth0|c7b8835b2947d4bcc799dca5")),
+        JOE(jwtFor("joe", "auth0|3baa9bc92c9c5decbda32f76"));
+
+        private final Jwt jwt;
+
+        Users(Jwt jwt) {
+            this.jwt = jwt;
+        }
+
+        public Jwt jwt() {
+            return this.jwt;
+        }
+
+        public String id() {
+            return this.jwt().getClaimAsString("id");
+        }
+    }
+
+    public static Jwt jwtFor(String username, String userId) {
+        return createJwt(username, userId).subject(userId).build();
+    }
+
+    private static Jwt.Builder createJwt(String username, String userId) {
+        return Jwt.withTokenValue("{}")
+            .claim("id", userId)
+            .claim("username", username)
+            .header("alg", "RS256")
+            .header("typ", "JWT")
+            .header("kid", "Pgj1sRhThSD2fsOc_c6mX");
     }
 }
