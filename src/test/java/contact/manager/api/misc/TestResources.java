@@ -327,4 +327,36 @@ public final class TestResources {
             .header("typ", "JWT")
             .header("kid", "Pgj1sRhThSD2fsOc_c6mX");
     }
+
+    public static String newContactJsonWithId(String id) {
+        return """
+        {
+            "id": "{id}",
+            "name": "Isabella Rodriguez",
+            "phoneNumbers": {
+                 "home": "+15551234567",
+                 "work": "+15559876543",
+                 "mobile": "+15555555555"
+            },
+            "emails": {
+                "personal": "isabella.rodriguez@example.com",
+                "work": "irodriguez@company.com",
+                "other": "bella.r@email.net"
+            },
+            "addresses": {
+                "home": {
+                   "country": "United States",
+                   "state": "California",
+                   "city": "Los Angeles",
+                   "zipcode": "90001",
+                   "street": "123 Main Street"
+                }
+            }
+        }
+        """.replace("{id}", id);
+    }
+
+    public static String newContactJson() {
+        return newContactJsonWithId("ff55ef9d-e912-4548-a790-50158470fafa");
+    }
 }
