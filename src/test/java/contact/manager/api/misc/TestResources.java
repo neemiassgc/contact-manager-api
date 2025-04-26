@@ -279,7 +279,7 @@ public final class TestResources {
         private Args() {}
 
         public Args jwtWithUUIDFor(Users user, String uuid) {
-            args.add(Arguments.arguments(named(user.name(), user.jwt()), UUID.fromString(uuid)));
+            args.add(Arguments.arguments(named(user.name(), user.jwt()), uuid));
             return this;
         }
 
@@ -315,7 +315,7 @@ public final class TestResources {
         }
     }
 
-    public static Jwt jwtFor(String username, String userId) {
+    private static Jwt jwtFor(String username, String userId) {
         return createJwt(username, userId).subject(userId).build();
     }
 

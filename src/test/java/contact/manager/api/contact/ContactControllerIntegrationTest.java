@@ -1,17 +1,25 @@
 package contact.manager.api.contact;
 
-import contact.manager.api.misc.TestResources;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+import static contact.manager.api.misc.TestResources.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -29,222 +37,180 @@ public class ContactControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @Nested
-    public class TestCasesForJoe {
+    @DisplayName("/api/contacts")
+    public class GetAll {
+
+        private static List<Arguments> args() {
+            return methodSourceArgs().jwtFor(Users.ROBERT).jwtFor(Users.JOE).done();
+        }
+
+        @ParameterizedTest(name = "jwt = {0} GET /api/contacts -> 200")
+        @MethodSource("args")
+        @DisplayName("Should respond with all of the contacts for a user")
+        public void shouldRespondWithAllOfTheContactsForAUser(Jwt jwt) throws Exception {
+            ResultActions ra =  mockMvc.perform(get("/api/contacts")
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt))
+                .accept(MediaType.ALL)
+            )
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
+            switch (jwt.getClaimAsString("username")) {
+                case "joe" -> {
+                    ra
+                    .andExpect(jsonPath("$[*].name").value(containsInAnyOrder("Greg from accounting", "Coworker Fred", "Sister Monica")))
+                    .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(5)))
+                    .andExpect(jsonPath("$[*].addresses.*").value(hasSize(4)))
+                    .andExpect(jsonPath("$[*].emails.*").value(hasSize(3)));
+                }
+                case "robert" -> {
+                    ra
+                    .andExpect(jsonPath("$[*].name").value(containsInAnyOrder("Best friend Julia", "Mom", "Pizza and burgers", "Uncle Jeff")))
+                    .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(7)))
+                    .andExpect(jsonPath("$[*].addresses.*").value(hasSize(7)))
+                    .andExpect(jsonPath("$[*].emails.*").value(hasSize(7)));
+                }
+                case "julia" -> {
+                    ra.andExpect(content().string("User not found"));
+                }
+            }
+        }
 
         @Test
-        @DisplayName("GET /api/contacts -> 200 OK")
-        public void should_respond_with_all_the_contacts() throws Exception {
+        @DisplayName("When fetching all contacts for a non-existing user then should respond 404")
+        public void whenFetchingAllContactsForANonExistingUser_thenShouldRespond404() throws Exception {
             mockMvc.perform(get("/api/contacts")
-                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJoe()))
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JULIA.jwt()))
                 .accept(MediaType.ALL)
             )
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$[*].name").value(containsInAnyOrder("Greg from accounting", "Coworker Fred", "Sister Monica")))
-            .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(5)))
-            .andExpect(jsonPath("$[*].addresses.*").value(hasSize(4)))
-            .andExpect(jsonPath("$[*].emails.*").value(hasSize(3)));
+            .andExpect(status().isNotFound())
+            .andExpect(content().string("User not found"));
         }
 
-        @Test
-        @DisplayName("GET /api/contacts/5c21433c-3c70-4253-a4b2-52b157be4167 --> 200 OK")
-        public void should_respond_with_a_contact_successfully() throws Exception {
-            mockMvc.perform(get("/api/contacts/5c21433c-3c70-4253-a4b2-52b157be4167")
-                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJoe()))
+    }
+
+    @Nested
+    public class GetById {
+
+        private static List<Arguments> args() {
+            return methodSourceArgs()
+                .jwtWithUUIDFor(Users.ROBERT, "7f23057f-77bd-4568-ac64-e933abae9a09")
+                .jwtWithUUIDFor(Users.JOE, "5c21433c-3c70-4253-a4b2-52b157be4167").done();
+        }
+
+        @ParameterizedTest(name = "jwt = {0} GET /api/contacts/{1} -> 200")
+        @MethodSource("args")
+        @DisplayName("Should return a contact for a user successfully")
+        public void shouldReturnAContactForAUserSuccessfully(Jwt jwt, String contactId) throws Exception {
+            ResultActions ra = mockMvc.perform(get("/api/contacts/" + contactId)
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt))
                 .accept(MediaType.APPLICATION_JSON)
             )
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.name").value("Greg from accounting"))
-            .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(1)))
-            .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
-            .andExpect(jsonPath("$.addresses.*").value(hasSize(2)));
-        }
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
-        @Test
-        @DisplayName("POST /api/contacts -> 201 CREATED")
-        void should_create_a_new_contact_successfully() throws Exception {
-            final String jsonContent = """
-            {
-                "name": "Steve",
-                "phoneNumbers": {
-                    "personal": "+817283640198"
-                },
-                "emails": {
-                    "main": "stevan@mymail.com"
-                },
-                "addresses": {
-                    "home": {
-                        "country": "United States",
-                        "street": "467 Jennifer Lane",
-                        "state": "North Carolina",
-                        "city": "Cary",
-                        "zipcode": "27513"
-                    }
+            switch (jwt.getClaimAsString("username")) {
+                case "robert" -> {
+                    ra
+                    .andExpect(jsonPath("$.name").value("Best friend Julia"))
+                    .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(3)))
+                    .andExpect(jsonPath("$.emails.*").value(hasSize(3)))
+                    .andExpect(jsonPath("$.addresses.*").value(hasSize(1)));
+                }
+                case "joe" -> {
+                    ra
+                    .andExpect(jsonPath("$.name").value("Greg from accounting"))
+                    .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(1)))
+                    .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
+                    .andExpect(jsonPath("$.addresses.*").value(hasSize(2)));
                 }
             }
-            """;
-
-            mockMvc.perform(post("/api/contacts")
-                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJoe()))
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonContent)
-            )
-            .andExpect(status().isCreated());
         }
 
         @Test
-        @DisplayName("PATCH /api/contacts/4fe25947-ecab-489c-a881-e0057124e408 -> 200 OK")
-        void should_update_isolated_fields_of_a_contact_successfully() throws Exception {
-            final String requestBody = """
-            {
-                "name": "Bill",
-                "phoneNumbers": {
-                    "cellphone": "+811234567890"
-                },
-                "addresses": {
-                }
-            }
-            """;
-
-            mockMvc.perform(patch("/api/contacts/4fe25947-ecab-489c-a881-e0057124e408")
-                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJoe()))
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody)
-            )
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$").isMap());
-        }
-
-        @Test
-        @DisplayName("DELETE /api/contacts/5c21433c-3c70-4253-a4b2-52b157be4167 -> 200 OK")
-        public void should_delete_a_contact_successfully() throws Exception {
-            mockMvc.perform(delete("/api/contacts/5c21433c-3c70-4253-a4b2-52b157be4167")
-                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJoe()))
+        @DisplayName("When requesting for a contact that does not exist then should respond 404")
+        void whenRequestingForAContactThatDoesNotExist_thenShouldRespond404() throws Exception {
+            mockMvc.perform(get("/api/contacts/c97775aa-b7f3-49c0-a586-d0466ba592bf")
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.ROBERT.jwt()))
                 .accept(MediaType.ALL)
             )
-            .andExpect(status().isOk());
+            .andExpect(status().isNotFound())
+            .andExpect(content().contentType(MediaType.TEXT_PLAIN))
+            .andExpect(content().string("Contact not found"));
+        }
+
+        @Test
+        @DisplayName("When requesting for a contact that does not belong to a user then should respond 400")
+        void whenRequestingForAContactThatDoesNotBelongToAUser_thenShouldRespond400() throws Exception {
+            mockMvc.perform(get("/api/contacts/4fe25947-ecab-489c-a881-e0057124e408")
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.ROBERT.jwt()))
+                .accept(MediaType.ALL)
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.TEXT_PLAIN))
+            .andExpect(content().string("Contact belongs to another user"));
+        }
+
+
+        @Test
+        @DisplayName("When requesting for a contact for a non-existing user then should respond 400")
+        void whenRequestingForAContactForANonExistingUser_thenShouldRespond400() throws Exception {
+            mockMvc.perform(get("/api/contacts/4fe25947-ecab-489c-a881-e0057124e408")
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JULIA.jwt()))
+                .accept(MediaType.ALL)
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.TEXT_PLAIN))
+            .andExpect(content().string("Contact belongs to another user"));
+        }
+
+        @Test
+        @DisplayName("When requesting for a contact without authentication then should deny with 401")
+        void whenRequestingForAContactWithoutAuthentication_thenShouldDenyWith401() throws Exception {
+            mockMvc.perform(get("/api/contacts/4fe25947-ecab-489c-a881-e0057124e408")
+                .with(SecurityMockMvcRequestPostProcessors.anonymous())
+                .accept(MediaType.ALL)
+            )
+            .andExpect(status().isUnauthorized());
         }
     }
 
     @Nested
-    public class TestCasesForRobert {
+    public class Create {
 
-        @Test
-        @DisplayName("GET /api/contacts -> 200 OK")
-        public void should_respond_with_all_the_contacts() throws Exception {
-            mockMvc.perform(get("/api/contacts")
-                .accept(MediaType.ALL)
-                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForRobert()))
-            )
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$[*].name").value(containsInAnyOrder("Best friend Julia", "Mom", "Pizza and burgers", "Uncle Jeff")))
-            .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(7)))
-            .andExpect(jsonPath("$[*].addresses.*").value(hasSize(7)))
-            .andExpect(jsonPath("$[*].emails.*").value(hasSize(7)));
+        private static List<Arguments> args() {
+            return methodSourceArgs().jwtFor(Users.ROBERT).jwtFor(Users.JOE).done();
         }
 
-        @Test
-        @DisplayName("GET /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef --> 200 OK")
-        public void should_respond_with_a_contact_successfully() throws Exception {
-            mockMvc.perform(get("/api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef")
-                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForRobert()))
-                .accept(MediaType.APPLICATION_JSON)
-            )
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.name").value("Uncle Jeff"))
-            .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(2)))
-            .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
-            .andExpect(jsonPath("$.addresses.*").value(hasSize(2)));
-        }
-
-        @Test
-        @DisplayName("POST /api/contacts -> 201 CREATED")
-        void should_create_a_new_contact_successfully() throws Exception {
-            final String jsonContent = """
-            {
-                "name": "Steve",
-                "phoneNumbers": {
-                    "personal": "+817283640198"
-                },
-                "emails": {
-                    "main": "stevan@mymail.com"
-                },
-                "addresses": {
-                    "home": {
-                        "country": "United States",
-                        "street": "467 Jennifer Lane",
-                        "state": "North Carolina",
-                        "city": "Cary",
-                        "zipcode": "27513"
-                    }
-                }
-            }
-            """;
+        @ParameterizedTest(name = "jwt = {0} POST /api/contacts  -> 201")
+        @MethodSource("args")
+        @DisplayName("Should create a new contact for a user successfully")
+        void shouldCreateANewContactForAUserSuccessfully(Jwt jwt) throws Exception {
+            String newContactJson = newContactJson();
 
             mockMvc.perform(post("/api/contacts")
-                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForRobert()))
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonContent)
+                .content(newContactJson)
             )
             .andExpect(status().isCreated());
+
+            final int actualContactsCount = contactManagerService.findAll().size();
+            assertThat(actualContactsCount).isEqualTo(8);
         }
 
-        @Test
-        @DisplayName("PATCH /api/contacts/84edd1b9-89a5-4107-a84d-435676c2b8f5 -> 200 OK")
-        void should_update_isolated_fields_of_a_contact_successfully() throws Exception {
-            final String requestBody = """
-            {
-                "name": "Bill",
-                "phoneNumbers": {
-                    "cellphone": "+811234567890"
-                },
-                "addresses": {
-                }
-            }
-            """;
-
-            mockMvc.perform(patch("/api/contacts/84edd1b9-89a5-4107-a84d-435676c2b8f5")
-                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForRobert()))
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody)
-            )
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$").isMap());
-        }
-
-        @Test
-        @DisplayName("DELETE /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> 200 OK")
-        public void should_delete_a_contact_successfully() throws Exception {
-            mockMvc.perform(delete("/api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef")
-                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForRobert()))
-                .accept(MediaType.ALL)
-            )
-            .andExpect(status().isOk());
-        }
-    }
-
-    @Nested
-    public class TestCasesForFieldValidations {
-
-        @Test
-        @DisplayName("POST /api/contacts -> 400 BAD REQUEST")
-        public void should_return_violations_when_adding_a_new_contact_with_missing_fields() throws Exception {
-            final String requestBody = "{}";
+        @ParameterizedTest(name = "jwt = {0} POST /api/contacts  -> 400")
+        @MethodSource("args")
+        @DisplayName("When provided data with missing fields then should respond 400 along with field violations")
+        public void whenProvidedJsonWithMissingFields_thenShouldRespond400AlongWithFieldViolations(Jwt jwt) throws Exception {
+            final String jsonWithMissingFields = "{}";
 
             mockMvc.perform(post("/api/contacts")
-                .content(requestBody)
+                .content(jsonWithMissingFields)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.ALL)
-                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJoe()))
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt))
             )
             .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -254,10 +220,11 @@ public class ContactControllerIntegrationTest {
             )));
         }
 
-        @Test
-        @DisplayName("POST /api/contacts -> 400 BAD REQUEST")
-        public void should_return_field_violations_when_creating_a_new_contact_with_invalid_data() throws Exception {
-            final String requestBody =
+        @ParameterizedTest(name = "jwt = {0} POST /api/contacts  -> 400")
+        @MethodSource("args")
+        @DisplayName("When provided json with invalid fields then should respond 400 along with field violations")
+        public void whenProvidedJsonWithInvalidFields_shouldShouldRespond400AlongWithFieldViolations(Jwt jwt) throws Exception {
+            final String jsonWithInvalidFields =
             """
             {
                 "emails": {
@@ -279,10 +246,10 @@ public class ContactControllerIntegrationTest {
             """;
 
             mockMvc.perform(post("/api/contacts")
-                .content(requestBody)
+                .content(jsonWithInvalidFields)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.ALL)
-                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJoe()))
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JOE.jwt()))
             )
             .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -299,81 +266,164 @@ public class ContactControllerIntegrationTest {
                 "country is too short"
             )));
         }
+
+        @Test
+        @DisplayName("When creating a contact for a non-existing user then should respond 404")
+        void whenCreatingAContactForANonExistingUser_thenShouldRespond404() throws Exception {
+            final String jsonContent = """
+            {
+                "name": "Steve",
+                "phoneNumbers": {
+                    "personal": "+817283640198"
+                },
+                "emails": {
+                    "main": "stevan@mymail.com"
+                },
+                "addresses": {
+                    "home": {
+                        "country": "United States",
+                        "street": "467 Jennifer Lane",
+                        "state": "North Carolina",
+                        "city": "Cary",
+                        "zipcode": "27513"
+                    }
+                }
+            }
+            """;
+
+            mockMvc.perform(post("/api/contacts")
+                .content(jsonContent)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.ALL)
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JULIA.jwt()))
+            )
+            .andExpect(status().isNotFound())
+            .andExpect(content().string("User not found"));
+        }
     }
 
-    @Test
-    @DisplayName("GET /api/contacts -> 404 NOT FOUND")
-    void should_respond_404_when_requesting_for_all_of_the_contacts_for_a_non_existing_user() throws Exception {
-        mockMvc.perform(get("/api/contacts")
-            .accept(MediaType.ALL)
-            .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJulia()))
-        )
-        .andExpect(status().isNotFound())
-        .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-        .andExpect(content().string("User not found"));
+    @Nested
+    public class Update {
+
+        private static List<Arguments> args() {
+            return methodSourceArgs()
+                .jwtWithUUIDFor(Users.ROBERT, "84edd1b9-89a5-4107-a84d-435676c2b8f5")
+                .jwtWithUUIDFor(Users.JOE, "35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7").done();
+        }
+
+        @ParameterizedTest(name = "jwt = {0} PUT /api/contacts/  -> 200")
+        @MethodSource("args")
+        @DisplayName("Should entirely update a contact for a user successfully")
+        void shouldEntirelyUpdateAContactForAUserSuccessfully(Jwt jwt, String contactId) throws Exception {
+            String newContactJson = newContactJsonWithId(contactId);
+            mockMvc.perform(put("/api/contacts")
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(newContactJson)
+            )
+            .andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("When updating a contact that does not belong to a user then should respond 400")
+        void whenUpdatingAContactThatDoesNotBelongToAUser_thenShouldRespond400() throws Exception {
+            mockMvc.perform(put("/api/contacts")
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JOE.jwt()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(newContactJsonWithId("b621650d-4a81-4016-a917-4a8a4992aaef"))
+                .accept(MediaType.ALL)
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.TEXT_PLAIN))
+            .andExpect(content().string("Contact belongs to another user"));
+        }
+
+        @Test
+        @DisplayName("When updating a contact that does not exist then should respond 404")
+        void whenUpdatingAContactThatDoesNotExist_thenShouldRespond404() throws Exception {
+            String nonExistingContactId = "b4f5cda4-9765-4dd2-a4c4-b178770cfd88";
+            mockMvc.perform(put("/api/contacts")
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.ROBERT.jwt()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(newContactJsonWithId(nonExistingContactId))
+                .accept(MediaType.ALL)
+            )
+            .andExpect(status().isNotFound())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+            .andExpect(content().string("Contact not found"));
+        }
+
+        @ParameterizedTest(name = "jwt = {0} PUT /api/contacts/ -> 400")
+        @MethodSource("args")
+        void whenEnteredAMalFormedContactToUpdate_thenShouldRespond400AlongWithFieldViolations(Jwt jwt, String contactId) throws Exception {
+            final String malFormedJson = "{\"name\": \"Bill\"}";
+            mockMvc.perform(put("/api/contacts")
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(malFormedJson)
+                .accept(MediaType.ALL)
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.fieldViolations").isMap());
+        }
     }
 
-    @Test
-    @DisplayName("GET /api/contacts/c97775aa-b7f3-49c0-a586-d0466ba592bf -> 404 NOT FOUND")
-    void should_respond_404_NOT_FOUND_when_requesting_for_a_contact_that_does_not_exist() throws Exception {
-        mockMvc.perform(get("/api/contacts/c97775aa-b7f3-49c0-a586-d0466ba592bf")
-            .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJoe()))
-            .accept(MediaType.ALL)
-        )
-        .andExpect(status().isNotFound())
-        .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-        .andExpect(content().string("Contact not found"));
-    }
+    @Nested
+    public class Delete {
 
-    @Test
-    @DisplayName("GET /api/contacts/4fe25947-ecab-489c-a881-e0057124e408 -> 400 BAD REQUEST")
-    void should_respond_400_when_requesting_for_a_contact_that_does_not_belong_to_the_current_user() throws Exception {
-        mockMvc.perform(get("/api/contacts/4fe25947-ecab-489c-a881-e0057124e408")
-            .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForRobert()))
-            .accept(MediaType.ALL)
-        )
-        .andExpect(status().isBadRequest())
-        .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-        .andExpect(content().string("Contact belongs to another user"));
-    }
+        private static List<Arguments> args() {
+            return methodSourceArgs()
+                .jwtWithUUIDFor(Users.ROBERT, "84edd1b9-89a5-4107-a84d-435676c2b8f5")
+                .jwtWithUUIDFor(Users.JOE, "35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7").done();
+        }
 
-    @Test
-    @DisplayName("PATCH /api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef -> 400 BAD REQUEST")
-    void should_respond_400_when_trying_to_update_a_concat_that_does_not_belong_to_the_current_user() throws Exception {
-        mockMvc.perform(patch("/api/contacts/b621650d-4a81-4016-a917-4a8a4992aaef")
-            .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJoe()))
-            .contentType(MediaType.APPLICATION_JSON)
-            .content("{\"name\": \"Billy\"}")
-            .accept(MediaType.ALL)
-        )
-        .andExpect(status().isBadRequest())
-        .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-        .andExpect(content().string("Contact belongs to another user"));
-    }
+        @ParameterizedTest(name = "jwt = {0} DELETE /api/contacts/{1}  -> 200")
+        @MethodSource("args")
+        @DisplayName("Should delete a contact for a user successfully")
+        void shouldDeleteAContactForAUserSuccessfully(Jwt jwt, String contactId) throws Exception {
+            mockMvc.perform(delete("/api/contacts/" + contactId)
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt))
+                .accept(MediaType.ALL)
+            )
+            .andExpect(status().isOk());
+        }
 
-    @Test
-    @DisplayName("DELETE /api/contacts/8fb2bd75-9aec-4cc5-b77b-a95f06081388 -> 400 BAD_REQUEST")
-    public void should_respond_400_when_deleting_a_concat_whose_user_does_not_own_it() throws Exception {
-        mockMvc.perform(delete("/api/contacts/8fb2bd75-9aec-4cc5-b77b-a95f06081388")
-            .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(TestResources.jwtForJoe()))
-            .accept(MediaType.ALL)
-        )
-        .andExpect(status().isBadRequest())
-        .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
-        .andExpect(content().string("Contact belongs to another user"));
-    }
+        @Test
+        @DisplayName("When deleting a contact that does not belong to a user then should respond 400")
+        void whenDeletingAContactThatDoesNotBelongToAUser_thenShouldRespond400() throws Exception {
+            mockMvc.perform(delete("/api/contacts/84edd1b9-89a5-4107-a84d-435676c2b8f5")
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JOE.jwt()))
+                .accept(MediaType.ALL)
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.TEXT_PLAIN))
+            .andExpect(content().string("Contact belongs to another user"));
+        }
 
-    @Test
-    @DisplayName("GET /api/contacts -> 401 UNAUTHORIZED")
-    public void should_deny_access_when_trying_to_get_contacts_with_no_authentication() throws Exception {
-        mockMvc.perform(get("/api/contacts").accept(MediaType.ALL))
-        .andExpect(status().isUnauthorized());
-    }
+        @Test
+        @DisplayName("When deleting a non-existing contact then should respond 404")
+        void whenDeletingANonExistingContact_thenShouldRespond404() throws Exception {
+            mockMvc.perform(delete("/api/contacts/892002b1-0153-465f-b084-31058cfaf1e7")
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.ROBERT.jwt()))
+                .accept(MediaType.ALL)
+            )
+            .andExpect(status().isNotFound())
+            .andExpect(content().contentType(MediaType.TEXT_PLAIN))
+            .andExpect(content().string("Contact not found"));
+        }
 
-    @Test
-    @DisplayName("GET /api/contacts/8fb2bd75-9aec-4cc5-b77b-a95f06081388")
-    public void access_should_be_denied_when_tried_get_a_contact_without_authorization() throws Exception {
-        mockMvc.perform(get("/api/contacts/8fb2bd75-9aec-4cc5-b77b-a95f06081388").accept(MediaType.ALL))
-        .andExpect(status().isUnauthorized());
+        @Test
+        @DisplayName("When deleting a non-existing contact then should respond 400")
+        void whenDeletingAContactForANonExistingUser_thenShouldRespond400() throws Exception {
+            mockMvc.perform(delete("/api/contacts/84edd1b9-89a5-4107-a84d-435676c2b8f5")
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JULIA.jwt()))
+                .accept(MediaType.ALL)
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.TEXT_PLAIN))
+            .andExpect(content().string("Contact belongs to another user"));
+        }
     }
 }
