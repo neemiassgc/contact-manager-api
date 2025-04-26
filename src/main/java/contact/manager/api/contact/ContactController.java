@@ -19,7 +19,7 @@ public class ContactController implements ContactControllerDoc {
 
     private final ContactManagerService contactManagerService;
 
-    @GetMapping()
+    @GetMapping
     public List<ContactData> getAll(@AuthenticationPrincipal Jwt jwt) {
         return Contact.toListOfContactData(contactManagerService.findAllByUserId(getUserFromSub(jwt)));
     }
@@ -29,7 +29,7 @@ public class ContactController implements ContactControllerDoc {
         return contactManagerService.findByIdWithUser(id, getUserFromSub(jwt)).toContactDta();
     }
 
-    @PostMapping()
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@RequestBody @Validated ContactData contactData, @AuthenticationPrincipal Jwt jwt) {
         contactManagerService.saveWithUser(Contact.toContact(contactData), getUserFromSub(jwt));
