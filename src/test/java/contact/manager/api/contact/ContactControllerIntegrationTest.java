@@ -388,6 +388,9 @@ public class ContactControllerIntegrationTest {
                 .accept(MediaType.ALL)
             )
             .andExpect(status().isOk());
+
+            int actualContactsCount = contactManagerService.findAll().size();
+            assertThat(actualContactsCount).isEqualTo(6);
         }
 
         @Test
