@@ -1,22 +1,22 @@
 package contact.manager.api.user;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static contact.manager.api.misc.TestResources.*;
 
 @DataJpaTest
 @Import({UserServiceImpl.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class UserServiceTest {
+public class UserServiceIntegrationTest {
 
     @Autowired
     private UserService userService;
@@ -24,61 +24,82 @@ public class UserServiceTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Test
-    void should_return_a_user_by_its_id() {
-        final User user = userService.findById("auth0|94afd9e7294a59e73e6abfbd");
+    @Nested
+    public class Create {
 
-        assertThat(user).isNotNull();
-        assertThat(user).extracting("username").isEqualTo("robert");
+        @Test
+        @DisplayName("Should create a new user successfully")
+        void shouldCreateANewUserSuccessfully() {
+            User newUser = new User("1933245856", "Elise");
+
+            userService.create(newUser);
+
+            int actualUsersCount = userRepository.findAll().size();
+            assertThat(actualUsersCount).isEqualTo(4);
+        }
+
+        @Test
+        @DisplayName("When creating a user that already exists then should fail with an exception")
+        void whenCreatingAUserThatAlreadyExists_thenShouldFailWithAnException() {
+            User existingUser = new User(Users.JOE.id(), "Joe");
+
+            Throwable throwable = catchThrowable(() -> userService.create(existingUser));
+
+            assertThat(throwable).isNotNull();
+            assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+            assertThat(throwable).hasMessageContaining("User already exists");
+        }
     }
 
-    @Test
-    void should_throw_an_error_when_user_does_not_exist() {
-        final Throwable throwable = catchThrowable(() -> userService.findById("auth0|adea243241c3754b349213d6"));
+    @Nested
+    public class FindById {
 
-        assertThat(throwable).isNotNull();
-        assertThat(throwable).isInstanceOf(ResponseStatusException.class);
-        assertThat(((ResponseStatusException) throwable).getReason()).isEqualTo("User not found");
-        assertThat(((ResponseStatusException) throwable).getStatusCode()).isEqualTo(HttpStatusCode.valueOf(404));
+        @Test
+        @DisplayName("When provided an id then should return a user")
+        void whenProvidedAnId_thenShouldReturnAUser() {
+            String userId = Users.ROBERT.id();
+
+            User actualUser = userService.findById(userId);
+
+            assertThat(actualUser).extracting(User::getUsername).isEqualTo("robert");
+        }
+
+        @Test
+        @DisplayName("When provided a non-existing id then should throw an exception")
+        void whenProvidedANonExistingId_thenShouldThrowAnException() {
+            String nonExistingId = "89012347234";
+
+            Throwable throwable = catchThrowable(() -> userService.findById(nonExistingId));
+
+            assertThat(throwable).isNotNull();
+            assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+            assertThat(throwable).hasMessageContaining("User not found");
+        }
     }
 
-    @Test
-    void should_create_a_new_user_successfully() {
-        final User newUser = new User("auth0|e721524323da766879dfce8b", "Kevin");
+    @Nested
+    public class FindByUsername {
 
-        userService.create(newUser);
+        @Test
+        @DisplayName("When provided a username then should return a user")
+        void whenProvidedAUsername_thenShouldReturnAUser() {
+            String username = "robert";
 
-        final List<User> actualUsers = userRepository.findAll();
+            User actualUser = userService.findByUsername(username);
 
-        assertThat(actualUsers).hasSize(4);
-    }
+            assertThat(actualUser).extracting(User::getUsername).isEqualTo("robert");
+        }
 
-    @Test
-    void should_throw_an_error_when_trying_to_create_a_user_that_already_exists() {
-        final User newUser = new User("auth0|3baa9bc92c9c5decbda32f76", "joe");
+        @Test
+        @DisplayName("When provided a non-existing username then should throw an exception")
+        void whenProvidedANonExistingUsername_thenShouldThrowAnException() {
+            String nonExistingUsername = "jeff";
 
-        final Throwable throwable = catchThrowable(() -> userService.create(newUser));
+            Throwable throwable = catchThrowable(() -> userService.findById(nonExistingUsername));
 
-        assertThat(throwable).isNotNull();
-        assertThat(throwable).isInstanceOf(ResponseStatusException.class);
-        assertThat(((ResponseStatusException) throwable).getReason()).isEqualTo("User already exists");
-        assertThat(((ResponseStatusException) throwable).getStatusCode()).isEqualTo(HttpStatusCode.valueOf(400));
-    }
-
-    @Test
-    void should_retrieve_a_user_by_their_username_successfully() {
-        final User user = userService.findByUsername("robert");
-
-        assertThat(user).isNotNull();
-    }
-
-    @Test
-    void should_throw_an_exception_when_retrieving_a_user_that_does_not_exist() {
-        final Throwable throwable = catchThrowable(() -> userService.findByUsername("Cris"));
-
-        assertThat(throwable).isNotNull();
-        assertThat(throwable).isInstanceOf(ResponseStatusException.class);
-        assertThat(((ResponseStatusException) throwable).getReason()).isEqualTo("User not found");
-        assertThat(((ResponseStatusException) throwable).getStatusCode()).isEqualTo(HttpStatusCode.valueOf(404));
+            assertThat(throwable).isNotNull();
+            assertThat(throwable).isInstanceOf(ResponseStatusException.class);
+            assertThat(throwable).hasMessageContaining("User not found");
+        }
     }
 }
