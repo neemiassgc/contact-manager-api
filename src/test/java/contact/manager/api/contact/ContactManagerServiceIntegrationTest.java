@@ -212,7 +212,8 @@ public class ContactManagerServiceIntegrationTest {
                 .phoneNumbers(Collections.emptyMap())
                 .build();
 
-            final Contact contact = Contact.toContact(contactData, getMockedUser(Users.JOE.id(), "joe"));
+            final Contact contact = Contact.toContact(contactData);
+            contact.setUser(getMockedUser(Users.JOE.id(), "joe"));
 
             contactManagerServiceUnderTest.updateWithUser(contact, Users.JOE.id());
 

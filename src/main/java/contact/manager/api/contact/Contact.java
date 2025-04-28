@@ -91,9 +91,9 @@ public class Contact {
         return new ContactData(this);
     }
 
-    public static Contact toContact(final ContactData contactData, final User user) {
+    public static Contact toContact(final ContactData contactData, UUID id) {
         final Contact newContact = toContact(contactData);
-        newContact.setUser(user);
+        newContact.setId(id);
         return newContact;
     }
 
