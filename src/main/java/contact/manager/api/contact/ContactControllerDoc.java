@@ -110,7 +110,7 @@ interface ContactControllerDoc {
         },
         security = @SecurityRequirement(name = "oauth2")
     )
-    void update(ContactData contactData, Jwt jwt);
+    void update(UUID id, ContactData contactData, Jwt jwt);
 
     @Operation(
         description = "Delete a user's contact by its id",

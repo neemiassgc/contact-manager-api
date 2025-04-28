@@ -311,12 +311,12 @@ public class ContactControllerIntegrationTest {
                 .jwtWithUUIDFor(Users.JOE, "35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7").done();
         }
 
-        @ParameterizedTest(name = "jwt = {0} PUT /api/contacts/  -> 200")
+        @ParameterizedTest(name = "jwt = {0} PUT /api/contacts/{1}  -> 200")
         @MethodSource("args")
         @DisplayName("Should entirely update a contact for a user successfully")
         void shouldEntirelyUpdateAContactForAUserSuccessfully(Jwt jwt, String contactId) throws Exception {
             String newContactJson = newContactJsonWithId(contactId);
-            mockMvc.perform(put("/api/contacts")
+            mockMvc.perform(put("/api/contacts/" + contactId)
                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -328,10 +328,11 @@ public class ContactControllerIntegrationTest {
         @Test
         @DisplayName("When updating a contact that does not belong to a user then should respond 400")
         void whenUpdatingAContactThatDoesNotBelongToAUser_thenShouldRespond400() throws Exception {
-            mockMvc.perform(put("/api/contacts")
+            String contactId = "b621650d-4a81-4016-a917-4a8a4992aaef";
+            mockMvc.perform(put("/api/contacts/" + contactId)
                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JOE.jwt()))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(newContactJsonWithId("b621650d-4a81-4016-a917-4a8a4992aaef"))
+                .content(newContactJsonWithId(contactId))
                 .accept(MediaType.ALL)
             )
             .andExpect(status().isBadRequest())
@@ -343,7 +344,7 @@ public class ContactControllerIntegrationTest {
         @DisplayName("When updating a contact that does not exist then should respond 404")
         void whenUpdatingAContactThatDoesNotExist_thenShouldRespond404() throws Exception {
             String nonExistingContactId = "b4f5cda4-9765-4dd2-a4c4-b178770cfd88";
-            mockMvc.perform(put("/api/contacts")
+            mockMvc.perform(put("/api/contacts/" + nonExistingContactId)
                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.ROBERT.jwt()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(newContactJsonWithId(nonExistingContactId))
@@ -354,11 +355,11 @@ public class ContactControllerIntegrationTest {
             .andExpect(content().string("Contact not found"));
         }
 
-        @ParameterizedTest(name = "jwt = {0} PUT /api/contacts/ -> 400")
+        @ParameterizedTest(name = "jwt = {0} PUT /api/contacts/{1} -> 400")
         @MethodSource("args")
         void whenEnteredAMalFormedContactToUpdate_thenShouldRespond400AlongWithFieldViolations(Jwt jwt, String contactId) throws Exception {
             final String malFormedJson = "{\"name\": \"Bill\"}";
-            mockMvc.perform(put("/api/contacts")
+            mockMvc.perform(put("/api/contacts/" + contactId)
                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(malFormedJson)

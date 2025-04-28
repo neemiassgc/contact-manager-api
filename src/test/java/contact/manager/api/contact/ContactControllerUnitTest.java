@@ -363,7 +363,7 @@ public class ContactControllerUnitTest {
             return methodSourceArgs().jwtFor(Users.ROBERT).jwtFor(Users.JOE).done();
         }
 
-        @ParameterizedTest(name = "jwt = {0} PUT /api/contacts -> 200")
+        @ParameterizedTest(name = "jwt = {0} PUT /api/contacts/ff55ef9d-e912-4548-a790-50158470fafa -> 200")
         @MethodSource("args")
         @DisplayName("Should entirely update a contact for a user successfully")
         void shouldEntirelyUpdateAContactForAUserSuccessfully(Jwt jwt) throws Exception {
@@ -371,7 +371,7 @@ public class ContactControllerUnitTest {
             doNothing().when(contactManagerService)
                 .updateWithUser(any(Contact.class), eq(userId));
 
-            mockMvc.perform(put("/api/contacts")
+            mockMvc.perform(put("/api/contacts/ff55ef9d-e912-4548-a790-50158470fafa")
                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -382,13 +382,13 @@ public class ContactControllerUnitTest {
             verify(contactManagerService, once()).updateWithUser(any(Contact.class), eq(userId));
         }
 
-        @ParameterizedTest(name = "jwt = {0} PUT /api/contacts -> 400")
+        @ParameterizedTest(name = "jwt = {0} PUT /api/contacts/ff55ef9d-e912-4548-a790-50158470fafa -> 400")
         @MethodSource("args")
         @DisplayName("When updating a contact that is not structured correctly then should respond 400 with field violations")
         void whenUpdatingAContactThatIsNotStructuredCorrectly_thenShouldRespond400WithFieldViolations(Jwt jwt) throws Exception {
             final String requestBody = "{\"name\": \"Bill\"}";
 
-            mockMvc.perform(post("/api/contacts")
+            mockMvc.perform(put("/api/contacts/ff55ef9d-e912-4548-a790-50158470fafa")
                 .content(requestBody)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.ALL)
@@ -408,7 +408,7 @@ public class ContactControllerUnitTest {
             doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage))
                 .when(contactManagerService).updateWithUser(any(Contact.class), eq(Users.JOE.id()));
 
-            mockMvc.perform(put("/api/contacts")
+            mockMvc.perform(put("/api/contacts/ff55ef9d-e912-4548-a790-50158470fafa")
                 .accept(MediaType.ALL)
                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JOE.jwt()))
                 .content(JSON_BODY)
@@ -421,7 +421,7 @@ public class ContactControllerUnitTest {
             verify(contactManagerService, once()).updateWithUser(any(Contact.class), eq(Users.JOE.id()));
         }
 
-        @ParameterizedTest(name = "jwt = {0} PUT /api/contacts/{1} -> 404")
+        @ParameterizedTest(name = "jwt = {0} PUT /api/contacts/ff55ef9d-e912-4548-a790-50158470fafa -> 404")
         @MethodSource("args")
         @DisplayName("When updating a contact that does not exist then should respond 404")
         void whenUpdatingAContactThatDoesNotExist_thenShouldRespond404(Jwt jwt) throws Exception {
@@ -430,7 +430,7 @@ public class ContactControllerUnitTest {
             doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage))
                 .when(contactManagerService).updateWithUser(any(Contact.class), eq(userId));
 
-            mockMvc.perform(put("/api/contacts")
+            mockMvc.perform(put("/api/contacts/ff55ef9d-e912-4548-a790-50158470fafa")
                 .accept(MediaType.ALL)
                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt))
                 .contentType(MediaType.APPLICATION_JSON)

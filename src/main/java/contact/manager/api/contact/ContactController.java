@@ -35,12 +35,10 @@ public class ContactController implements ContactControllerDoc {
         contactManagerService.saveWithUser(Contact.toContact(contactData), getUserFromSub(jwt));
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@RequestBody @Validated ContactData contactData, @AuthenticationPrincipal Jwt jwt) {
-        if (Objects.isNull(contactData.getId()))
-            contactManagerService.saveWithUser(Contact.toContact(contactData), getUserFromSub(jwt));
-        else contactManagerService.updateWithUser(Contact.toContact(contactData), getUserFromSub(jwt));
+    public void update(@PathVariable(value = "id") UUID id, @RequestBody @Validated ContactData contactData, @AuthenticationPrincipal Jwt jwt) {
+        contactManagerService.updateWithUser(Contact.toContact(contactData, id), getUserFromSub(jwt));
     }
 
     @DeleteMapping("/{id}")
