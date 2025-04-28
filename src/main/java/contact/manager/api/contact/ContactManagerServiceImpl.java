@@ -50,7 +50,8 @@ public class ContactManagerServiceImpl implements ContactManagerService {
 
     @Override
     public void updateWithUser(Contact contact, String userId) {
-        findByIdWithUser(contact.getId(), userId);
+        Contact contactFromStorage = findByIdWithUser(contact.getId(), userId);
+        contact.setUser(contactFromStorage.getUser());
         save(contact);
     }
 

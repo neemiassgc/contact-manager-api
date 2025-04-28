@@ -325,6 +325,20 @@ public class ContactControllerIntegrationTest {
             .andExpect(status().isOk());
         }
 
+        @ParameterizedTest(name = "jwt = {0} PUT /api/contacts/{1}  -> 200")
+        @MethodSource("args")
+        @DisplayName("When provided Json data without id then should update successfully responding 200")
+        void whenProvidedJsonDataWithoutId_thenShouldUpdateSuccessfullyResponding200(Jwt jwt, String contactId) throws Exception {
+            String newContactJson = newContactJsonWithoutId();
+            mockMvc.perform(put("/api/contacts/" + contactId)
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(newContactJson)
+            )
+            .andExpect(status().isOk());
+        }
+
         @Test
         @DisplayName("When updating a contact that does not belong to a user then should respond 400")
         void whenUpdatingAContactThatDoesNotBelongToAUser_thenShouldRespond400() throws Exception {

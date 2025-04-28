@@ -382,6 +382,25 @@ public class ContactControllerUnitTest {
             verify(contactManagerService, once()).updateWithUser(any(Contact.class), eq(userId));
         }
 
+        @ParameterizedTest(name = "jwt = {0} PUT /api/contacts/ff55ef9d-e912-4548-a790-50158470faf  -> 200")
+        @MethodSource("args")
+        @DisplayName("When provided Json data without id then should update successfully responding 200")
+        void whenProvidedJsonDataWithoutId_thenShouldUpdateSuccessfullyResponding200(Jwt jwt) throws Exception {
+            String userId = jwt.getClaimAsString("id");
+            doNothing().when(contactManagerService)
+                .updateWithUser(any(Contact.class), eq(userId));
+
+            mockMvc.perform(put("/api/contacts/ff55ef9d-e912-4548-a790-50158470fafa")
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(newContactJsonWithoutId())
+            )
+            .andExpect(status().isOk());
+
+            verify(contactManagerService, once()).updateWithUser(any(Contact.class), eq(userId));
+        }
+
         @ParameterizedTest(name = "jwt = {0} PUT /api/contacts/ff55ef9d-e912-4548-a790-50158470fafa -> 400")
         @MethodSource("args")
         @DisplayName("When updating a contact that is not structured correctly then should respond 400 with field violations")

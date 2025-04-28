@@ -7,10 +7,7 @@ import contact.manager.api.contact.Contact;
 import contact.manager.api.contact.Address;
 import org.mockito.verification.VerificationMode;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Named.named;
@@ -329,9 +326,9 @@ public final class TestResources {
     }
 
     public static String newContactJsonWithId(String id) {
-        return """
+        String jsonData =  """
         {
-            "id": "{id}",
+            {id}
             "name": "Isabella Rodriguez",
             "phoneNumbers": {
                  "home": "+15551234567",
@@ -353,10 +350,18 @@ public final class TestResources {
                 }
             }
         }
-        """.replace("{id}", id);
+        """;
+
+        if (Objects.isNull(id))
+            return jsonData.replace("{id}", "");
+        return jsonData.replace("{id}", String.format("\"id\": \"%s\",", id));
     }
 
     public static String newContactJson() {
         return newContactJsonWithId("ff55ef9d-e912-4548-a790-50158470fafa");
+    }
+
+    public static String newContactJsonWithoutId() {
+        return newContactJsonWithId(null);
     }
 }
