@@ -44,7 +44,7 @@ public class Address {
     private String state;
 
     @NotNull(message = "zipcode is missing")
-    @Min(value = 5, message = "zipcode is too short")
+    @Min(value = 4, message = "zipcode is too short")
     @Max(value = 15, message = "zipcode is too long")
     @Column(nullable = false, length = 15)
     private String zipcode;
