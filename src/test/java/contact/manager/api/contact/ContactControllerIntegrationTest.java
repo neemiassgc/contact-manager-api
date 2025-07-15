@@ -59,6 +59,7 @@ public class ContactControllerIntegrationTest {
                 case "joe" -> {
                     ra
                     .andExpect(jsonPath("$[*].name").value(containsInAnyOrder("Greg from accounting", "Coworker Fred", "Sister Monica")))
+                    .andExpect(jsonPath("$[*].addedOn").isNotEmpty())
                     .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(5)))
                     .andExpect(jsonPath("$[*].addresses.*").value(hasSize(4)))
                     .andExpect(jsonPath("$[*].emails.*").value(hasSize(3)));
@@ -66,6 +67,7 @@ public class ContactControllerIntegrationTest {
                 case "robert" -> {
                     ra
                     .andExpect(jsonPath("$[*].name").value(containsInAnyOrder("Best friend Julia", "Mom", "Pizza and burgers", "Uncle Jeff")))
+                    .andExpect(jsonPath("$[*].addedOn").isNotEmpty())
                     .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(7)))
                     .andExpect(jsonPath("$[*].addresses.*").value(hasSize(7)))
                     .andExpect(jsonPath("$[*].emails.*").value(hasSize(7)));
@@ -113,6 +115,7 @@ public class ContactControllerIntegrationTest {
                 case "robert" -> {
                     ra
                     .andExpect(jsonPath("$.name").value("Best friend Julia"))
+                    .andExpect(jsonPath("$.addedOn").isNotEmpty())
                     .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(3)))
                     .andExpect(jsonPath("$.emails.*").value(hasSize(3)))
                     .andExpect(jsonPath("$.addresses.*").value(hasSize(1)));
@@ -120,6 +123,7 @@ public class ContactControllerIntegrationTest {
                 case "joe" -> {
                     ra
                     .andExpect(jsonPath("$.name").value("Greg from accounting"))
+                    .andExpect(jsonPath("$.addedOn").isNotEmpty())
                     .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(1)))
                     .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
                     .andExpect(jsonPath("$.addresses.*").value(hasSize(2)));

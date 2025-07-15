@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,9 @@ public class Contact {
 
     @Column(nullable = false, length = 140)
     private String name;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP")
+    private Instant addedOn = Instant.now();
 
     @ElementCollection
     @CollectionTable(name = "phone_numbers", joinColumns = @JoinColumn(name = "contact_id"))

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 
@@ -13,30 +14,26 @@ import java.util.UUID;
 public final class ContactData extends ConstrainedContact {
 
     private final UUID id;
+    private final Instant addedOn;
 
     @Builder
     public ContactData(
         final UUID id,
         final String name,
+        final Instant addedOn,
         final Map<String, String> phoneNumbers,
         final Map<String, String> emails,
         final Map<String, Address> addresses
     ) {
         super(name, phoneNumbers, emails, addresses);
+        this.addedOn = addedOn;
         this.id = id;
-    }
-
-    public ContactData(final UUID id, final String name, final ConstrainedContact constrainedContact) {
-        this(id, name, constrainedContact.getPhoneNumbers(), constrainedContact.getEmails(), constrainedContact.getAddresses());
-    }
-
-    public ContactData(final ConstrainedContact constrainedContact) {
-        this(null, constrainedContact.getName(), constrainedContact);
     }
 
     public ContactData(final Contact contact) {
         super(contact.getName(), contact.getPhoneNumberMap(), contact.getEmailMap(), contact.getAddressMap());
         this.id = contact.getId();
+        this.addedOn = contact.getAddedOn();
     }
 
     @Override

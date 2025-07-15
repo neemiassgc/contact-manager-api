@@ -26,7 +26,7 @@ public final class TestResources {
 
         final Contact contact1 = new Contact("Craig Bennett", UUID.randomUUID());
         contact1.setUser(thomas);
-        contact1.putPhoneNumber("home", "+44  078 5357 6955");
+        contact1.putPhoneNumber("home", "+44 078 5357 6955");
         contact1.putEmail("main", "ethan.morris@yahoo.co.uk");
         contact1.putAddress("home", Address.builder()
             .street("2062 Maud Street")
