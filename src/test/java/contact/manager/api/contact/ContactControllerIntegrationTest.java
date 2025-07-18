@@ -20,8 +20,8 @@ import java.util.List;
 
 import static contact.manager.api.misc.TestResources.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -60,6 +60,7 @@ public class ContactControllerIntegrationTest {
                     ra
                     .andExpect(jsonPath("$[*].name").value(containsInAnyOrder("Greg from accounting", "Coworker Fred", "Sister Monica")))
                     .andExpect(jsonPath("$[*].addedOn").isNotEmpty())
+                    .andExpect(jsonPath("$[*].birthday").isNotEmpty())
                     .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(5)))
                     .andExpect(jsonPath("$[*].addresses.*").value(hasSize(4)))
                     .andExpect(jsonPath("$[*].emails.*").value(hasSize(3)));
@@ -68,6 +69,7 @@ public class ContactControllerIntegrationTest {
                     ra
                     .andExpect(jsonPath("$[*].name").value(containsInAnyOrder("Best friend Julia", "Mom", "Pizza and burgers", "Uncle Jeff")))
                     .andExpect(jsonPath("$[*].addedOn").isNotEmpty())
+                    .andExpect(jsonPath("$[*].birthday").isNotEmpty())
                     .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(7)))
                     .andExpect(jsonPath("$[*].addresses.*").value(hasSize(7)))
                     .andExpect(jsonPath("$[*].emails.*").value(hasSize(7)));
@@ -116,6 +118,7 @@ public class ContactControllerIntegrationTest {
                     ra
                     .andExpect(jsonPath("$.name").value("Best friend Julia"))
                     .andExpect(jsonPath("$.addedOn").isNotEmpty())
+                    .andExpect(jsonPath("$.birthday").isNotEmpty())
                     .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(3)))
                     .andExpect(jsonPath("$.emails.*").value(hasSize(3)))
                     .andExpect(jsonPath("$.addresses.*").value(hasSize(1)));
@@ -124,6 +127,7 @@ public class ContactControllerIntegrationTest {
                     ra
                     .andExpect(jsonPath("$.name").value("Greg from accounting"))
                     .andExpect(jsonPath("$.addedOn").isNotEmpty())
+                    .andExpect(jsonPath("$.birthday").isNotEmpty())
                     .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(1)))
                     .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
                     .andExpect(jsonPath("$.addresses.*").value(hasSize(2)));
@@ -274,35 +278,42 @@ public class ContactControllerIntegrationTest {
         @Test
         @DisplayName("When creating a contact for a non-existing user then should respond 404")
         void whenCreatingAContactForANonExistingUser_thenShouldRespond404() throws Exception {
-            final String jsonContent = """
-            {
-                "name": "Steve",
-                "phoneNumbers": {
-                    "personal": "+817283640198"
-                },
-                "emails": {
-                    "main": "stevan@mymail.com"
-                },
-                "addresses": {
-                    "home": {
-                        "country": "United States",
-                        "street": "467 Jennifer Lane",
-                        "state": "North Carolina",
-                        "city": "Cary",
-                        "zipcode": "27513"
-                    }
-                }
-            }
-            """;
-
             mockMvc.perform(post("/api/contacts")
-                .content(jsonContent)
+                .content(newContactJsonWithoutId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.ALL)
                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JULIA.jwt()))
             )
             .andExpect(status().isNotFound())
             .andExpect(content().string("User not found"));
+        }
+
+        @Test
+        @DisplayName("When entered an invalid date format then should respond 400 with error message")
+        void whenEnteredInvalidDateFormat_thenShouldRespond400WithErrorMessage() throws Exception {
+            mockMvc.perform(post("/api/contacts")
+                .content(newContactJsonWithoutId().replace("1995-06-15", "1990-15-01"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.ALL)
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JOE.jwt()))
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+            .andExpect(content().string(containsString("Invalid value for MonthOfYear")));
+        }
+
+        @Test
+        @DisplayName("When is not possible to parse the date then should respond 400 with error message")
+        void whenIsNotPossibleToParseTheDateThenShouldRespond400WithErrorMessage() throws Exception {
+            mockMvc.perform(post("/api/contacts")
+                .content(newContactJsonWithoutId().replace("1995-06-15", "199015-15"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.ALL)
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JOE.jwt()))
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+            .andExpect(content().string("Invalid date format. Expected format is YYYY-MM-DD."));
         }
     }
 
@@ -386,6 +397,34 @@ public class ContactControllerIntegrationTest {
             .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.fieldViolations").isMap());
+        }
+
+        @Test
+        @DisplayName("When updating a contact with invalid date format then should respond 400 with error message")
+        void whenUpdatingAContactWithInvalidDateFormatThenShouldRespond400WithErrorMessage() throws Exception {
+            mockMvc.perform(post("/api/contacts")
+                .content(newContactJsonWithoutId().replace("1995-06-15", "1990-15-15"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.ALL)
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JOE.jwt()))
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+            .andExpect(content().string(containsString("Invalid value for MonthOfYear")));
+        }
+
+        @Test
+        @DisplayName("When updating a contact whose birthday is not parsable then should respond 400 with error message")
+        void whenUpdatingAContactWhoseBirthdayIsNotParsableThenShouldRespond400WithErrorMessage() throws Exception {
+            mockMvc.perform(post("/api/contacts")
+                .content(newContactJsonWithoutId().replace("1995-06-15", "199015-15"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.ALL)
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JOE.jwt()))
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+            .andExpect(content().string("Invalid date format. Expected format is YYYY-MM-DD."));
         }
     }
 

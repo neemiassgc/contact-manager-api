@@ -91,15 +91,14 @@ public class UserControllerIntegrationTest {
         public void whenProvidedAMalformedJson_thenShouldRespond400() throws Exception {
             final String malformedJson = "{\"username\":}";
             mockMvc.perform(post("/api/users").with(
-                    SecurityMockMvcRequestPostProcessors.jwt().jwt(DEFAULT_JWT)
-                )
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.ALL)
-                .content(malformedJson)
+                SecurityMockMvcRequestPostProcessors.jwt().jwt(DEFAULT_JWT)
+            )
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.ALL)
+            .content(malformedJson)
             )
             .andExpect(status().isBadRequest())
-            .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
-            .andExpect(content().string(Matchers.containsString("JSON parse error")));
+            .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN));
         }
 
         @Test

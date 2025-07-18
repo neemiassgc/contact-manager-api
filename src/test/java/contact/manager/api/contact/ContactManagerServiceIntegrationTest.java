@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +89,7 @@ public class ContactManagerServiceIntegrationTest {
 
             assertThat(contact).isNotNull();
             assertThat(contact).extracting(Contact::getName).isEqualTo("Greg from accounting");
+            assertThat(contact).extracting(Contact::getBirthday).extracting(LocalDate::toString).isEqualTo("1980-05-15");
             assertThat(contact).extracting(Contact::getPhoneNumberMap).satisfies(phoneNumberMap -> {
                 assertThat(phoneNumberMap).isNotNull();
                 assertThat(phoneNumberMap).hasSize(1);
@@ -137,6 +138,7 @@ public class ContactManagerServiceIntegrationTest {
             final Contact newContact = new Contact("boss");
             newContact.putPhoneNumber("office", "+1(57)8131-9975");
             newContact.putEmail("business", "main.contact@company.com");
+            newContact.setBirthday(LocalDate.of(1985, 3, 25));
             final Address companyAddress = Address.builder()
                 .country("US")
                 .street("1767 Heavner Avenue")
@@ -162,6 +164,7 @@ public class ContactManagerServiceIntegrationTest {
             final Contact newContact = new Contact("Aunt Julia");
             newContact.putPhoneNumber("home", "+1(61)7982-7401");
             newContact.putPhoneNumber("new", "juliaandherself.1@gmail.com");
+            newContact.setBirthday(LocalDate.of(1980, 1, 15));
             final Address homeAddress = Address.builder()
                 .country("US")
                 .street("456 Roosevelt Street")
@@ -183,6 +186,7 @@ public class ContactManagerServiceIntegrationTest {
             final Contact newContact = new Contact("boss");
             newContact.putPhoneNumber("office", "+1(57)8131-9975");
             newContact.putEmail("business", "main.contact@company.com");
+            newContact.setBirthday(LocalDate.of(1985, 3, 25));
             final Address companyAddress = Address.builder()
                 .country("US")
                 .street("1767 Heavner Avenue")
@@ -211,6 +215,7 @@ public class ContactManagerServiceIntegrationTest {
                 .addresses(Collections.emptyMap())
                 .emails(Collections.emptyMap())
                 .phoneNumbers(Collections.emptyMap())
+                .birthday(LocalDate.of(1990, 5, 15))
                 .build();
 
             final Contact contact = Contact.toContact(contactData);

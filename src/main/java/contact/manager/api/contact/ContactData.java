@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.UUID;
 
@@ -21,17 +22,24 @@ public final class ContactData extends ConstrainedContact {
         final UUID id,
         final String name,
         final Instant addedOn,
+        final LocalDate birthday,
         final Map<String, String> phoneNumbers,
         final Map<String, String> emails,
         final Map<String, Address> addresses
     ) {
-        super(name, phoneNumbers, emails, addresses);
+        super(name, birthday, phoneNumbers, emails, addresses);
         this.addedOn = addedOn;
         this.id = id;
     }
 
     public ContactData(final Contact contact) {
-        super(contact.getName(), contact.getPhoneNumberMap(), contact.getEmailMap(), contact.getAddressMap());
+        super(
+            contact.getName(),
+            contact.getBirthday(),
+            contact.getPhoneNumberMap(),
+            contact.getEmailMap(),
+            contact.getAddressMap()
+        );
         this.id = contact.getId();
         this.addedOn = contact.getAddedOn();
     }

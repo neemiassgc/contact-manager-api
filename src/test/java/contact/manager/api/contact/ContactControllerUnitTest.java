@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -23,8 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static contact.manager.api.misc.TestResources.*;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -40,17 +40,18 @@ public class ContactControllerUnitTest {
     private MockMvc mockMvc;
 
     private final String JSON_BODY = """
-    {
+        {
         "id": "ff55ef9d-e912-4548-a790-50158470fafa",
-       "name": "Isabella Rodriguez",
-       "phoneNumbers": {
-         "home": "+15551234567",
-         "work": "+15559876543",
-         "mobile": "+15555555555"
-       },
+        "name": "Isabella Rodriguez",
+        "birthday": "1990-05-15",
+        "phoneNumbers": {
+        "home": "+15551234567",
+        "work": "+15559876543",
+        "mobile": "+15555555555"
+        },
        "emails": {
          "personal": "isabella.rodriguez@example.com",
-         "work": "irodriguez@company.com",
+         "work": "irodriguez@compArgumentMatchers.any.com",
          "other": "bella.r@email.net"
        },
        "addresses": {
@@ -97,6 +98,7 @@ public class ContactControllerUnitTest {
                     resultActions
                         .andExpect(jsonPath("$[*].name").value(containsInAnyOrder("Greg from accounting", "Coworker Fred", "Sister Monica")))
                         .andExpect(jsonPath("$[*].addedOn").isNotEmpty())
+                        .andExpect(jsonPath("$[*].birthday").isNotEmpty())
                         .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(5)))
                         .andExpect(jsonPath("$[*].addresses.*").value(hasSize(4)))
                         .andExpect(jsonPath("$[*].emails.*").value(hasSize(3)));
@@ -105,6 +107,7 @@ public class ContactControllerUnitTest {
                     resultActions
                         .andExpect(jsonPath("$[*].name").value(containsInAnyOrder("Best friend Julia", "Mom", "Pizza and burgers", "Uncle Jeff")))
                         .andExpect(jsonPath("$[*].addedOn").isNotEmpty())
+                        .andExpect(jsonPath("$[*].birthday").isNotEmpty())
                         .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(7)))
                         .andExpect(jsonPath("$[*].addresses.*").value(hasSize(7)))
                         .andExpect(jsonPath("$[*].emails.*").value(hasSize(7)));
@@ -164,6 +167,7 @@ public class ContactControllerUnitTest {
                     ra
                     .andExpect(jsonPath("$.name").value("Coworker Fred"))
                     .andExpect(jsonPath("$.addedOn").isNotEmpty())
+                    .andExpect(jsonPath("$.birthday").isNotEmpty())
                     .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(3)))
                     .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
                     .andExpect(jsonPath("$.addresses.*").value(hasSize(1)));
@@ -172,6 +176,7 @@ public class ContactControllerUnitTest {
                     ra
                     .andExpect(jsonPath("$.name").value("Greg from accounting"))
                     .andExpect(jsonPath("$.addedOn").isNotEmpty())
+                    .andExpect(jsonPath("$.birthday").isNotEmpty())
                     .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(1)))
                     .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
                     .andExpect(jsonPath("$.addresses.*").value(hasSize(2)));
@@ -234,6 +239,7 @@ public class ContactControllerUnitTest {
         private final String JSON_CONTENT = """
         {
             "name": "Steve",
+            "birthday": "1990-05-15",
             "phoneNumbers": {
                 "personal": "+817283640198"
             },
@@ -257,7 +263,7 @@ public class ContactControllerUnitTest {
         @DisplayName("Should create a new contact for a user successfully")
         void shouldCreateANewContactForAUserSuccessfully(Jwt jwt) throws Exception {
             String contactId = jwt.getClaimAsString("id");
-            doNothing().when(contactManagerService).saveWithUser(any(Contact.class), eq(contactId));
+            doNothing().when(contactManagerService).saveWithUser(ArgumentMatchers.any(Contact.class), eq(contactId));
 
             mockMvc.perform(post("/api/contacts")
                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt))
@@ -267,14 +273,14 @@ public class ContactControllerUnitTest {
             )
             .andExpect(status().isCreated());
 
-            verify(contactManagerService).saveWithUser(any(Contact.class), eq(contactId));
+            verify(contactManagerService).saveWithUser(ArgumentMatchers.any(Contact.class), eq(contactId));
         }
 
         @Test
         @DisplayName("When saving a new contact for a non-exiting user then should respond 404")
         public void whenSavingANewContactForANonExistingUser_thenShouldRespond404() throws Exception {
            doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"))
-               .when(contactManagerService).saveWithUser(any(Contact.class), eq(Users.JULIA.id()));
+               .when(contactManagerService).saveWithUser(ArgumentMatchers.any(Contact.class), eq(Users.JULIA.id()));
 
             mockMvc.perform(post("/api/contacts")
                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JULIA.jwt()))
@@ -285,7 +291,7 @@ public class ContactControllerUnitTest {
             .andExpect(status().isNotFound())
             .andExpect(content().string("User not found"));
 
-            verify(contactManagerService, once()).saveWithUser(any(Contact.class), eq(Users.JULIA.id()));
+            verify(contactManagerService, once()).saveWithUser(ArgumentMatchers.any(Contact.class), eq(Users.JULIA.id()));
         }
 
         @ParameterizedTest(name = "jwt = {0} POST /api/contacts -> 400")
@@ -358,6 +364,38 @@ public class ContactControllerUnitTest {
 
             verifyNoInteractions(contactManagerService);
         }
+
+        @Test
+        @DisplayName("When entered an invalid date format then should respond 400 with error message")
+        void whenEnteredInvalidDateFormat_thenShouldRespond400WithErrorMessage() throws Exception {
+            mockMvc.perform(post("/api/contacts")
+                .content(JSON_CONTENT.replace("1990-05-15", "1990-15-15"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.ALL)
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JOE.jwt()))
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+            .andExpect(content().string(containsString("Invalid value for MonthOfYear")));
+
+            verifyNoInteractions(contactManagerService);
+        }
+
+        @Test
+        @DisplayName("When is not possible to parse the date then should respond 400 with error message")
+        void whenIsNotPossibleToParseTheDateThenShouldRespond400WithErrorMessage() throws Exception {
+            mockMvc.perform(post("/api/contacts")
+                .content(JSON_CONTENT.replace("1990-05-15", "199015-15"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.ALL)
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JOE.jwt()))
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+            .andExpect(content().string("Invalid date format. Expected format is YYYY-MM-DD."));
+
+            verifyNoInteractions(contactManagerService);
+        }
     }
 
     @Nested
@@ -373,7 +411,7 @@ public class ContactControllerUnitTest {
         void shouldEntirelyUpdateAContactForAUserSuccessfully(Jwt jwt) throws Exception {
             String userId = jwt.getClaimAsString("id");
             doNothing().when(contactManagerService)
-                .updateWithUser(any(Contact.class), eq(userId));
+                .updateWithUser(ArgumentMatchers.any(Contact.class), eq(userId));
 
             mockMvc.perform(put("/api/contacts/ff55ef9d-e912-4548-a790-50158470fafa")
                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt))
@@ -383,7 +421,7 @@ public class ContactControllerUnitTest {
             )
             .andExpect(status().isOk());
 
-            verify(contactManagerService, once()).updateWithUser(any(Contact.class), eq(userId));
+            verify(contactManagerService, once()).updateWithUser(ArgumentMatchers.any(Contact.class), eq(userId));
         }
 
         @ParameterizedTest(name = "jwt = {0} PUT /api/contacts/ff55ef9d-e912-4548-a790-50158470faf  -> 200")
@@ -392,7 +430,7 @@ public class ContactControllerUnitTest {
         void whenProvidedJsonDataWithoutId_thenShouldUpdateSuccessfullyResponding200(Jwt jwt) throws Exception {
             String userId = jwt.getClaimAsString("id");
             doNothing().when(contactManagerService)
-                .updateWithUser(any(Contact.class), eq(userId));
+                .updateWithUser(ArgumentMatchers.any(Contact.class), eq(userId));
 
             mockMvc.perform(put("/api/contacts/ff55ef9d-e912-4548-a790-50158470fafa")
                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt))
@@ -402,7 +440,7 @@ public class ContactControllerUnitTest {
             )
             .andExpect(status().isOk());
 
-            verify(contactManagerService, once()).updateWithUser(any(Contact.class), eq(userId));
+            verify(contactManagerService, once()).updateWithUser(ArgumentMatchers.any(Contact.class), eq(userId));
         }
 
         @ParameterizedTest(name = "jwt = {0} PUT /api/contacts/ff55ef9d-e912-4548-a790-50158470fafa -> 400")
@@ -429,7 +467,7 @@ public class ContactControllerUnitTest {
         void whenUpdatingAContactThatDoesNotBelongToTheUser_thenShouldRespond400() throws Exception {
             final String errorMessage = "Contact belongs to another user";
             doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage))
-                .when(contactManagerService).updateWithUser(any(Contact.class), eq(Users.JOE.id()));
+                .when(contactManagerService).updateWithUser(ArgumentMatchers.any(Contact.class), eq(Users.JOE.id()));
 
             mockMvc.perform(put("/api/contacts/ff55ef9d-e912-4548-a790-50158470fafa")
                 .accept(MediaType.ALL)
@@ -441,7 +479,7 @@ public class ContactControllerUnitTest {
             .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
             .andExpect(content().string(errorMessage));
 
-            verify(contactManagerService, once()).updateWithUser(any(Contact.class), eq(Users.JOE.id()));
+            verify(contactManagerService, once()).updateWithUser(ArgumentMatchers.any(Contact.class), eq(Users.JOE.id()));
         }
 
         @ParameterizedTest(name = "jwt = {0} PUT /api/contacts/ff55ef9d-e912-4548-a790-50158470fafa -> 404")
@@ -451,7 +489,7 @@ public class ContactControllerUnitTest {
             final String errorMessage = "Contact not found";
             final String userId = jwt.getClaimAsString("id");
             doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage))
-                .when(contactManagerService).updateWithUser(any(Contact.class), eq(userId));
+                .when(contactManagerService).updateWithUser(ArgumentMatchers.any(Contact.class), eq(userId));
 
             mockMvc.perform(put("/api/contacts/ff55ef9d-e912-4548-a790-50158470fafa")
                 .accept(MediaType.ALL)
@@ -462,7 +500,39 @@ public class ContactControllerUnitTest {
             .andExpect(status().isNotFound())
             .andExpect(content().string(errorMessage));
 
-            verify(contactManagerService, once()).updateWithUser(any(Contact.class), eq(userId));
+            verify(contactManagerService, once()).updateWithUser(ArgumentMatchers.any(Contact.class), eq(userId));
+        }
+
+        @Test
+        @DisplayName("When updating a contact with invalid date format then should respond 400 with error message")
+        void whenUpdatingAContactWithInvalidDateFormatThenShouldRespond400WithErrorMessage() throws Exception {
+            mockMvc.perform(post("/api/contacts")
+                .content(JSON_BODY.replace("1990-05-15", "1990-15-15"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.ALL)
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JOE.jwt()))
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+            .andExpect(content().string(containsString("Invalid value for MonthOfYear")));
+
+            verifyNoInteractions(contactManagerService);
+        }
+
+        @Test
+        @DisplayName("When updating a contact whose birthday is not parsable then should respond 400 with error message")
+        void whenUpdatingAContactWhoseBirthdayIsNotParsableThenShouldRespond400WithErrorMessage() throws Exception {
+            mockMvc.perform(post("/api/contacts")
+                .content(JSON_BODY.replace("1990-05-15", "199015-15"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.ALL)
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(Users.JOE.jwt()))
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+            .andExpect(content().string("Invalid date format. Expected format is YYYY-MM-DD."));
+
+            verifyNoInteractions(contactManagerService);
         }
     }
 

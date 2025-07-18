@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.format.DateTimeParseException;
 import java.util.Objects;
 
 @ControllerAdvice
@@ -29,6 +30,13 @@ public class GlobalErrorController {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> resolveHttpMessageNotReadableException(HttpMessageNotReadableException exception) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
+        if (exception.getRootCause() instanceof DateTimeParseException)
+            return ResponseEntity.badRequest().body("Invalid date format. Expected format is YYYY-MM-DD.");
+
+        return ResponseEntity.badRequest().contentType(MediaType.TEXT_PLAIN).body(
+            Objects.isNull(exception.getRootCause())
+                ? exception.getMessage()
+                : exception.getRootCause().getMessage()
+        );
     }
 }

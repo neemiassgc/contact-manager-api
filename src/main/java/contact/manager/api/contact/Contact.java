@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,10 @@ public class Contact {
 
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private Instant addedOn = Instant.now();
+
+    @Setter(AccessLevel.PUBLIC)
+    @Column
+    private LocalDate birthday;
 
     @ElementCollection
     @CollectionTable(name = "phone_numbers", joinColumns = @JoinColumn(name = "contact_id"))
@@ -58,13 +63,13 @@ public class Contact {
         this.user = user;
     }
 
-    public Contact(final String name) {
-        this.name = name;
+    public Contact(final String name, final UUID id) {
+        this(name);
+        this.id = id;
     }
 
-    public Contact(final String name, final UUID id) {
+    public Contact(final String name) {
         this.name = name;
-        this.id = id;
     }
 
     public Map<String, String> getPhoneNumberMap() {
@@ -107,6 +112,7 @@ public class Contact {
         newContact.setEmailMap(contactData.getEmails());
         newContact.setAddressMap(contactData.getAddresses());
         newContact.setId(contactData.getId());
+        newContact.setBirthday(contactData.getBirthday());
         return newContact;
     }
 

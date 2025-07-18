@@ -13,6 +13,7 @@ import contact.manager.api.contact.Contact;
 import contact.manager.api.contact.ContactManagerService;
 import contact.manager.api.user.UserRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @CommonsLog
@@ -52,6 +53,7 @@ public class WarmupHandler {
 
                 log.info("Contact with the name Roger has not been found!");
                 final Contact contact = new Contact("Roger");
+                contact.setBirthday(LocalDate.of(1990, 5, 15));
                 contact.putPhoneNumber("phone", "+12937864324");
                 contact.putEmail("main email", "tertiary@hotmail.com");
                 final Address address = Address.builder()

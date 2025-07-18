@@ -7,6 +7,7 @@ import contact.manager.api.contact.Contact;
 import contact.manager.api.contact.Address;
 import org.mockito.verification.VerificationMode;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,7 @@ public final class TestResources {
             .country("United Kindom")
             .zipcode("FK14 9HE").build()
         );
+        contact1.setBirthday(LocalDate.of(1990, 5, 15));
 
         final Contact contact2 = new Contact("Maisie Harris", UUID.randomUUID());
         contact2.setUser(thomas);
@@ -47,6 +49,7 @@ public final class TestResources {
             .street("2062 Maud Street")
             .zipcode("KY7 7EY").build()
         );
+        contact2.setBirthday(LocalDate.of(1992, 3, 22));
 
         final Contact contact3 = new Contact("Lauren Bailey", UUID.randomUUID());
         contact3.setUser(thomas);
@@ -59,6 +62,7 @@ public final class TestResources {
             .state("Delaware")
             .zipcode("LL40 2WX").build()
         );
+        contact3.setBirthday(LocalDate.of(1995, 7, 30));
 
         final Contact contact4 = new Contact("Greg from accounting", UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"));
         contact4.setUser(joe);
@@ -80,6 +84,7 @@ public final class TestResources {
             .zipcode("02169")
             .build()
         );
+        contact4.setBirthday(LocalDate.of(1988, 11, 5));
 
         final Contact contact5 = new Contact("Coworker Fred", UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408"));
         contact5.setUser(joe);
@@ -95,6 +100,7 @@ public final class TestResources {
             .zipcode("33131")
             .build()
         );
+        contact5.setBirthday(LocalDate.of(1993, 2, 14));
 
         final Contact contact6 = new Contact("Sister Monica", UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7"));
         contact6.setUser(joe);
@@ -108,6 +114,7 @@ public final class TestResources {
             .zipcode("22980")
             .build()
         );
+        contact6.setBirthday(LocalDate.of(1991, 8, 20));
 
         final Contact contact7 = new Contact("Best friend Julia", UUID.fromString("7f23057f-77bd-4568-ac64-e933abae9a09"));
         contact7.setUser(robert);
@@ -125,6 +132,7 @@ public final class TestResources {
             .zipcode("48335")
             .build()
         );
+        contact7.setBirthday(LocalDate.of(1990, 12, 25));
 
         final Contact contact8 = new Contact("Mom", UUID.fromString("84edd1b9-89a5-4107-a84d-435676c2b8f5"));
         contact8.setUser(robert);
@@ -138,6 +146,7 @@ public final class TestResources {
             .zipcode("55343")
             .build()
         );
+        contact8.setBirthday(LocalDate.of(1965, 4, 10));
 
         final Contact contact9 = new Contact("Pizza and burgers", UUID.fromString("8fb2bd75-9aec-4cc5-b77b-a95f06081388"));
         contact9.setUser(robert);
@@ -190,6 +199,7 @@ public final class TestResources {
             .zipcode("48335")
             .build()
         );
+        contact10.setBirthday(LocalDate.of(1975, 9, 30));
 
         contacts.add(contact1);
         contacts.add(contact2);
@@ -330,6 +340,8 @@ public final class TestResources {
         {
             {id}
             "name": "Isabella Rodriguez",
+            "addedOn": "2023-10-01T12:00:00Z",
+            "birthday": "1995-06-15",
             "phoneNumbers": {
                  "home": "+15551234567",
                  "work": "+15559876543",

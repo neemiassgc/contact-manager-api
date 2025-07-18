@@ -26,7 +26,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${JWT_ISSUER_URI}
+          issuer-uri: https://dev-ml6q5bzm.auth0.com/
 
 springdoc:
   paths-to-exclude: /warmup, /warmup-db

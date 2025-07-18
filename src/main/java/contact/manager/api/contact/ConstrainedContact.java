@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 @Getter
@@ -17,6 +18,9 @@ public class ConstrainedContact {
     @contact.manager.api.contact.constraint.Min(value = 2, message = "name is too short")
     @contact.manager.api.contact.constraint.Max(value = 140, message = "name is too long")
     private final String name;
+
+    @Past(message = "birthday must be in the past")
+    private final LocalDate birthday;
 
     @Size(min = 1, max = 20, message = "phoneNumbers must have between 1 and 20 items")
     private final Map<

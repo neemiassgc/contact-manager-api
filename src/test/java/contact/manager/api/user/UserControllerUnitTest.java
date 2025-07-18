@@ -112,8 +112,7 @@ public class UserControllerUnitTest {
                 .content(malformedJson)
             )
             .andExpect(status().isBadRequest())
-            .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
-            .andExpect(content().string(Matchers.containsString("JSON parse error")));
+            .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN));
 
             verifyNoInteractions(userService);
         }
