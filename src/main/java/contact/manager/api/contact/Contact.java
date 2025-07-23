@@ -36,6 +36,10 @@ public class Contact {
     @Column
     private LocalDate birthday;
 
+    @Column(length = 100)
+    @Setter(AccessLevel.PUBLIC)
+    private String company;
+
     @ElementCollection
     @CollectionTable(name = "phone_numbers", joinColumns = @JoinColumn(name = "contact_id"))
     @MapKeyColumn(name = "mark", length = 25)
@@ -113,6 +117,7 @@ public class Contact {
         newContact.setAddressMap(contactData.getAddresses());
         newContact.setId(contactData.getId());
         newContact.setBirthday(contactData.getBirthday());
+        newContact.setCompany(contactData.getCompany());
         return newContact;
     }
 

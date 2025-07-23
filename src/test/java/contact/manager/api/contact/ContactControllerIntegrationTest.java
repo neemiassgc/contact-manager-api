@@ -21,7 +21,6 @@ import java.util.List;
 import static contact.manager.api.misc.TestResources.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -235,6 +234,7 @@ public class ContactControllerIntegrationTest {
             final String jsonWithInvalidFields =
             """
             {
+                "company": "c",
                 "emails": {
                     "main":"roger@gmail."
                 },
@@ -263,6 +263,7 @@ public class ContactControllerIntegrationTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.fieldViolations[*][*]")
             .value(containsInAnyOrder(
+                "company is too short",
                 "street is too short",
                 "phone number is too short",
                 "city is too short",
