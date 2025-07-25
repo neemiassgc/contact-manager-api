@@ -30,6 +30,7 @@ public final class TestResources {
         contact1.putPhoneNumber("home", "+44 078 5357 6955");
         contact1.putEmail("main", "ethan.morris@yahoo.co.uk");
         contact1.setCompany("Tech Solutions Ltd.");
+        contact1.setRole("Software Engineer");
         contact1.putAddress("home", Address.builder()
             .street("2062 Maud Street")
             .city("Dollarbeg")
@@ -52,6 +53,7 @@ public final class TestResources {
         );
         contact2.setBirthday(LocalDate.of(1992, 3, 22));
         contact2.setCompany("Global Tech Innovations");
+        contact2.setRole("Project Manager");
 
         final Contact contact3 = new Contact("Lauren Bailey", UUID.randomUUID());
         contact3.setUser(thomas);
@@ -66,6 +68,7 @@ public final class TestResources {
         );
         contact3.setBirthday(LocalDate.of(1995, 7, 30));
         contact3.setCompany("Tech Innovations Inc.");
+        contact3.setRole("Data Analyst");
 
         final Contact contact4 = new Contact("Greg from accounting", UUID.fromString("5c21433c-3c70-4253-a4b2-52b157be4167"));
         contact4.setUser(joe);
@@ -89,6 +92,7 @@ public final class TestResources {
         );
         contact4.setBirthday(LocalDate.of(1988, 11, 5));
         contact4.setCompany("Tech Solutions Ltd.");
+        contact4.setRole("Accountant");
 
         final Contact contact5 = new Contact("Coworker Fred", UUID.fromString("4fe25947-ecab-489c-a881-e0057124e408"));
         contact5.setUser(joe);
@@ -106,6 +110,7 @@ public final class TestResources {
         );
         contact5.setBirthday(LocalDate.of(1993, 2, 14));
         contact5.setCompany("Business Solutions Inc.");
+        contact5.setRole("Software Developer");
 
         final Contact contact6 = new Contact("Sister Monica", UUID.fromString("35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7"));
         contact6.setUser(joe);
@@ -121,6 +126,7 @@ public final class TestResources {
         );
         contact6.setBirthday(LocalDate.of(1991, 8, 20));
         contact6.setCompany("Community Services Ltd.");
+        contact6.setRole("Community Organizer");
 
         final Contact contact7 = new Contact("Best friend Julia", UUID.fromString("7f23057f-77bd-4568-ac64-e933abae9a09"));
         contact7.setUser(robert);
@@ -140,6 +146,7 @@ public final class TestResources {
         );
         contact7.setBirthday(LocalDate.of(1990, 12, 25));
         contact7.setCompany("Tech Innovations Ltd.");
+        contact7.setRole("Software Engineer");
 
         final Contact contact8 = new Contact("Mom", UUID.fromString("84edd1b9-89a5-4107-a84d-435676c2b8f5"));
         contact8.setUser(robert);
@@ -155,6 +162,7 @@ public final class TestResources {
         );
         contact8.setBirthday(LocalDate.of(1965, 4, 10));
         contact8.setCompany("Family Business Inc.");
+        contact8.setRole("Family Manager");
 
         final Contact contact9 = new Contact("Pizza and burgers", UUID.fromString("8fb2bd75-9aec-4cc5-b77b-a95f06081388"));
         contact9.setUser(robert);
@@ -186,6 +194,7 @@ public final class TestResources {
             .build()
         );
         contact9.setCompany("Pizza and Burgers Inc.");
+        contact9.setRole("Food Delivery Service");
 
         final Contact contact10 = new Contact("Uncle Jeff", UUID.fromString("b621650d-4a81-4016-a917-4a8a4992aaef"));
         contact10.setUser(robert);
@@ -210,6 +219,7 @@ public final class TestResources {
         );
         contact10.setBirthday(LocalDate.of(1975, 9, 30));
         contact10.setCompany("Personal Ventures Ltd.");
+        contact10.setRole("Entrepreneur");
 
         contacts.add(contact1);
         contacts.add(contact2);
@@ -352,6 +362,7 @@ public final class TestResources {
             "name": "Isabella Rodriguez",
             "addedOn": "2023-10-01T12:00:00Z",
             "company": "Tech Innovations Ltd.",
+            "role": "Software Engineer",
             "birthday": "1995-06-15",
             "phoneNumbers": {
                  "home": "+15551234567",

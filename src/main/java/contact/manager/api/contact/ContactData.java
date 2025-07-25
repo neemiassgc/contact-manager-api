@@ -24,11 +24,12 @@ public final class ContactData extends ConstrainedContact {
         final Instant addedOn,
         final LocalDate birthday,
         final String company,
+        final String role,
         final Map<String, String> phoneNumbers,
         final Map<String, String> emails,
         final Map<String, Address> addresses
     ) {
-        super(name, birthday, company, phoneNumbers, emails, addresses);
+        super(name, birthday, company, role, phoneNumbers, emails, addresses);
         this.addedOn = addedOn;
         this.id = id;
     }
@@ -38,6 +39,7 @@ public final class ContactData extends ConstrainedContact {
             contact.getName(),
             contact.getBirthday(),
             contact.getCompany(),
+            contact.getRole(),
             contact.getPhoneNumberMap(),
             contact.getEmailMap(),
             contact.getAddressMap()

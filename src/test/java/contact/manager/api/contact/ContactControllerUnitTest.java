@@ -44,6 +44,7 @@ public class ContactControllerUnitTest {
         "id": "ff55ef9d-e912-4548-a790-50158470fafa",
         "name": "Isabella Rodriguez",
         "company": "Tech Solutions Inc.",
+        "role": "Software Engineer",
         "birthday": "1990-05-15",
         "phoneNumbers": {
         "home": "+15551234567",
@@ -101,6 +102,7 @@ public class ContactControllerUnitTest {
                         .andExpect(jsonPath("$[*].addedOn").isNotEmpty())
                         .andExpect(jsonPath("$[*].birthday").isNotEmpty())
                         .andExpect(jsonPath("$[*].company").isNotEmpty())
+                        .andExpect(jsonPath("$[*].role").isNotEmpty())
                         .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(5)))
                         .andExpect(jsonPath("$[*].addresses.*").value(hasSize(4)))
                         .andExpect(jsonPath("$[*].emails.*").value(hasSize(3)));
@@ -111,6 +113,7 @@ public class ContactControllerUnitTest {
                         .andExpect(jsonPath("$[*].addedOn").isNotEmpty())
                         .andExpect(jsonPath("$[*].birthday").isNotEmpty())
                         .andExpect(jsonPath("$[*].company").isNotEmpty())
+                        .andExpect(jsonPath("$[*].role").isNotEmpty())
                         .andExpect(jsonPath("$[*].phoneNumbers.*").value(hasSize(7)))
                         .andExpect(jsonPath("$[*].addresses.*").value(hasSize(7)))
                         .andExpect(jsonPath("$[*].emails.*").value(hasSize(7)));
@@ -172,6 +175,7 @@ public class ContactControllerUnitTest {
                     .andExpect(jsonPath("$.addedOn").isNotEmpty())
                     .andExpect(jsonPath("$.birthday").isNotEmpty())
                     .andExpect(jsonPath("$.company").isNotEmpty())
+                    .andExpect(jsonPath("$.role").isNotEmpty())
                     .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(3)))
                     .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
                     .andExpect(jsonPath("$.addresses.*").value(hasSize(1)));
@@ -182,6 +186,7 @@ public class ContactControllerUnitTest {
                     .andExpect(jsonPath("$.addedOn").isNotEmpty())
                     .andExpect(jsonPath("$.birthday").isNotEmpty())
                     .andExpect(jsonPath("$.company").isNotEmpty())
+                    .andExpect(jsonPath("$.role").isNotEmpty())
                     .andExpect(jsonPath("$.phoneNumbers.*").value(hasSize(1)))
                     .andExpect(jsonPath("$.emails.*").value(hasSize(1)))
                     .andExpect(jsonPath("$.addresses.*").value(hasSize(2)));
@@ -246,6 +251,7 @@ public class ContactControllerUnitTest {
             "name": "Steve",
             "birthday": "1990-05-15",
             "company": "My Company",
+            "role": "Business Analyst",
             "phoneNumbers": {
                 "personal": "+817283640198"
             },
@@ -315,8 +321,8 @@ public class ContactControllerUnitTest {
             .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.fieldViolations[*][*]").value(containsInAnyOrder(
-                    "phoneNumbers must not be missing",
-                    "name must not be missing"
+                "phoneNumbers must not be missing",
+                "name must not be missing"
             )));
 
             verifyNoInteractions(contactManagerService);
@@ -330,6 +336,7 @@ public class ContactControllerUnitTest {
             """
             {
                 "company": "M",
+                "role": "Doer",
                 "emails": {
                     "main":"roger@gmail."
                 },
@@ -359,6 +366,7 @@ public class ContactControllerUnitTest {
             .andExpect(jsonPath("$.fieldViolations[*][*]")
             .value(containsInAnyOrder(
                 "company is too short",
+                "role is too short",
                 "street is too short",
                 "phone number is too short",
                 "city is too short",

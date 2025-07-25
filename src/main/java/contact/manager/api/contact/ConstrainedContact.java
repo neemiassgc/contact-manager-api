@@ -26,6 +26,10 @@ public class ConstrainedContact {
     @contact.manager.api.contact.constraint.Min(value = 2, message = "company is too short")
     private final String company;
 
+    @Size(max = 50, message = "role must be at most 50 characters long")
+    @contact.manager.api.contact.constraint.Min(value = 5, message = "role is too short")
+    private final String role;
+
     @Size(min = 1, max = 20, message = "phoneNumbers must have between 1 and 20 items")
     private final Map<
         @contact.manager.api.contact.constraint.Max(value = 25, message = "mark is too long")

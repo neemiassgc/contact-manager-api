@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS contacts (
     added_on TIMESTAMP NOT NULL,
     birthday DATE,
     company VARCHAR(100),
+    role VARCHAR(50),
     CONSTRAINT fk_users
         FOREIGN KEY (user_id)
         REFERENCES users (user_id)

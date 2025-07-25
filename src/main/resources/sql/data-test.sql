@@ -3,14 +3,14 @@ insert into users (user_id, username) values
 ('auth0|3baa9bc92c9c5decbda32f76', 'joe'),
 ('auth0|66f81f7d9caecc11cdab18d6', 'me@gmail.com');
 
-insert into contacts (contact_id, name, user_id, added_on, birthday, company) values
-('5c21433c-3c70-4253-a4b2-52b157be4167', 'Greg from accounting', 'auth0|3baa9bc92c9c5decbda32f76', CURRENT_TIMESTAMP, '1980-05-15', 'Accounting Inc.'),
-('4fe25947-ecab-489c-a881-e0057124e408', 'Coworker Fred', 'auth0|3baa9bc92c9c5decbda32f76', CURRENT_TIMESTAMP, '1985-08-20', 'Tech Solutions Ltd.'),
-('35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7', 'Sister Monica', 'auth0|3baa9bc92c9c5decbda32f76', CURRENT_TIMESTAMP, '1990-12-01', 'Family Business Corp.'),
-('7f23057f-77bd-4568-ac64-e933abae9a09', 'Best friend Julia', 'auth0|94afd9e7294a59e73e6abfbd', CURRENT_TIMESTAMP, '1992-03-10', 'Social Media Co.'),
-('84edd1b9-89a5-4107-a84d-435676c2b8f5', 'Mom', 'auth0|94afd9e7294a59e73e6abfbd', CURRENT_TIMESTAMP, '1975-07-25', 'Family Co.'),
-('8fb2bd75-9aec-4cc5-b77b-a95f06081388', 'Pizza and burgers', 'auth0|94afd9e7294a59e73e6abfbd', CURRENT_TIMESTAMP, '1988-11-30', 'Pizza and Burgers Inc.'),
-('b621650d-4a81-4016-a917-4a8a4992aaef', 'Uncle Jeff', 'auth0|94afd9e7294a59e73e6abfbd', CURRENT_TIMESTAMP, '1983-02-14', 'Quality Goods Ltd.');
+insert into contacts (contact_id, name, user_id, added_on, birthday, company, role) values
+('5c21433c-3c70-4253-a4b2-52b157be4167', 'Greg from accounting', 'auth0|3baa9bc92c9c5decbda32f76', CURRENT_TIMESTAMP, '1980-05-15', 'Accounting Inc.', 'Accountant'),
+('4fe25947-ecab-489c-a881-e0057124e408', 'Coworker Fred', 'auth0|3baa9bc92c9c5decbda32f76', CURRENT_TIMESTAMP, '1985-08-20', 'Tech Solutions Ltd.', 'Software Engineer'),
+('35b175ba-0a27-43e9-bc3f-cf23e1ca2ea7', 'Sister Monica', 'auth0|3baa9bc92c9c5decbda32f76', CURRENT_TIMESTAMP, '1990-12-01', 'Family Business Corp.', 'Marketing Manager'),
+('7f23057f-77bd-4568-ac64-e933abae9a09', 'Best friend Julia', 'auth0|94afd9e7294a59e73e6abfbd', CURRENT_TIMESTAMP, '1992-03-10', 'Social Media Co.', 'Social Media Manager'),
+('84edd1b9-89a5-4107-a84d-435676c2b8f5', 'Mom', 'auth0|94afd9e7294a59e73e6abfbd', CURRENT_TIMESTAMP, '1975-07-25', 'Family Co.', 'Housewife'),
+('8fb2bd75-9aec-4cc5-b77b-a95f06081388', 'Pizza and burgers', 'auth0|94afd9e7294a59e73e6abfbd', CURRENT_TIMESTAMP, '1988-11-30', 'Pizza and Burgers Inc.', 'Restaurant Owner'),
+('b621650d-4a81-4016-a917-4a8a4992aaef', 'Uncle Jeff', 'auth0|94afd9e7294a59e73e6abfbd', CURRENT_TIMESTAMP, '1983-02-14', 'Quality Goods Ltd.', 'Sales Manager');
 
 insert into phone_numbers (phone_number, contact_id, mark) values
 ('+3592659480427', '5c21433c-3c70-4253-a4b2-52b157be4167', 'home'),
